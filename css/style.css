@@ -349,3 +349,17 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .intro.nat .vs{position:relative;z-index:2}.natname small{letter-spacing:.3em;color:#f9a8d4;font-weight:800}.natname b{font-size:2.6rem;background:linear-gradient(90deg,#f87171,#fbbf24,#4ade80,#38bdf8,#a78bfa,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}.natname span{font-size:.8rem;color:#e9d5ff}
 .natvsimg,.foe[src*="tr/nat"]{image-rendering:auto!important;filter:drop-shadow(0 0 1px rgba(10,0,20,.9)) drop-shadow(0 3px 4px rgba(0,0,0,.45))}
 .vs img{height:min(30vh,200px,36vw)}
+/* v2: nomes longos na caixa de HP + Dinamax/Gigantamax */
+.info{width:min(56%,290px)}.info .bnm{font-size:.92rem;line-height:1.15;white-space:normal;overflow-wrap:anywhere}
+@media (max-width:420px){.info{width:min(60%,250px);padding:6px 9px}.info .bnm{font-size:.8rem}.info small{font-size:.7rem}}
+.dmt{display:inline-block;background:#dc2626;color:#fff;border-radius:6px;padding:0 5px;font-size:.7rem;vertical-align:middle}
+.powrow{display:flex;gap:6px;grid-column:1/-1}.powrow .bb{flex:1}
+.dynatog{background:linear-gradient(135deg,#b91c1c,#f43f5e);color:#fff;border:2px solid #fecaca66}.dynatog.on{box-shadow:0 0 0 3px #fca5a5,0 0 24px #ef4444;animation:megapulse 1s infinite alternate}
+.mvb.maxmv{background:linear-gradient(135deg,#7f1d1d,#be123c)!important;color:#fff;border-color:#fda4af!important}.mvb.maxmv small{color:#fecdd3}
+.bmon.dmax img{transform:scale(1.22);filter:drop-shadow(0 0 10px #ef4444) drop-shadow(0 0 22px #b91c1c) saturate(1.15)}
+.bmon.dmax::before{content:'';position:absolute;left:-12%;right:-12%;bottom:-6%;height:38%;border-radius:50%;background:radial-gradient(closest-side,rgba(239,68,68,.55),rgba(127,29,29,.35) 60%,transparent);filter:blur(6px);z-index:-1;animation:dcloud 2.4s ease-in-out infinite alternate}
+.bmon.gmax::after{content:'';position:absolute;left:-8%;right:-8%;top:-4%;height:30%;background:radial-gradient(ellipse at 30% 60%,rgba(244,63,94,.4),transparent 60%),radial-gradient(ellipse at 70% 40%,rgba(220,38,38,.4),transparent 60%);filter:blur(8px);pointer-events:none;animation:dcloud 3s ease-in-out infinite alternate-reverse}
+@keyframes dcloud{to{transform:translateX(6%) scale(1.06);opacity:.75}}
+.bmon.dgrow img{animation:dgrow 1.3s ease-in forwards}@keyframes dgrow{30%{transform:scale(.6);filter:brightness(3) sepia(1) hue-rotate(-40deg) saturate(6)}100%{transform:scale(1.25);filter:brightness(2) sepia(1) hue-rotate(-40deg) saturate(6)}}
+.bmon.shrink img{transition:transform .45s;transform:scale(.8)!important}
+#battle.dsky .scene,#battle.dsky{box-shadow:inset 0 0 120px rgba(220,38,38,.55)}

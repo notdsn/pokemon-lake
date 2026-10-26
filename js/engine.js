@@ -61,14 +61,14 @@
       moves: (o.moves || movesAt(id, lvl)).map(n => ({ n, pp: D.moves[n].pp })), status: null, nick: null, ot: o.ot || null, caughtAt: o.caughtAt || null };
     m.hp = calcStats(m)[0]; return m;
   }
-  const maxhp = m => calcStats(m)[0];
+  const maxhp = m => calcStats(m)[0] * (m.dmax ? 2 : 1);
 
   // ---------- batalha ----------
   function bm(m) { return { m, st: { atk:0,def:0,spa:0,spd:0,spe:0,acc:0,eva:0 }, conf: 0, flinch: false, sleep: 0, toxic: 0 }; }
   function createBattle(o) {
     // o: {kind:'wild'|'trainer'|'pvp', seed, sides:[{party,name},{party,name,ai}], weather, canRun}
     const s = { kind: o.kind, seed: o.seed | 0, turn: 0, weather: o.weather || null, over: false, winner: null, caught: null, ran: false,
-      sides: o.sides.map(sd => ({ name: sd.name, party: sd.party, active: Math.max(0, sd.party.findIndex(x => x.hp > 0)), b: null, ai: sd.ai || 0, trainer: sd.trainer || null, megaOk: !!sd.mega, megaUsed: false, participants: [] })) };
+      sides: o.sides.map(sd => ({ name: sd.name, party: sd.party, active: Math.max(0, sd.party.findIndex(x => x.hp > 0)), b: null, ai: sd.ai || 0, trainer: sd.trainer || null, megaOk: !!sd.mega, megaUsed: false, dynaOk: !!sd.dyna, dynaUsed: false, participants: [] })) };
     s.sides.forEach(sd => { sd.b = bm(sd.party[sd.active]); sd.participants = [sd.active]; });
     return s;
   }
@@ -106,7 +106,7 @@
   function dealDamage(s, ti, dmg, ev, extra) {
     const m = s.sides[ti].b.m; dmg = Math.max(0, Math.min(m.hp, Math.floor(dmg))); m.hp -= dmg;
     ev.push(Object.assign({ e: 'hp', side: ti, hp: m.hp, max: maxhp(m), dmg }, extra || {}));
-    if (m.hp <= 0) { m.status = null; ev.push({ e: 'faint', side: ti, text: `${pname(s, ti)} desmaiou!` }); }
+    if (m.hp <= 0) { m.status = null; if (m.dmax) delete m.dmax; ev.push({ e: 'faint', side: ti, text: `${pname(s, ti)} desmaiou!` }); }
     return dmg;
   }
   function useMove(s, ai, mvName, ev) {
@@ -121,10 +121,12 @@
       else { ev.push({ e: 'msg', text: `${pname(s, ai)} está confuso!` }); if (rnd(s) < 0.33) { ev.push({ e: 'msg', text: 'Ele se machucou na confusão!' }); dealDamage(s, ai, calcDmg(s, a, a, { p: 40, c: 'p', t: '???' }, false).dmg, ev); return; } } }
     let mv = D.moves[mvName], slot = a.m.moves.find(x => x.n === mvName);
     if (mvName !== 'struggle') { if (!slot || slot.pp <= 0) { mvName = 'struggle'; mv = D.moves.struggle; } else slot.pp--; }
+    if (a.m.dmax) return useMaxMove(s, ai, mv, ev);
     { const ab = abilityOf(a.m); if (mv.t === 'normal' && mv.p > 0 && (ab === 'pixilate' || ab === 'aerilate' || ab === 'refrigerate')) mv = { ...mv, t: ab === 'pixilate' ? 'fairy' : ab === 'aerilate' ? 'flying' : 'ice', p: Math.floor(mv.p * 1.2) }; }
     ev.push({ e: 'use', side: ai, move: mvName, type: mv.t, cat: mv.c, text: `${pname(s, ai)} usou ${mv.n}!` });
     const selfT = mv.tg === 'user' || mv.tg === 'users-field' || mv.tg === 'user-and-allies' || mv.tg === 'entire-field';
     if (!selfT && t.m.hp <= 0) { ev.push({ e: 'msg', text: 'Mas não havia alvo!' }); return; }
+    if (!selfT && t.prot) { ev.push({ e: 'msg', side: ti, text: `${pname(s, ti)} se protegeu com a Barreira Max!` }); return; }
     if (mv.a && !selfT && abilityOf(a.m) !== 'no-guard' && abilityOf(t.m) !== 'no-guard') { const acc = mv.a / 100 * accMul(a.st.acc - t.st.eva); if (rnd(s) >= acc) { ev.push({ e: 'miss', side: ai, text: `O ataque de ${pname(s, ai)} errou!` }); return; } }
     if (mv.c !== 't' && mv.p > 0) {
       const hits = mv.mh ? (abilityOf(a.m) === 'skill-link' ? mv.xh : ri(s, mv.mh, mv.xh)) : 1; let total = 0, n = 0;
@@ -138,7 +140,7 @@
       if (mv.d) { if (mv.d > 0) { const hh = Math.max(1, Math.floor(total * mv.d / 100)); healMon(s, ai, hh, ev, `${pname(s, ti)} teve a energia drenada!`); } else { ev.push({ e: 'msg', text: `${pname(s, ai)} sofreu dano de recuo!` }); dealDamage(s, ai, Math.max(1, total * -mv.d / 100), ev); } }
       if (mvName === 'struggle') { dealDamage(s, ai, maxhp(a.m) / 4, ev); }
       if (t.m.hp > 0) {
-        if (mv.f && rnd(s) * 100 < mv.f) t.flinch = true;
+        if (mv.f && rnd(s) * 100 < mv.f && !t.m.dmax) t.flinch = true;
         if (mv.ai && mv.aic && rnd(s) * 100 < mv.aic) secondary(s, ti, mv, ev);
         if (mv.st && mv.st.length && mv.stc && rnd(s) * 100 < mv.stc) for (const [k, d] of mv.st) changeStat(s, d > 0 ? ai : ti, STATK[k], d, ev);
       }
@@ -164,7 +166,7 @@
     ev.push({ e: 'heal', side: i, hp: m.hp, max: mh, amt: h, text: text || `${pname(s, i)} recuperou HP!` }); }
   function abilityOf(m) { return m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].ab : D.mons[m.id].ab; }
   function calcDmg(s, a, t, mv, useRng) {
-    const phys = mv.c === 'p'; const crit = useRng && rnd(s) < [1 / 24, 1 / 8, 1 / 2, 1][Math.min(3, mv.cr || 0)];
+    const phys = mv.c === 'p'; const crit = useRng && rnd(s) < [1 / 24, 1 / 8, 1 / 2, 1][Math.min(3, (mv.cr || 0) + (a.critB || 0))];
     let A = eStat(a, phys ? 'atk' : 'spa'), Df = eStat(t, phys ? 'def' : 'spd');
     if (crit) { A = Math.max(A, calcStats(a.m)[phys ? 1 : 3]); Df = Math.min(Df, calcStats(t.m)[phys ? 2 : 4]); }
     let d = Math.floor(Math.floor(Math.floor(2 * a.m.lvl / 5 + 2) * mv.p * A / Df) / 50) + 2;
@@ -183,12 +185,15 @@
   }
   function endTurn(s, ev) {
     if (s.weather) ev.push({ e: 'weather', w: s.weather });
+    for (let i = 0; i < 2; i++) { const sd = s.sides[i], b = sd.b; b.prot = false; const r = sd.gres;
+      if (r && r.t > 0) { r.t--; if (b.m.hp > 0 && !monTypes(b.m).includes(r.ty)) { ev.push({ e: 'msg', anim: r.ty === 'fire' ? 'brn' : undefined, side: i, text: `${pname(s, i)} sofreu com ${r.n}!` }); dealDamage(s, i, Math.max(1, calcStats(b.m)[0] / 6), ev); } if (!r.t) sd.gres = null; } }
     for (let i = 0; i < 2; i++) { const b = s.sides[i].b, m = b.m; if (m.hp <= 0) continue;
       if (m.status === 'brn') { ev.push({ e: 'msg', anim: 'brn', side: i, text: `${pname(s, i)} sofreu com a queimadura!` }); dealDamage(s, i, Math.max(1, maxhp(m) / 16), ev); }
       else if (m.status === 'psn') { ev.push({ e: 'msg', anim: 'psn', side: i, text: `${pname(s, i)} sofreu com o veneno!` }); dealDamage(s, i, Math.max(1, maxhp(m) / 8), ev); }
       else if (m.status === 'tox') { ev.push({ e: 'msg', anim: 'psn', side: i, text: `${pname(s, i)} sofreu com o veneno!` }); dealDamage(s, i, Math.max(1, maxhp(m) * b.toxic++ / 16), ev); }
       if (abilityOf(m) === 'speed-boost' && m.hp > 0 && b.st.spe < 6) changeStat(s, i, 'spe', 1, ev);
       b.flinch = false; }
+    for (let i = 0; i < 2; i++) { const m = s.sides[i].b.m; if (m.dmax && m.hp > 0 && --m.dmax.t <= 0) undyna(s, i, ev, true); }
   }
   // ---------- captura (fórmula Gen III/IV) ----------
   const BALLS = { 'poke-ball': 1, 'great-ball': 1.5, 'ultra-ball': 2, 'master-ball': 255 };
@@ -214,7 +219,7 @@
     if (item === 'antidote' || item === 'full-heal') { m.status = null; if (target === sd.active) sd.b.conf = 0; ev.push({ e: 'cure', side, text: `${nm} foi curado!` }); }
   }
   function doSwitch(s, side, idx, ev) {
-    const sd = s.sides[side]; if (s.sides[side].b.m.status === 'tox') s.sides[side].b.m.status = 'psn';
+    const sd = s.sides[side]; if (s.sides[side].b.m.status === 'tox') s.sides[side].b.m.status = 'psn'; if (sd.b.m.dmax) undyna(s, side, ev, false);
     if (sd.b.m.hp > 0) ev.push({ e: 'recall', side, text: side === 0 ? `Volte, ${sd.b.m.nick || D.mons[sd.b.m.id].n}!` : `${sd.name} recolheu ${D.mons[sd.b.m.id].n}.` });
     sd.active = idx; sd.b = bm(sd.party[idx]); if (!sd.participants.includes(idx)) sd.participants.push(idx);
     const m = sd.b.m; ev.push({ e: 'send', side, id: m.id, shiny: m.shiny, lvl: m.lvl, hp: m.hp, max: maxhp(m), name: m.nick || D.mons[m.id].n, status: m.status,
@@ -224,6 +229,7 @@
   function step(s, acts) {
     const ev = []; if (s.over) return ev; s.turn++;
     // Mega Evolução acontece antes de tudo (mais rápido primeiro)
+    for (const i of speedOrder(s, acts)) if (acts[i] && acts[i].dyna && acts[i].type === 'move' && canDyna(s, i)) doDyna(s, i, ev);
     for (const i of speedOrder(s, acts)) if (acts[i] && acts[i].mega && acts[i].type === 'move' && canMega(s, i)) doMega(s, i, ev);
     // ações não-golpe primeiro
     const order = speedOrder(s, acts);
@@ -231,6 +237,7 @@
       const a = acts[i]; if (!a || s.over) continue;
       if (a.type === 'run') {
         if (s.kind !== 'wild') { ev.push({ e: 'msg', text: 'Não dá para fugir de uma batalha de treinador!' }); continue; }
+        if (s.trapped) { ev.push({ e: 'msg', text: 'O Terror G-Max não deixa você fugir!' }); continue; }
         const sp = eStat(s.sides[0].b, 'spe'), es = eStat(s.sides[1].b, 'spe'); s.runTries = (s.runTries || 0) + 1;
         const f = (sp * 128 / Math.max(1, es) + 30 * s.runTries) % 256;
         if (sp >= es || rnd(s) * 256 < f) { ev.push({ e: 'run', text: 'Você fugiu com segurança!' }); s.over = true; s.ran = true; return ev; }
@@ -249,7 +256,62 @@
     for (const f of fs) { const g = D.megas[f]; if (g.st ? (ignoreItem || m.item === g.st) : m.moves.some(x => x.n === 'dragon-ascent')) return f; }
     return null;
   }
-  function canMega(s, i) { const sd = s.sides[i]; return !!(sd.megaOk && !sd.megaUsed && sd.b.m.hp > 0 && megaFormFor(sd.b.m)); }
+  function canMega(s, i) { const sd = s.sides[i]; return !!(sd.megaOk && !sd.megaUsed && !sd.dynaUsed && sd.b.m.hp > 0 && megaFormFor(sd.b.m)); }
+  // ---------- Dynamax / Gigantamax (uma vez por batalha, não combina com Mega, 3 turnos) ----------
+  const GMAX = {
+    6: { k: 'charizard', n: 'Charizard Gigantamax', ty: 'fire', mv: 'Fogaréu G-Max', fx: 'res', rn: 'o Fogaréu G-Max' },
+    3: { k: 'venusaur', n: 'Venusaur Gigantamax', ty: 'grass', mv: 'Chicote G-Max', fx: 'res', rn: 'o Chicote G-Max' },
+    9: { k: 'blastoise', n: 'Blastoise Gigantamax', ty: 'water', mv: 'Canhonaço G-Max', fx: 'res', rn: 'o Canhonaço G-Max' },
+    12: { k: 'butterfree', n: 'Butterfree Gigantamax', ty: 'bug', mv: 'Atordoar G-Max', fx: 'befuddle' },
+    25: { k: 'pikachu', n: 'Pikachu Gigantamax', ty: 'electric', mv: 'Choque Volt G-Max', fx: 'par' },
+    52: { k: 'meowth', n: 'Meowth Gigantamax', ty: 'normal', mv: 'Chuva de Ouro G-Max', fx: 'gold' },
+    68: { k: 'machamp', n: 'Machamp Gigantamax', ty: 'fighting', mv: 'Golpe Chi G-Max', fx: 'chi' },
+    94: { k: 'gengar', n: 'Gengar Gigantamax', ty: 'ghost', mv: 'Terror G-Max', fx: 'terror' },
+    99: { k: 'kingler', n: 'Kingler Gigantamax', ty: 'water', mv: 'Espuma Explosiva G-Max', fx: 'foam' },
+    131: { k: 'lapras', n: 'Lapras Gigantamax', ty: 'ice', mv: 'Ressonância G-Max', fx: 'reso' },
+    133: { k: 'eevee', n: 'Eevee Gigantamax', ty: 'normal', mv: 'Abraço G-Max', fx: 'cuddle' },
+    143: { k: 'snorlax', n: 'Snorlax Gigantamax', ty: 'normal', mv: 'Reabastecer G-Max', fx: 'heal' } };
+  const MAXN = { normal: ['Ataque Max', 'tspe-1'], fire: ['Chama Max', 'sun'], water: ['Gêiser Max', 'rain'], grass: ['Mata Max', 'heal'], electric: ['Raio Max', 'uspe+1'],
+    ice: ['Geada Max', 'tspe-1'], fighting: ['Punho Max', 'uatk+1'], poison: ['Lodo Max', 'uspa+1'], ground: ['Tremor Max', 'uspd+1'], flying: ['Corrente Max', 'uspe+1'],
+    psychic: ['Mente Max', 'tspd-1'], bug: ['Inseto Max', 'tspa-1'], rock: ['Rocha Max', 'udef+1'], ghost: ['Fantasma Max', 'tdef-1'], dragon: ['Dragão Max', 'tatk-1'],
+    dark: ['Trevas Max', 'tspd-1'], steel: ['Aço Max', 'udef+1'], fairy: ['Fada Max', 'uspd+1'] };
+  function maxPow(mv) { const p = mv.p || 80, weak = mv.t === 'fighting' || mv.t === 'poison';
+    const t = p < 45 ? 0 : p < 55 ? 1 : p < 65 ? 2 : p < 75 ? 3 : p < 110 ? 4 : p < 150 ? 5 : 6; return (weak ? [70, 75, 80, 85, 90, 95, 100] : [90, 100, 110, 120, 130, 140, 150])[t]; }
+  const gmaxOf = m => GMAX[m.id] || null;
+  function maxMoveOf(m, mv) { if (!mv || mv.c === 't') return { n: 'Barreira Max', c: 't', t: mv ? mv.t : 'normal', guard: 1 };
+    const g = m.dmax && m.dmax.g ? GMAX[m.id] : null, ty = mv.t === '???' ? 'normal' : mv.t;
+    if (g && g.ty === ty) return { n: g.mv, c: mv.c, t: ty, p: g.fx === 'res' ? 150 : maxPow(mv), gfx: g.fx, g };
+    const x = MAXN[ty] || MAXN.normal; return { n: x[0], c: mv.c, t: ty, p: maxPow(mv), mfx: x[1] }; }
+  function canDyna(s, i) { const sd = s.sides[i], m = sd.b.m; return !!(sd.dynaOk && !sd.dynaUsed && !sd.megaUsed && !m.mega && !m.dmax && m.hp > 0); }
+  function doDyna(s, i, ev) { const sd = s.sides[i], m = sd.b.m; sd.dynaUsed = true; const g = gmaxOf(m), old = maxhp(m);
+    m.dmax = { t: 3, g: g ? 1 : 0 }; m.hp = Math.min(maxhp(m), m.hp + (maxhp(m) - old));
+    ev.push({ e: 'dyna', side: i, id: m.id, gmax: !!g, hp: m.hp, max: maxhp(m), name: g ? g.n : (m.nick || D.mons[m.id].n),
+      text: g ? `${pname(s, i)} Gigantamaxou! Virou ${g.n}!` : `${pname(s, i)} Dinamaxou! Ficou gigante!` }); }
+  function undyna(s, i, ev, announce) { const m = s.sides[i].b.m; if (!m.dmax) return; const mx = maxhp(m); delete m.dmax; const nm = maxhp(m);
+    m.hp = Math.max(m.hp > 0 ? 1 : 0, Math.min(nm, Math.round(m.hp * nm / mx)));
+    if (announce) ev.push({ e: 'undyna', side: i, hp: m.hp, max: nm, text: `${pname(s, i)} voltou ao tamanho normal!` }); else ev.push({ e: 'undyna', side: i, hp: m.hp, max: nm, quiet: 1 }); }
+  function useMaxMove(s, ai, base, ev) { const A = s.sides[ai], ti = 1 - ai, a = A.b, t = s.sides[ti].b, mv = maxMoveOf(a.m, base);
+    ev.push({ e: 'use', side: ai, move: 'max', type: mv.t, cat: mv.c, max: 1, text: `${pname(s, ai)} usou ${mv.n}!` });
+    if (mv.guard) { a.prot = true; ev.push({ e: 'msg', side: ai, text: `${pname(s, ai)} ergueu uma Barreira Max!` }); return; }
+    if (t.m.hp <= 0) { ev.push({ e: 'msg', text: 'Mas não havia alvo!' }); return; }
+    if (t.prot) { ev.push({ e: 'msg', side: ti, text: `${pname(s, ti)} se protegeu com a Barreira Max!` }); return; }
+    const r = calcDmg(s, a, t, mv, true); if (r.eff === 0) { ev.push({ e: 'msg', text: `Não afeta ${pname(s, ti)}...` }); return; }
+    dealDamage(s, ti, r.dmg, ev, { crit: r.crit, eff: r.eff, mtype: mv.t }); if (r.crit) ev.push({ e: 'msg', text: 'Um golpe crítico!' });
+    if (r.eff > 1) ev.push({ e: 'msg', text: 'É super efetivo!' }); else if (r.eff < 1) ev.push({ e: 'msg', text: 'Não é muito efetivo...' });
+    const fx = mv.mfx || mv.gfx, alive = t.m.hp > 0;
+    if (fx === 'sun' && s.weather !== 'sun') { s.weather = 'sun'; ev.push({ e: 'weather', w: 'sun', text: 'A luz do sol ficou intensa!' }); }
+    else if (fx === 'rain' && s.weather !== 'rain') { s.weather = 'rain'; ev.push({ e: 'weather', w: 'rain', text: 'Começou a chover!' }); }
+    else if (fx === 'heal') healMon(s, ai, maxhp(a.m) / 6, ev);
+    else if (fx && /^[ut](atk|def|spa|spd|spe)[+-]\d$/.test(fx)) { const who = fx[0] === 'u' ? ai : ti; if (who === ai || alive) changeStat(s, who, fx.slice(1, 4), +fx.slice(4), ev); }
+    else if (fx === 'res') { s.sides[ti].gres = { t: 4, ty: mv.t, n: mv.g.rn }; ev.push({ e: 'msg', text: `${pname(s, ti)} ficou preso n${mv.g.rn}!` }); }
+    else if (fx === 'befuddle' && alive) applyStatus(s, ti, ['slp', 'par', 'psn'][Math.floor(rnd(s) * 3)], ev);
+    else if (fx === 'par' && alive) applyStatus(s, ti, 'par', ev);
+    else if (fx === 'gold') { if (alive && !t.conf) { t.conf = ri(s, 2, 4); ev.push({ e: 'status', side: ti, status: 'conf', text: `${pname(s, ti)} ficou confuso!` }); } s.goldRush = (s.goldRush || 0) + a.m.lvl * 100; ev.push({ e: 'msg', text: 'Moedas se espalharam por todo lado!' }); }
+    else if (fx === 'chi') { a.critB = Math.min(3, (a.critB || 0) + 1); ev.push({ e: 'msg', text: `${pname(s, ai)} está focado em golpes críticos!` }); }
+    else if (fx === 'terror' && alive) { s.trapped = true; changeStat(s, ti, 'spe', -1, ev); ev.push({ e: 'msg', text: `${pname(s, ti)} não consegue fugir!` }); }
+    else if (fx === 'foam' && alive) changeStat(s, ti, 'spe', -2, ev);
+    else if (fx === 'reso') { changeStat(s, ai, 'def', 1, ev); changeStat(s, ai, 'spd', 1, ev); }
+    else if (fx === 'cuddle' && alive) { ev.push({ e: 'msg', text: `${pname(s, ti)} ficou encantado!` }); changeStat(s, ti, 'atk', -1, ev); } }
   function doMega(s, i, ev) {
     const sd = s.sides[i], m = sd.b.m, f = megaFormFor(m); if (!f) return; const oldMax = maxhp(m);
     sd.megaUsed = true; m.mega = f; m.hp = Math.max(1, Math.min(maxhp(m), m.hp + maxhp(m) - oldMax)); const g = D.megas[f];
@@ -258,7 +320,7 @@
     if (g.ab === 'drought') { s.weather = 'sun'; ev.push({ e: 'weather', w: 'sun', text: 'A luz do sol ficou intensa!' }); }
     if (g.ab === 'drizzle') { s.weather = 'rain'; ev.push({ e: 'weather', w: 'rain', text: 'Começou a chover!' }); }
   }
-  function revertMega(party) { (party || []).forEach(m => { if (m && m.mega) { const oldMax = maxhp(m); delete m.mega; m.hp = Math.max(m.hp > 0 ? 1 : 0, Math.min(maxhp(m), m.hp)); } }); }
+  function revertMega(party) { (party || []).forEach(m => { if (m && m.dmax) { const mx = maxhp(m); delete m.dmax; m.hp = Math.max(m.hp > 0 ? 1 : 0, Math.min(maxhp(m), Math.round(m.hp * maxhp(m) / mx))); } if (m && m.mega) { const oldMax = maxhp(m); delete m.mega; m.hp = Math.max(m.hp > 0 ? 1 : 0, Math.min(maxhp(m), m.hp)); } }); }
   function checkEnd(s, ev) {
     for (let i = 0; i < 2; i++) if (s.sides[i].party.every(m => m.hp <= 0)) { s.over = true; s.winner = 1 - i; ev.push({ e: 'end', winner: 1 - i }); return true; }
     return false;
@@ -270,8 +332,8 @@
   function aiAction(s, side) {
     const sd = s.sides[side], b = sd.b, t = s.sides[1 - side].b; const usable = b.m.moves.filter(x => x.pp > 0);
     if (!usable.length) return { type: 'move', n: 'struggle' };
-    const mg = canMega(s, side);
-    if (!sd.ai) return { type: 'move', n: usable[Math.floor(rnd(s) * usable.length)].n, mega: mg };
+    const mg = canMega(s, side), dy = !mg && canDyna(s, side) && (s.sides[side].party.filter(x => x.hp > 0).length <= 2 || gmaxOf(b.m) || sd.b.m === sd.party[sd.party.length - 1]);
+    if (!sd.ai) return { type: 'move', n: usable[Math.floor(rnd(s) * usable.length)].n, mega: mg, dyna: dy };
     // ponderada pelo dano esperado
     let best = null, bs = -1;
     for (const x of usable) { const mv = D.moves[x.n]; let sc;
@@ -283,7 +345,7 @@
       let bi = -1, bv = cur + 60; sd.party.forEach((m, i) => { if (m.hp > 0 && m !== b.m) { const v = matchup(m, t.m); if (v > bv) { bv = v; bi = i; } } });
       if (bi >= 0 && frac < 0.45 && rnd(s) < 0.8) { sd.swCd = 2; return { type: 'switch', i: bi }; } }
     if (sd.swCd) sd.swCd--;
-    return { type: 'move', n: best, mega: mg };
+    return { type: 'move', n: best, mega: mg, dyna: dy };
   }
   function matchup(m, o) { const mt = monTypesOf(m), ot = monTypesOf(o); let off = 0;
     for (const x of m.moves) { const mv = D.moves[x.n]; if (mv && mv.c !== 't' && mv.p) off = Math.max(off, mv.p * eff(mv.t, ot) * (mt.includes(mv.t) ? 1.5 : 1)); }
@@ -308,6 +370,6 @@
   function evolve(m, to) { const oldMax = maxhp(m); m.id = to; m.hp = Math.max(1, m.hp + maxhp(m) - oldMax); return m; }
 
   const API = { movePower, TYPES, eff, rnd, ri, xpFor, calcStats, maxhp, makeMon, movesAt, createBattle, step, needSwitch, forceSwitch, aiAction, aiSwitchIdx,
-    monTypes, abilityOf, megaFormFor, canMega, revertMega, xpGain, addXP, levelEvo, stoneEvo, evolve, ballName, BALLS, HEAL, statusName };
+    monTypes, abilityOf, megaFormFor, canMega, revertMega, canDyna, gmaxOf, maxMoveOf, GMAX, MAXN, xpGain, addXP, levelEvo, stoneEvo, evolve, ballName, BALLS, HEAL, statusName };
   G.PE = API; if (typeof module !== 'undefined') module.exports = API;
 })(typeof window !== 'undefined' ? window : globalThis);

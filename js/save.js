@@ -1,9 +1,11 @@
 // Saves versionados. NUNCA apagar saves: para mudar o formato, incremente SAVE_VERSION e adicione uma migração.
 (function (G) {
   const ls = G.localStorage;
-  const SAVE_VERSION = 2, P = 'pkLake.';
+  const SAVE_VERSION = 3, P = 'pkLake.';
   const MIGRATIONS = {
     // v1 -> v2: Johto, Creche/Ovos, Mega Evolução, Pontos de Batalha. Só ADICIONA campos (S.gifts e tudo mais é mantido).
+    // v2 -> v3: Dinamax/Gigantamax. Só remove estado temporário de batalha (dmax) se tiver sobrado.
+    2: s => { [...(s.party || []), ...(s.box || [])].forEach(m => { if (m && m.dmax) delete m.dmax; }); return s; },
     1: s => { [...(s.party || []), ...(s.box || [])].forEach(m => { if (m && m.mega) delete m.mega; }); return s; },
   };
   function fresh(user) {
@@ -21,7 +23,7 @@
     // campos novos são aditivos: completa o que faltar sem sobrescrever
     const f = fresh(s.user); for (const k in f) if (s[k] === undefined) s[k] = f[k];
     for (const k of ['stats', 'dex', 'daily', 'tower', 'settings', 'daycare']) for (const kk in f[k]) if (s[k][kk] === undefined) s[k][kk] = f[k][kk];
-    [...(s.party || []), ...(s.box || [])].forEach(m => { if (m && m.mega) delete m.mega; });
+    [...(s.party || []), ...(s.box || [])].forEach(m => { if (m && m.mega) delete m.mega; if (m && m.dmax) delete m.dmax; });
     return s;
   }
   const accounts = () => { try { return JSON.parse(ls.getItem(P + 'accounts') || '{}'); } catch (e) { return {}; } };

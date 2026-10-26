@@ -160,7 +160,7 @@
     { id:'dragon-scale', name:'Escama de Dragão', price:3000, desc:'Use em Seadra (evolução por troca).', req:3 },
     { id:'up-grade', name:'Melhoria', price:3000, desc:'Use em Porygon (evolução por troca).', req:3 },
   ];
-  const ITEM_NAME = Object.assign(Object.fromEntries(SHOP.map(x => [x.id, x.name])), MEGA_STONES, { 'mega-bracelet':'Mega Pulseira' });
+  const ITEM_NAME = Object.assign(Object.fromEntries(SHOP.map(x => [x.id, x.name])), MEGA_STONES, { 'mega-bracelet':'Mega Pulseira', 'dynamax-band':'Pulseira Dinamax' });
   MAPS.forEach(m => m.region = m.region || 'kanto'); MAPS.push(...JMAPS);
   const THEME_BG = { grass:['#4ade80','#166534'], forest:['#15803d','#052e16'], cave:['#57534e','#1c1917'], water:['#38bdf8','#0c4a6e'], ghost:['#7c3aed','#1e1b4b'],
     safari:['#a3e635','#3f6212'], electric:['#fde047','#713f12'], ice:['#bae6fd','#0e7490'], volcano:['#f97316','#450a0a'], psychic:['#e879f9','#3b0764'], sky:['#fcd34d','#1e3a8a'], gym:['#64748b','#0f172a'] };
