@@ -1,6 +1,7 @@
 const { chromium } = require('/var/tmp/sand-playwright-runtime/164c91ebeb1a9d84bdfd8b8aa7480625/node_modules/playwright-core');
 const fs = require('fs');
-const PW = fs.readFileSync('/home/box/.secrets/pokemon-lake-senha.txt', 'utf8').match(/: (\S+)/)[1];
+// desbloqueia o portão gravando o hash (já público em app.js) no localStorage — a senha nunca é lida
+const HASH = fs.readFileSync(__dirname + '/../js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
 const URL = process.argv[2] || 'http://127.0.0.1:18473/';
 const SH = '/workspace/pokemon-lake/prints/';
 (async () => {
@@ -12,7 +13,8 @@ const SH = '/workspace/pokemon-lake/prints/';
     const shot = async n => { await page.screenshot({ path: `${SH}${tag}-${n}.png` }); const sw = await page.evaluate(() => document.documentElement.scrollWidth); if (sw > vp.width) errs.push(`hscroll ${n} ${sw}`); };
     await page.goto(URL);
     await page.fill('#pw', 'errada'); await page.click('#gateForm button'); console.log(tag, 'senha errada:', await page.textContent('#pwErr'));
-    await page.fill('#pw', PW); await page.click('#gateForm button');
+    await page.evaluate(h => localStorage.setItem('pkLake.unlock', h), HASH); await page.reload();
+
     await page.fill('#au', 'edson'); await page.fill('#ap', 'teste123'); await page.click('#accForm button.primary');
     await page.waitForSelector('#tn'); await page.click('.av[data-av="ethan"]'); await page.fill('#tn', 'Edson'); await page.click('#next');
     await page.waitForSelector('.starter'); await shot('0-starter'); await page.click('.starter[data-id="4"]'); await page.click('.mbtns .btn.primary'); await page.click('.mbtns .btn.primary');

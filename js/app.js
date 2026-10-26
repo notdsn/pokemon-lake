@@ -39,15 +39,62 @@
 
   // ---------- util de Pokémon ----------
   const pn = m => m.nick || D.mons[m.id].n;
+  // sprites do Showdown têm tamanho natural proporcional ao Pokémon: escala fixa e nítida na batalha
+  document.addEventListener('load', e => { const t = e.target; if (t.tagName === 'IMG' && t.closest && t.closest('.bmon')) fitSpr(t); }, true);
+  function fitSpr(img) { if (!img.naturalWidth) return; const back = !!img.closest('.pmon'), k = innerWidth < 600 ? (back ? 1.15 : 1.7) : (back ? 1.5 : 2.4), box = img.closest('.bmon');
+    let w = img.naturalWidth * k, h = img.naturalHeight * k; const mh = box ? box.clientHeight * 1.15 : 1e9, mw = box ? box.clientWidth * 1.15 : 1e9; const f = Math.min(1, mh / h, mw / w); w *= f; h *= f; img.style.width = w + 'px'; img.style.height = h + 'px'; }
   const spr = (m, back) => { const d = back ? (m.shiny ? 'backshiny' : 'back') : (m.shiny ? 'shiny' : 'front'); return m.mega ? `img/mega/${d}/${m.mega}.gif` : `img/${d}/${m.id}.gif`; };
   const mtypes = m => PE.monTypes(m);
   const tod = () => period() === 'night' ? 'night' : 'day';
   const abName = k => (D.abils && D.abils[k] ? D.abils[k].n : (k || '').replace(/-/g, ' '));
-  const FEAT = { johto: false, daycare: false }; // liberados em uma próxima versão
+  const ACT = {};
+  const FEAT = { johto: true, daycare: true };
   const isJohtoOpen = () => FEAT.johto && !!S.champion;
-  // (Creche/ovos chegam na próxima versão)
-  const vDaycare = () => `<div class="card center"><h2>🏡 Creche Pokémon</h2><p class="mut">Em breve!</p></div>`;
-  const eggCard = () => '', eggSteps = () => {}, checkEggs = () => {}, daycareTick = () => {};
+  // ---------- Creche Pokémon + ovos ----------
+  const PREVO = {}; for (const id in D.mons) for (const e of D.mons[id].e || []) if (D.mons[e.to] && !PREVO[e.to]) PREVO[e.to] = +id;
+  const baseOf = id => { let x = id, g = 0; while (PREVO[x] && g++ < 5) x = PREVO[x]; return x; };
+  const EGG_MIN = 8 * 60e3, XP_PER_MIN = 60;
+  function compat(a, b) { if (!a || !b) return 0; const ea = D.mons[a.id].eg || [], eb = D.mons[b.id].eg || [];
+    if (ea.includes('no-eggs') || eb.includes('no-eggs') || D.mons[a.id].L || D.mons[b.id].L) return 0;
+    if (a.id === 132 && b.id === 132) return 0; if (a.id === 132 || b.id === 132) return 2;
+    if (!ea.some(g => eb.includes(g))) return 0; return baseOf(a.id) === baseOf(b.id) ? 3 : 2; }
+  const COMPAT_TXT = ['Eles não parecem se dar bem... Nenhum ovo vai aparecer.', '', 'Eles se dão bem. Ovos aparecem de vez em quando.', 'Eles se adoram! Ovos aparecem com frequência.'];
+  function lvlUp(m) { let up = 0; while (m.lvl < 100 && m.xp >= PE.xpFor(D.mons[m.id].g, m.lvl + 1)) { m.lvl++; up++; } return up; }
+  function daycareTick(extraMs = 0) { const dc = S.daycare; const now = Date.now() + (A.dcSkew || 0) + extraMs; if (extraMs) A.dcSkew = (A.dcSkew || 0) + extraMs;
+    if (!dc.slots.length) { dc.since = now; dc.lastEgg = now; return; }
+    const mins = Math.max(0, (now - (dc.since || now)) / 60e3); if (mins >= 1) { for (const m of dc.slots) { m.xp += Math.floor(mins * XP_PER_MIN * (1 + m.lvl / 10)); lvlUp(m); } dc.since = now; }
+    const [a, b] = dc.slots, c = compat(a, b);
+    if (c && S.eggs.length < 6) { while (now - (dc.lastEgg || now) >= EGG_MIN) { dc.lastEgg += EGG_MIN; if (R() < (c === 3 ? 0.7 : 0.45) && S.eggs.length < 6) makeEgg(a, b); } } else dc.lastEgg = now;
+    const em = Math.floor((now - (S.eggT || now)) / 60e3); if (em >= 1 || !S.eggT) { eggSteps(em * 5); S.eggT = em >= 1 ? (S.eggT || now) + em * 60e3 : now; } save(); }
+  function makeEgg(a, b, idOverride) { const id = idOverride || baseOf(a.id === 132 ? b.id : a.id), iv = [0, 1, 2, 3, 4, 5].map(() => PE.ri({ seed: (R() * 2 ** 31) | 0 }, 0, 31));
+    if (a && b) { const pick = [0, 1, 2, 3, 4, 5].sort(() => R() - 0.5).slice(0, 3); for (const k of pick) iv[k] = (R() < 0.5 ? a : b).iv[k]; }
+    const hc = D.mons[id].hc || 20; S.eggs.push({ id, iv, steps: hc * 12, total: hc * 12, from: a ? 'Creche' : 'Prof. Elm', at: Date.now() }); A.newEgg = 1; }
+  function eggSteps(n) { if (!n) return; for (const e of S.eggs) e.steps = Math.max(0, e.steps - n); }
+  async function checkEggs() { if (B || !S.trainer) return; const i = S.eggs.findIndex(e => e.steps <= 0); if (i < 0) { if (A.newEgg) { A.newEgg = 0; toast('🥚 A Creche encontrou um Ovo! Veja em Time.', 'good'); } return; }
+    const e = S.eggs.splice(i, 1)[0]; const m = PE.makeMon(e.id, 1, { seed: (R() * 2 ** 31) | 0 }, { ot: S.trainer, caughtAt: 'Chocado de um Ovo (' + e.from + ')', iv: e.iv, shiny: R() < 1 / 256 });
+    addCaught(m); S.stats.caught++; if (S.party.length < 6) S.party.push(m); else S.box.push(m); save();
+    modal(`<div class="center hatch"><div class="eggbig" id="eggbig"></div><h2 id="hatchT">Hã? O ovo está se mexendo!</h2><p id="hatchP" class="mut"></p><div class="mbtns"><button class="btn primary wide hidden" id="hatchOk" data-a="close">Que fofo!</button></div></div>`);
+    SFX.shake(); await sleep(900); $('#eggbig')?.classList.add('crack'); SFX.shake(); await sleep(1300);
+    const eb = $('#eggbig'); if (!eb) return; eb.outerHTML = `<img class="hatched" src="${spr(m)}" alt="">`; SFX.caught(); cry(m.id);
+    $('#hatchT').textContent = `${D.mons[m.id].n} nasceu!${m.shiny ? ' ✨' : ''}`; $('#hatchP').textContent = S.party.includes(m) ? 'Entrou no seu time.' : 'Foi para o PC.'; $('#hatchOk').classList.remove('hidden'); render(); }
+  const eggCard = e => { const pct = Math.round((1 - e.steps / e.total) * 100); return `<div class="egg" title="${e.from}"><div class="eggico ${pct > 80 ? 'soon' : ''}"></div><small>${pct > 80 ? 'Quase chocando!' : pct > 40 ? 'Faz barulhos...' : 'Vai demorar...'}</small><i style="width:${pct}%"></i></div>`; };
+  function vDaycare() { daycareTick(); const dc = S.daycare, [a, b] = dc.slots, c = compat(a, b);
+    const slot = (m, i) => m ? `<div class="dcslot"><img src="${spr(m)}" alt=""><b>${pn(m)}</b><small>Nv ${m.lvl}</small><button class="btn small" data-a="dcout" data-i="${i}">Retirar</button></div>` : `<div class="dcslot empty"><span>+</span><small>Vaga livre</small></div>`;
+    const cand = [...S.party.map((m, i) => [m, 'p', i]), ...S.box.map((m, i) => [m, 'b', i])].filter(([m]) => m.hp > 0 || true);
+    return `<div class="grid"><div class="card span2 dchead"><h2>🏡 Creche Pokémon</h2><p class="mut">Deixe até 2 Pokémon. Eles ganham XP com o tempo real e, se forem compatíveis, aparecem Ovos! Ovos chocam explorando (cada busca = passos) ou com o tempo.</p>
+      <div class="dcslots">${slot(a, 0)}<div class="dcheart">${a && b ? (c ? '💞' : '💤') : '🏠'}</div>${slot(b, 1)}</div>${a && b ? `<p class="center dcmsg">${COMPAT_TXT[c]}</p>` : ''}
+      <p class="mut small center">🥚 Ovos com você: <b>${S.eggs.length}/6</b></p></div>
+      ${dc.slots.length < 2 ? `<div class="card span2"><h3>Escolha quem deixar na Creche</h3><div class="dcpick">${cand.map(([m, w, i]) => `<button class="pm" data-a="dcin" data-w="${w}" data-i="${i}" ${w === 'p' && S.party.length <= 1 ? 'disabled' : ''}><img src="${spr(m)}" alt=""><small>${D.mons[m.id].n} Nv ${m.lvl}</small></button>`).join('')}</div><p class="mut small">Você precisa manter pelo menos 1 Pokémon no time.</p></div>` : ''}
+      ${S.eggs.length ? `<div class="card span2"><h3>🥚 Seus ovos</h3><div class="eggs">${S.eggs.map(eggCard).join('')}</div></div>` : ''}</div>`; }
+  ACT.dcin = d => { if (S.daycare.slots.length >= 2) return; const arr = d.w === 'p' ? S.party : S.box, i = +d.i; if (d.w === 'p' && S.party.length <= 1) return toast('Mantenha pelo menos 1 Pokémon no time.');
+    daycareTick(); const m = arr.splice(i, 1)[0]; m.hp = PE.maxhp(m); m.status = null; S.daycare.slots.push(m); if (S.daycare.slots.length === 1) { S.daycare.since = Date.now() + (A.dcSkew || 0); S.daycare.lastEgg = S.daycare.since; } save(); toast(`${pn(m)} ficou na Creche.`, 'good'); render(); };
+  ACT.dcout = d => { daycareTick(); const m = S.daycare.slots.splice(+d.i, 1)[0]; if (!m) return; m.hp = PE.maxhp(m); if (S.party.length < 6) S.party.push(m); else S.box.push(m); save(); toast(`${pn(m)} voltou (Nv ${m.lvl})${S.party.includes(m) ? '' : ' para o PC'}.`, 'good'); render(); };
+  // ---------- Prof. Elm ----------
+  ACT.elm = () => { if (S.elmGift) return; modal(`<div class="center elmbox"><img src="img/tr/elm.png" alt="" class="elmimg"><h2>Prof. Elm</h2><p>“Bem-vindo a Johto, Campeão! Escolha um destes Pokémon. E leve também este Ovo misterioso que um amigo me mandou...”</p>
+      <div class="starters">${[152, 155, 158].map(id => `<button class="starter" data-a="elmpick" data-id="${id}"><img src="${sprId(id)}" alt=""><b>${D.mons[id].n}</b>${typeChip(D.mons[id].t[0])}</button>`).join('')}</div></div>`); };
+  ACT.elmpick = d => { if (S.elmGift) return; const id = +d.id, m = PE.makeMon(id, 15, { seed: (R() * 2 ** 31) | 0 }, { ot: S.trainer, caughtAt: 'Presente do Prof. Elm', shiny: false });
+    addCaught(m); S.stats.caught++; if (S.party.length < 6) S.party.push(m); else S.box.push(m); makeEgg(null, null, 175); A.newEgg = 0; S.elmGift = true; save(); SFX.caught(); cry(id);
+    modal(`<div class="center"><img src="${spr(m)}" alt="" style="height:96px"><h2>Você recebeu ${D.mons[id].n}!</h2><p>…e um <b>Ovo misterioso</b> 🥚. Ele vai chocar enquanto você explora.</p><button class="btn primary wide" data-a="close">Obrigado, Prof.!</button></div>`); render(); };
   const sprId = (id, shiny) => `img/${shiny ? 'shiny' : 'front'}/${id}.gif`;
   const typeChip = t => `<span class="type" style="--tc:${C.TYPE_COLOR[t]}">${C.TYPE_PT[t]}</span>`;
   const hpPct = m => Math.max(0, m.hp / PE.maxhp(m) * 100);
@@ -90,7 +137,6 @@
     const b = e.target.closest('[data-a]'); if (!b || b.disabled) return; const a = b.dataset.a; SFX.click(); actx();
     const fn = ACT[a]; if (fn) { e.preventDefault(); fn(b.dataset, b); }
   });
-  const ACT = {};
   ACT.tab = d => go(d.t);
   function toast(msg, kind = '') { const t = document.createElement('div'); t.className = 'toast ' + kind; t.innerHTML = msg; $('#toast-root').appendChild(t); setTimeout(() => t.classList.add('out'), 2600); setTimeout(() => t.remove(), 3100); }
   function modal(html, cls = '') { closeModal(); const m = document.createElement('div'); m.className = 'modal-bg'; m.innerHTML = `<div class="modal ${cls}">${html}</div>`;
@@ -125,7 +171,7 @@
     $$('.acc').forEach(b => b.onclick = () => { $('#au').value = b.dataset.u; $('#ap').focus(); });
     $('#accForm').onsubmit = e => { e.preventDefault(); try { const u = mode === 'login' ? PS.login($('#au').value, $('#ap').value) : PS.createAccount($('#au').value, $('#ap').value); startUser(u); } catch (er) { $('#aerr').textContent = er.message; } };
   }
-  function startUser(u) { user = u; sessionStorage.setItem(SESSION_KEY, u); S = PS.read(u); sessionStart = Date.now(); if (!S.trainer) onboarding(); else { retroRewards(); checkDaily(); repairMoves(); go('home'); } }
+  function startUser(u) { user = u; sessionStorage.setItem(SESSION_KEY, u); S = PS.read(u); sessionStart = Date.now(); if (!S.trainer) onboarding(); else { retroRewards(); checkDaily(); repairMoves(); try { daycareTick(); setTimeout(checkEggs, 1500); } catch (e) {} go('home'); } }
   function retroRewards() { if (S.champion && !S.bag['mega-bracelet']) { S.bag['mega-bracelet'] = 1; save(); setTimeout(() => modal(`<div class="center badgewin"><div class="bigbadge megab"><img src="img/items/mega-bracelet.png" alt=""></div><h2>Mega Pulseira!</h2><p>Como Campeão de Kanto, você recebeu a <b>Mega Pulseira</b>. Faça um Pokémon segurar a Mega Pedra certa e toque em <b>🧬 Mega Evoluir</b> no menu de golpes!</p><p class="mut small">Mega Pedras: achados raros nos mapas, prêmios de Ginásios/Elite e loja de Pontos da Torre de Batalha. Johto também foi liberado!</p><button class="btn primary wide" data-a="close">Incrível!</button></div>`), 900); } }
   ACT.logout = () => { save(); sessionStorage.removeItem(SESSION_KEY); accountsScreen(); };
 
@@ -320,7 +366,7 @@
     S.stats.steps += steps; sc.classList.remove('walking');
     const w = weatherOf(mp), ws = encWeights(mp, w), tot = ws.reduce((a, b) => a + b, 0); let r = R() * tot, k = 0; while (k < ws.length - 1 && r > ws[k]) r -= ws[k++];
     const e = mp.enc[k]; const lvl = PE.ri(st, e[2], e[3]);
-    eggSteps(steps);
+    eggSteps(steps); setTimeout(checkEggs, 2500);
     if (mp.finds && R() < (A.findRate || 0.035)) { const f = pickFind(mp); if (f) { searching = false; $('#searchBtn').disabled = false; S.bag[f] = (S.bag[f] || 0) + 1; save(); SFX.caught();
       modal(`<div class="center badgewin"><div class="bigbadge megab"><img src="img/items/${f}.png" alt=""></div><h2>Você encontrou algo brilhando!</h2><p>Achou <b>${C.ITEM_NAME[f]}</b> escondida em ${mp.name}!</p><p class="mut small">Faça o Pokémon certo segurar para Mega Evoluir.</p><button class="btn primary wide" data-a="close">Uau!</button></div>`); return render(); } }
     const m = PE.makeMon(e[0], lvl, st, { shinyRate: A.shinyRate || 1 / 256, shiny: e[4] && e[4].shiny ? true : undefined }); m.caughtAt = mp.name;
@@ -512,7 +558,7 @@
       <div class="info einfo" id="einfo"></div><div class="info pinfo" id="pinfo"></div>
       <div class="ebs" id="ebs"></div>${o.weather ? `<div class="wchip">${o.weather === 'rain' ? '🌧️ Chuva: Água +50%, Fogo −50%' : '☀️ Sol: Fogo +50%, Água −50%'}</div>` : ''}<div class="fxl" id="fxl"></div>
       ${o.kind === 'trainer' ? `<img class="foe" id="foe" src="img/tr/${o.sprite}.png" alt="">` : ''}<img class="metr" id="metr" src="img/tr/${S.avatar}.png" alt="">
-      <div class="intro ${o.kind} ${o.nat ? 'nat' : ''}" id="intro">${o.nat ? `<div class="natsplash"><div class="natrays"></div><img class="natart" src="img/nat/nat-full.webp" alt="Nat"><img class="natme" src="img/tr/${S.avatar}.png" alt=""><b class="natvs">VS</b><div class="nattxt"><small>DESAFIO FINAL</small><b>NAT</b><span>Mestra das Eeveelutions</span></div></div>` : o.kind === 'trainer' ? `<div class="vs"><img src="img/tr/${S.avatar}.png" alt=""><b>VS</b><img src="img/tr/${o.sprite}.png" alt=""></div><div class="vsname">${esc(o.intro || '')}<br><b>${esc(o.name)}</b></div>` : '<i class="bar1"></i><i class="bar2"></i>'}</div></div>
+      <div class="intro ${o.kind} ${o.nat ? 'nat' : ''}" id="intro">${o.nat ? `<div class="natrays"></div><div class="vs"><img src="img/tr/${S.avatar}.png" alt=""><b>VS</b><img class="natvsimg" src="img/tr/nat.png" alt="Nat"></div><div class="vsname natname"><small>DESAFIO FINAL</small><br><b>NAT</b><br><span>Mestra das Eeveelutions</span></div>` : o.kind === 'trainer' ? `<div class="vs"><img src="img/tr/${S.avatar}.png" alt=""><b>VS</b><img src="img/tr/${o.sprite}.png" alt=""></div><div class="vsname">${esc(o.intro || '')}<br><b>${esc(o.name)}</b></div>` : '<i class="bar1"></i><i class="bar2"></i>'}</div></div>
       <div class="bpanel"><div class="blog" id="blog"></div><div class="bctl" id="bctl"></div></div></div>`;
     document.body.appendChild(ov); document.body.classList.add('in-battle');
     drawInfo(0); drawInfo(1); drawBalls(); runIntro();
@@ -718,7 +764,7 @@
     setTimeout(checkEggs, 700);
     save(); const ov = $('#battle'); B = null; if (ov) { ov.classList.add('closing'); setTimeout(() => { ov.remove(); document.body.classList.remove('in-battle'); render(); }, 350); }
   }
-  A.debug = { get S() { return S; }, startBattle, go, get B() { return B; }, healAll, save, render, act: a => act(a), daycareTick: (ms) => daycareTick(ms), checkEggs: () => checkEggs(), mkTeam };
+  A.debug = { get S() { return S; }, startBattle, go, get B() { return B; }, healAll, save, render, act: a => act(a), runAct: (k, d) => ACT[k](d || {}), daycareTick: (ms) => daycareTick(ms), checkEggs: () => checkEggs(), mkTeam };
 
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
