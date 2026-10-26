@@ -368,8 +368,32 @@
   function vSettings() {
     return `<div class="card"><h3>⚙️ Configurações</h3><div class="setrow"><span>Som</span><div class="seg">${[[true, 'Ligado'], [false, 'Desligado']].map(([v, l]) => `<button class="${S.settings.sound === v ? 'on' : ''}" data-a="set" data-k="sound" data-v="${v}">${l}</button>`).join('')}</div></div>
       <div class="setrow"><span>Velocidade da batalha</span><div class="seg">${[[1.4, 'Lenta'], [1, 'Normal'], [0.6, 'Rápida'], [0.3, 'Turbo']].map(([v, l]) => `<button class="${S.settings.speed === v ? 'on' : ''}" data-a="set" data-k="speed" data-v="${v}">${l}</button>`).join('')}</div></div>
-      <button class="btn wide ghost" data-a="lock">🔒 Bloquear site neste aparelho</button></div>`;
+      <button class="btn wide ghost" data-a="lock">🔒 Bloquear site neste aparelho</button></div>
+      <div class="card"><h3>🎁 Código de presente</h3><p class="mut small">Tem um código? Digite aqui para receber o presente (cada código vale uma vez por conta).</p>
+      <form id="giftForm" class="row gift"><input id="giftCode" autocapitalize="characters" autocomplete="off" placeholder="XXXX-XXXX" aria-label="Código de presente"><button class="btn primary">Resgatar</button></form><p id="giftErr" class="err"></p></div>`;
   }
+  // ---------- códigos de presente (hash sha256, validado no cliente) ----------
+  const GIFTS = { 'dac1e434edd06c55a24826838ea64907fd92279994a369734519122db8e2754c': { name: 'Lendas do Edson', build: () => {
+    const seen = new Set(), list = [];
+    C.MAPS.forEach(mp => mp.enc.forEach(e => { if (e[4] && e[4].legend && !seen.has(e[0])) { seen.add(e[0]); list.push([e[0], e[2]]); } }));
+    const out = list.map(([id, l]) => PE.makeMon(id, l, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false }));
+    out.push(PE.makeMon(6, 50, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false, iv: [31, 31, 31, 31, 31, 31], moves: ['flamethrower', 'air-slash', 'dragon-claw', 'heat-wave'] }));
+    return out; } } };
+  async function redeemGift(code) {
+    const h = sha256(code.trim().toUpperCase()), g = GIFTS[h], err = $('#giftErr');
+    if (!g) { if (err) err.textContent = 'Código inválido.'; return; }
+    S.gifts = S.gifts || {};
+    if (S.gifts[h]) { if (err) err.textContent = 'Este código já foi resgatado nesta conta.'; return; }
+    const mons = g.build(); let toBox = 0;
+    mons.forEach(m => { addCaught(m); S.stats.caught++; if (S.party.length < 6) S.party.push(m); else { S.box.push(m); toBox++; } });
+    S.gifts[h] = { at: Date.now(), n: mons.length }; save(); SFX.caught();
+    modal(`<div class="center giftwin"><div class="burstbg"></div><h2>🎁 ${g.name}!</h2><p>Você recebeu <b>${mons.length} Pokémon</b>!${toBox ? ` ${toBox} foram para o PC.` : ''}</p>
+      <div class="giftgrid">${mons.map((m, i) => `<div class="giftmon" style="animation-delay:${i * 0.12}s"><img src="${spr(m)}" alt=""><small>${D.mons[m.id].n}<br>Nv ${m.lvl}</small></div>`).join('')}</div>
+      <div class="mbtns"><button class="btn primary wide" data-a="close">Incrível!</button></div></div>`);
+    mons.forEach((m, i) => setTimeout(() => { if (i % 3 === 0) cry(m.id); }, i * 120));
+    render();
+  }
+  document.addEventListener('submit', e => { if (e.target.id === 'giftForm') { e.preventDefault(); redeemGift($('#giftCode').value); } });
   ACT.set = d => { S.settings[d.k] = d.k === 'sound' ? d.v === 'true' : +d.v; save(); render(); };
   ACT.lock = () => { save(); localStorage.removeItem(UNLOCK_KEY); sessionStorage.removeItem(SESSION_KEY); S = null; gate(); };
 

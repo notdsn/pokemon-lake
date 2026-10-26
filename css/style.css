@@ -302,3 +302,10 @@ textarea{resize:vertical;min-height:90px;font-size:.8rem}
 .bpm{display:flex;gap:6px;align-items:center;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:6px;text-align:left;min-height:60px}.bpm img{width:44px;height:44px;object-fit:contain;image-rendering:pixelated}.bpm b{font-size:.82rem}.bpm small{font-size:.68rem}.bpm.act{border-color:var(--acc)}.bpm:disabled{opacity:.45}
 @media(min-width:900px){.bwrap{padding:20px 0}.bscene{border-radius:20px 20px 0 0;border:1px solid var(--line);border-bottom:0}.bpanel{border-radius:0 0 20px 20px;display:grid;grid-template-columns:1fr 1.1fr;gap:10px;align-items:stretch}.blog{margin:0;font-size:1.05rem}.bmon img{height:80%}}
 @media(min-width:900px) and (min-height:700px){.bwrap{height:min(100dvh,820px);margin:auto}}
+
+.gift{display:flex;gap:8px}.gift input{flex:1;min-width:0;text-transform:uppercase}
+.giftgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px;max-height:46vh;overflow:auto;margin:12px 0}
+.giftmon{background:rgba(255,255,255,.06);border-radius:12px;padding:6px;opacity:0;animation:giftpop .5s cubic-bezier(.2,1.4,.4,1) forwards}
+.giftmon img{height:56px;image-rendering:pixelated}.giftmon small{display:block;font-size:.65rem;line-height:1.2}
+@keyframes giftpop{0%{opacity:0;transform:scale(.3) translateY(20px)}100%{opacity:1;transform:none}}
+.giftwin{position:relative}
