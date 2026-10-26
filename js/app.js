@@ -42,7 +42,7 @@
   // sprites do Showdown têm tamanho natural proporcional ao Pokémon: escala fixa e nítida na batalha
   document.addEventListener('load', e => { const t = e.target; if (t.tagName === 'IMG' && t.closest && t.closest('.bmon')) fitSpr(t); }, true);
   function fitSpr(img) { if (!img.naturalWidth) return; const back = !!img.closest('.pmon'), k = innerWidth < 600 ? (back ? 1.15 : 1.7) : (back ? 1.5 : 2.4), box = img.closest('.bmon');
-    let w = img.naturalWidth * k, h = img.naturalHeight * k; const mh = box ? box.clientHeight * 1.15 : 1e9, mw = box ? box.clientWidth * 1.15 : 1e9; const f = Math.min(1, mh / h, mw / w); w *= f; h *= f; img.style.width = w + 'px'; img.style.height = h + 'px'; }
+    let w = img.naturalWidth * k, h = img.naturalHeight * k; const mh = box ? box.clientHeight : 1e9, mw = box ? box.clientWidth : 1e9; const f = Math.min(1, mh / h, mw / w); w *= f; h *= f; img.style.width = w + 'px'; img.style.height = h + 'px'; }
   const spr = (m, back) => { const d = back ? (m.shiny ? 'backshiny' : 'back') : (m.shiny ? 'shiny' : 'front'); return m.mega ? `img/mega/${d}/${m.mega}.gif` : `img/${d}/${m.id}.gif`; };
   const mtypes = m => PE.monTypes(m);
   const tod = () => period() === 'night' ? 'night' : 'day';
@@ -566,7 +566,7 @@
   function drawInfo(side) {
     const m = B.s.sides[side].b.m, p = hpPct(m), el = $(side ? '#einfo' : '#pinfo');
     const x0 = PE.xpFor(D.mons[m.id].g, m.lvl), x1 = PE.xpFor(D.mons[m.id].g, m.lvl + 1);
-    el.innerHTML = `<div class="row between"><b>${esc(pn(m))}${m.shiny ? ' ✨' : ''}</b><small>Nv${m.lvl}</small></div><div class="row"><small class="hpl">HP</small><div class="hpbar"><i style="width:${p}%;background:${hpCol(p)}"></i></div></div>
+    el.innerHTML = `<div class="row between"><b>${esc(m.mega && !m.nick && D.megas[m.mega] ? D.megas[m.mega].n : pn(m))}${m.shiny ? ' ✨' : ''}</b><small>Nv${m.lvl}</small></div><div class="row"><small class="hpl">HP</small><div class="hpbar"><i style="width:${p}%;background:${hpCol(p)}"></i></div></div>
       <div class="row between"><span>${stChip(m.status)}${B.o.kind === 'wild' && side === 1 && S.dex.caught[m.id] ? '<img class="caughtmark" src="img/items/poke-ball.png" alt="">' : ''}</span>${side ? '' : `<small class="hpn">${m.hp}/${PE.maxhp(m)}</small>`}</div>${side ? '' : `<div class="xpbar"><i style="width:${m.lvl >= 100 ? 100 : (m.xp - x0) / (x1 - x0) * 100}%"></i></div>`}`;
   }
   function setHP(side, hp, max) { const el = $(side ? '#einfo' : '#pinfo'); const i = $('.hpbar i', el); const p = Math.max(0, hp / max * 100); i.style.width = p + '%'; i.style.background = hpCol(p);
