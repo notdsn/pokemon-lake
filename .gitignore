@@ -2,3 +2,4 @@ data/raw.json
 prints/
 node_modules/
 *.log
+assets-src/

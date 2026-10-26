@@ -1,25 +1,29 @@
 // Saves versionados. NUNCA apagar saves: para mudar o formato, incremente SAVE_VERSION e adicione uma migração.
 (function (G) {
-  const SAVE_VERSION = 1, P = 'pkLake.';
+  const ls = G.localStorage;
+  const SAVE_VERSION = 2, P = 'pkLake.';
   const MIGRATIONS = {
-    // 1: s => { ...; return s; }   (de v1 para v2)
+    // v1 -> v2: Johto, Creche/Ovos, Mega Evolução, Pontos de Batalha. Só ADICIONA campos (S.gifts e tudo mais é mantido).
+    1: s => { [...(s.party || []), ...(s.box || [])].forEach(m => { if (m && m.mega) delete m.mega; }); return s; },
   };
   function fresh(user) {
     return { v: SAVE_VERSION, user, created: Date.now(), trainer: null, avatar: 'red', money: 3000, party: [], box: [],
       bag: { 'poke-ball': 5, potion: 3 }, badges: [], elite: 0, champion: false, champs: 0, dex: { seen: {}, caught: {}, shiny: {} },
       trainersBeaten: {}, stats: { battles: 0, wins: 0, caught: 0, shinies: 0, steps: 0, playMs: 0 }, daily: { last: null, streak: 0 },
-      tower: { best: 0, cur: 0 }, settings: { sound: true, speed: 1 }, lastMap: null };
+      tower: { best: 0, cur: 0 }, settings: { sound: true, speed: 1 }, lastMap: null,
+      gifts: {}, jbadges: [], jelite: 0, jchampion: false, jchamps: 0, region: 'kanto', elmGift: false, rewards: {}, bp: 0, eggs: [], daycare: { slots: [], since: 0, lastEgg: 0 } };
   }
   function migrate(s) {
     if (!s || typeof s !== 'object') throw new Error('save inválido');
     let v = s.v || 1;
+    if (v < SAVE_VERSION && s.user && ls) { try { ls.setItem(P + 'save.' + s.user + '.premigrate.v' + v, JSON.stringify(s)); } catch (e) {} }
     while (v < SAVE_VERSION) { s = MIGRATIONS[v](s); v++; s.v = v; }
     // campos novos são aditivos: completa o que faltar sem sobrescrever
     const f = fresh(s.user); for (const k in f) if (s[k] === undefined) s[k] = f[k];
-    for (const k of ['stats', 'dex', 'daily', 'tower', 'settings']) for (const kk in f[k]) if (s[k][kk] === undefined) s[k][kk] = f[k][kk];
+    for (const k of ['stats', 'dex', 'daily', 'tower', 'settings', 'daycare']) for (const kk in f[k]) if (s[k][kk] === undefined) s[k][kk] = f[k][kk];
+    [...(s.party || []), ...(s.box || [])].forEach(m => { if (m && m.mega) delete m.mega; });
     return s;
   }
-  const ls = G.localStorage;
   const accounts = () => { try { return JSON.parse(ls.getItem(P + 'accounts') || '{}'); } catch (e) { return {}; } };
   function createAccount(user, pass) {
     const a = accounts(); const k = user.trim().toLowerCase(); if (!k) throw new Error('Digite um nome de usuário.');

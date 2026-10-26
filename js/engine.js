@@ -29,15 +29,29 @@
       case 'slow-then-very-fast': return Math.floor(n ** 3 * 0.9); case 'fast-then-very-slow': return Math.floor(n ** 3 * 1.1);
       default: return n ** 3; }
   }
+  const monTypes = m => (m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].t : D.mons[m.id].t);
   const SN = ['hp','atk','def','spa','spd','spe'];
   function calcStats(m) {
-    const b = D.mons[m.id].s, L = m.lvl, iv = m.iv, ev = m.ev || [0,0,0,0,0,0];
+    const b = (m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].s : D.mons[m.id].s), L = m.lvl, iv = m.iv, ev = m.ev || [0,0,0,0,0,0];
     return b.map((bs, i) => i === 0 ? (m.id === 292 ? 1 : Math.floor((2 * bs + iv[i] + Math.floor(ev[i] / 4)) * L / 100) + L + 10)
       : Math.floor((2 * bs + iv[i] + Math.floor(ev[i] / 4)) * L / 100) + 5);
   }
+  // moveset "inteligente": até 3 golpes de dano fortes (tipos variados, STAB preferido) + 1 de status útil
+  const BAD = new Set(['self-destruct', 'explosion', 'memento', 'final-gambit', 'healing-wish', 'lunar-dance', 'struggle', 'focus-punch', 'hyper-beam', 'giga-impact', 'solar-beam', 'sky-attack', 'skull-bash', 'razor-wind', 'dream-eater', 'snore', 'belch', 'last-resort', 'synchronoise', 'natural-gift', 'fling', 'spit-up']);
+  function movePower(n, id) { const mv = D.moves[n]; if (!mv || mv.c === 't' || !mv.p) return 0; let p = mv.p * (mv.mh ? (mv.mh + mv.xh) / 2 : 1) * (mv.a ? Math.min(1, mv.a / 100) : 1);
+    if (D.mons[id].t.includes(mv.t)) p *= 1.5; if (BAD.has(n)) p *= 0.35; if (mv.d < 0) p *= 0.85; return p; }
   function movesAt(id, lvl) {
     const seen = []; for (const [l, n] of D.mons[id].l) if (l <= lvl && D.moves[n] && !seen.includes(n)) seen.push(n);
-    return seen.slice(-4).length ? seen.slice(-4) : ['tackle'];
+    if (!seen.length) return ['tackle'];
+    const dmg = seen.filter(n => movePower(n, id) > 0).sort((a, b) => movePower(b, id) - movePower(a, id));
+    const pick = []; for (const n of dmg) { if (pick.length >= 3) break; const t = D.moves[n].t; if (pick.some(x => D.moves[x].t === t) && dmg.some(y => !pick.includes(y) && y !== n && !pick.some(x => D.moves[x].t === D.moves[y].t))) continue; pick.push(n); }
+    for (const n of dmg) if (pick.length < 3 && !pick.includes(n)) pick.push(n);
+    const GOOD = ['swords-dance', 'nasty-plot', 'calm-mind', 'dragon-dance', 'bulk-up', 'quiver-dance', 'shell-smash', 'roost', 'recover', 'soft-boiled', 'slack-off', 'moonlight', 'morning-sun', 'synthesis', 'wish', 'thunder-wave', 'will-o-wisp', 'toxic', 'spore', 'sleep-powder', 'hypnosis', 'agility', 'growth', 'leech-seed', 'protect', 'reflect', 'light-screen', 'rest', 'amnesia', 'iron-defense', 'cosmic-power', 'coil', 'work-up', 'stun-spore', 'confuse-ray', 'curse', 'rain-dance', 'sunny-day'];
+    const stat = seen.filter(n => D.moves[n].c === 't' || !D.moves[n].p).sort((a, b) => (GOOD.includes(a) ? GOOD.indexOf(a) : 99) - (GOOD.includes(b) ? GOOD.indexOf(b) : 99));
+    if (stat.length && GOOD.includes(stat[0])) pick.push(stat[0]);
+    for (const n of dmg) if (pick.length < 4 && !pick.includes(n)) pick.push(n);
+    for (const n of [...seen].reverse()) if (pick.length < 4 && !pick.includes(n)) pick.push(n);
+    return pick.slice(0, 4);
   }
   let uidc = 0;
   function makeMon(id, lvl, st, o = {}) {
@@ -54,7 +68,7 @@
   function createBattle(o) {
     // o: {kind:'wild'|'trainer'|'pvp', seed, sides:[{party,name},{party,name,ai}], weather, canRun}
     const s = { kind: o.kind, seed: o.seed | 0, turn: 0, weather: o.weather || null, over: false, winner: null, caught: null, ran: false,
-      sides: o.sides.map(sd => ({ name: sd.name, party: sd.party, active: Math.max(0, sd.party.findIndex(x => x.hp > 0)), b: null, ai: sd.ai || 0, trainer: sd.trainer || null, participants: [] })) };
+      sides: o.sides.map(sd => ({ name: sd.name, party: sd.party, active: Math.max(0, sd.party.findIndex(x => x.hp > 0)), b: null, ai: sd.ai || 0, trainer: sd.trainer || null, megaOk: !!sd.mega, megaUsed: false, participants: [] })) };
     s.sides.forEach(sd => { sd.b = bm(sd.party[sd.active]); sd.participants = [sd.active]; });
     return s;
   }
@@ -78,7 +92,7 @@
   function pname(s, i) { const m = s.sides[i].b.m; return (m.nick || D.mons[m.id].n) + (i === 1 ? (s.kind === 'wild' ? ' selvagem' : ' inimigo') : ''); }
   function applyStatus(s, ti, st, ev, src) {
     const t = s.sides[ti].b; if (t.m.status || t.m.hp <= 0) return false;
-    const tt = D.mons[t.m.id].t;
+    const tt = monTypes(t.m);
     if ((st === 'brn' && tt.includes('fire')) || (st === 'frz' && tt.includes('ice')) || ((st === 'psn' || st === 'tox') && (tt.includes('poison') || tt.includes('steel'))) || (st === 'par' && tt.includes('electric'))) return false;
     t.m.status = st; if (st === 'slp') t.sleep = ri(s, 1, 3); if (st === 'tox') t.toxic = 1;
     ev.push({ e: 'status', side: ti, status: st, text: `${pname(s, ti)} ficou ${statusName[st]}!` }); return true;
@@ -111,9 +125,9 @@
     ev.push({ e: 'use', side: ai, move: mvName, type: mv.t, cat: mv.c, text: `${pname(s, ai)} usou ${mv.n}!` });
     const selfT = mv.tg === 'user' || mv.tg === 'users-field' || mv.tg === 'user-and-allies' || mv.tg === 'entire-field';
     if (!selfT && t.m.hp <= 0) { ev.push({ e: 'msg', text: 'Mas não havia alvo!' }); return; }
-    if (mv.a && !selfT) { const acc = mv.a / 100 * accMul(a.st.acc - t.st.eva); if (rnd(s) >= acc) { ev.push({ e: 'miss', side: ai, text: `O ataque de ${pname(s, ai)} errou!` }); return; } }
-    if (mv.c !== 's' && mv.p > 0) {
-      const hits = mv.mh ? ri(s, mv.mh, mv.xh) : 1; let total = 0, n = 0;
+    if (mv.a && !selfT && abilityOf(a.m) !== 'no-guard' && abilityOf(t.m) !== 'no-guard') { const acc = mv.a / 100 * accMul(a.st.acc - t.st.eva); if (rnd(s) >= acc) { ev.push({ e: 'miss', side: ai, text: `O ataque de ${pname(s, ai)} errou!` }); return; } }
+    if (mv.c !== 't' && mv.p > 0) {
+      const hits = mv.mh ? (abilityOf(a.m) === 'skill-link' ? mv.xh : ri(s, mv.mh, mv.xh)) : 1; let total = 0, n = 0;
       for (let h = 0; h < hits && t.m.hp > 0 && a.m.hp > 0; h++) {
         const r = calcDmg(s, a, t, mv, true); if (r.eff === 0) { ev.push({ e: 'msg', text: `Não afeta ${pname(s, ti)}...` }); return; }
         total += dealDamage(s, ti, r.dmg, ev, { crit: r.crit, eff: r.eff, mtype: mv.t }); n++;
@@ -129,10 +143,10 @@
         if (mv.st && mv.st.length && mv.stc && rnd(s) * 100 < mv.stc) for (const [k, d] of mv.st) changeStat(s, d > 0 ? ai : ti, STATK[k], d, ev);
       }
       if (t.m.status === 'frz' && mv.t === 'fire' && t.m.hp > 0) { t.m.status = null; ev.push({ e: 'cure', side: ti, text: `${pname(s, ti)} descongelou!` }); }
-    } else if (mv.c !== 's' && mv.p === 0) {
+    } else if (mv.c !== 't' && mv.p === 0) {
       // golpes de dano fixo/variável (Seismic Toss, Night Shade, Dragon Rage, Sonic Boom, Super Fang)
       const fixed = { 'seismic-toss': a.m.lvl, 'night-shade': a.m.lvl, 'dragon-rage': 40, 'sonic-boom': 20, 'super-fang': Math.max(1, Math.floor(t.m.hp / 2)), psywave: Math.floor(a.m.lvl * (0.5 + rnd(s))) }[mvName];
-      if (fixed && eff(mv.t, D.mons[t.m.id].t) !== 0) dealDamage(s, ti, fixed, ev, { mtype: mv.t, eff: 1 }); else ev.push({ e: 'msg', text: 'Mas falhou!' });
+      if (fixed && eff(mv.t, monTypes(t.m)) !== 0) dealDamage(s, ti, fixed, ev, { mtype: mv.t, eff: 1 }); else ev.push({ e: 'msg', text: 'Mas falhou!' });
     } else {
       let did = false;
       if (mv.h > 0) { const mh = maxhp(a.m); if (a.m.hp >= mh) ev.push({ e: 'msg', text: 'O HP já está cheio!' }); else healMon(s, ai, mh * mv.h / 100, ev); did = true; }
@@ -144,7 +158,7 @@
   }
   function secondary(s, ti, mv, ev) {
     if (mv.ai === 'confusion') { const t = s.sides[ti].b; if (t.conf) return false; t.conf = ri(s, 2, 5); ev.push({ e: 'status', side: ti, status: 'conf', text: `${pname(s, ti)} ficou confuso!` }); return true; }
-    const st = AIL[mv.ai]; if (!st) return false; return applyStatus(s, ti, mv.n === 'Toxic' ? 'tox' : st, ev);
+    const st = AIL[mv.ai]; if (!st) return false; return applyStatus(s, ti, mv.en === 'Toxic' ? 'tox' : st, ev);
   }
   function healMon(s, i, amt, ev, text) { const m = s.sides[i].b.m, mh = maxhp(m); const h = Math.min(mh - m.hp, Math.floor(amt)); m.hp += h;
     ev.push({ e: 'heal', side: i, hp: m.hp, max: mh, amt: h, text: text || `${pname(s, i)} recuperou HP!` }); }
@@ -157,8 +171,13 @@
     if (s.weather === 'rain') d *= mv.t === 'water' ? 1.5 : mv.t === 'fire' ? 0.5 : 1;
     if (s.weather === 'sun') d *= mv.t === 'fire' ? 1.5 : mv.t === 'water' ? 0.5 : 1;
     if (crit) d *= 1.5; if (useRng) d *= (85 + Math.floor(rnd(s) * 16)) / 100;
-    const at = D.mons[a.m.id].t; if (at.includes(mv.t)) d *= 1.5;
-    const e = mv.t === '???' ? 1 : eff(mv.t, D.mons[t.m.id].t); d *= e;
+    const aa = abilityOf(a.m), ta = abilityOf(t.m);
+    const at = monTypes(a.m); if (at.includes(mv.t)) d *= aa === 'adaptability' ? 2 : 1.5;
+    let e = mv.t === '???' ? 1 : eff(mv.t, monTypes(t.m)); if (ta === 'levitate' && mv.t === 'ground') e = 0; d *= e;
+    if (aa === 'tough-claws' && phys) d *= 1.3; if (aa === 'technician' && mv.p <= 60) d *= 1.5; if (aa === 'parental-bond') d *= 1.25;
+    if ((aa === 'huge-power' || aa === 'pure-power') && phys) d *= 2; if (aa === 'mega-launcher' && /Pulse|Aura/.test(mv.en || '')) d *= 1.5;
+    if (aa === 'strong-jaw' && /Fang|Bite|Crunch/.test(mv.en || '')) d *= 1.5;
+    if (ta === 'thick-fat' && (mv.t === 'fire' || mv.t === 'ice')) d *= 0.5; if (ta === 'filter' || ta === 'solid-rock') { if (e > 1) d *= 0.75; }
     if (phys && a.m.status === 'brn') d *= 0.5;
     return { dmg: e === 0 ? 0 : Math.max(1, Math.floor(d)), crit, eff: e };
   }
@@ -168,6 +187,7 @@
       if (m.status === 'brn') { ev.push({ e: 'msg', anim: 'brn', side: i, text: `${pname(s, i)} sofreu com a queimadura!` }); dealDamage(s, i, Math.max(1, maxhp(m) / 16), ev); }
       else if (m.status === 'psn') { ev.push({ e: 'msg', anim: 'psn', side: i, text: `${pname(s, i)} sofreu com o veneno!` }); dealDamage(s, i, Math.max(1, maxhp(m) / 8), ev); }
       else if (m.status === 'tox') { ev.push({ e: 'msg', anim: 'psn', side: i, text: `${pname(s, i)} sofreu com o veneno!` }); dealDamage(s, i, Math.max(1, maxhp(m) * b.toxic++ / 16), ev); }
+      if (abilityOf(m) === 'speed-boost' && m.hp > 0 && b.st.spe < 6) changeStat(s, i, 'spe', 1, ev);
       b.flinch = false; }
   }
   // ---------- captura (fórmula Gen III/IV) ----------
@@ -203,6 +223,8 @@
   // ação: {type:'move',n} | {type:'switch',i} | {type:'item',item,target} | {type:'ball',ball} | {type:'run'}
   function step(s, acts) {
     const ev = []; if (s.over) return ev; s.turn++;
+    // Mega Evolução acontece antes de tudo (mais rápido primeiro)
+    for (const i of speedOrder(s, acts)) if (acts[i] && acts[i].mega && acts[i].type === 'move' && canMega(s, i)) doMega(s, i, ev);
     // ações não-golpe primeiro
     const order = speedOrder(s, acts);
     for (const i of order) {
@@ -221,6 +243,22 @@
       useMove(s, i, a.n, ev); if (checkEnd(s, ev)) return ev; }
     endTurn(s, ev); checkEnd(s, ev); return ev;
   }
+  // ---------- Mega Evolução ----------
+  function megaFormFor(m, ignoreItem) {
+    if (!m || m.mega || !D.megas) return null; const fs = D.mons[m.id].mg || []; if (!fs.length) return null;
+    for (const f of fs) { const g = D.megas[f]; if (g.st ? (ignoreItem || m.item === g.st) : m.moves.some(x => x.n === 'dragon-ascent')) return f; }
+    return null;
+  }
+  function canMega(s, i) { const sd = s.sides[i]; return !!(sd.megaOk && !sd.megaUsed && sd.b.m.hp > 0 && megaFormFor(sd.b.m)); }
+  function doMega(s, i, ev) {
+    const sd = s.sides[i], m = sd.b.m, f = megaFormFor(m); if (!f) return; const oldMax = maxhp(m);
+    sd.megaUsed = true; m.mega = f; m.hp = Math.max(1, Math.min(maxhp(m), m.hp + maxhp(m) - oldMax)); const g = D.megas[f];
+    ev.push({ e: 'mega', side: i, id: m.id, form: f, shiny: m.shiny, name: g.n, hp: m.hp, max: maxhp(m), text: `${pname(s, i)} reagiu à Mega Pulseira e Mega Evoluiu em ${g.n}!` });
+    const an = D.abils && D.abils[g.ab] ? D.abils[g.ab].n : g.ab; ev.push({ e: 'msg', text: `Habilidade: ${an}!` });
+    if (g.ab === 'drought') { s.weather = 'sun'; ev.push({ e: 'weather', w: 'sun', text: 'A luz do sol ficou intensa!' }); }
+    if (g.ab === 'drizzle') { s.weather = 'rain'; ev.push({ e: 'weather', w: 'rain', text: 'Começou a chover!' }); }
+  }
+  function revertMega(party) { (party || []).forEach(m => { if (m && m.mega) { const oldMax = maxhp(m); delete m.mega; m.hp = Math.max(m.hp > 0 ? 1 : 0, Math.min(maxhp(m), m.hp)); } }); }
   function checkEnd(s, ev) {
     for (let i = 0; i < 2; i++) if (s.sides[i].party.every(m => m.hp <= 0)) { s.over = true; s.winner = 1 - i; ev.push({ e: 'end', winner: 1 - i }); return true; }
     return false;
@@ -232,16 +270,27 @@
   function aiAction(s, side) {
     const sd = s.sides[side], b = sd.b, t = s.sides[1 - side].b; const usable = b.m.moves.filter(x => x.pp > 0);
     if (!usable.length) return { type: 'move', n: 'struggle' };
-    if (!sd.ai) return { type: 'move', n: usable[Math.floor(rnd(s) * usable.length)].n };
+    const mg = canMega(s, side);
+    if (!sd.ai) return { type: 'move', n: usable[Math.floor(rnd(s) * usable.length)].n, mega: mg };
     // ponderada pelo dano esperado
     let best = null, bs = -1;
     for (const x of usable) { const mv = D.moves[x.n]; let sc;
-      if (mv.c !== 's' && mv.p) sc = calcDmg(s, b, t, mv, false).dmg * (mv.a ? mv.a / 100 : 1);
+      if (mv.c !== 't' && mv.p) sc = calcDmg(s, b, t, mv, false).dmg * (mv.a ? mv.a / 100 : 1);
       else sc = (mv.ai && !t.m.status ? 20 : 5) + (mv.h && b.m.hp < maxhp(b.m) / 2 ? 40 : 0);
       sc *= 0.7 + rnd(s) * 0.6; if (sc > bs) { bs = sc; best = x.n; } }
-    return { type: 'move', n: best };
+    // IA esperta (chefes): troca quando o confronto é ruim
+    if (sd.ai === 2 && !sd.swCd) { const cur = matchup(b.m, t.m), frac = bs / Math.max(1, t.m.hp);
+      let bi = -1, bv = cur + 60; sd.party.forEach((m, i) => { if (m.hp > 0 && m !== b.m) { const v = matchup(m, t.m); if (v > bv) { bv = v; bi = i; } } });
+      if (bi >= 0 && frac < 0.45 && rnd(s) < 0.8) { sd.swCd = 2; return { type: 'switch', i: bi }; } }
+    if (sd.swCd) sd.swCd--;
+    return { type: 'move', n: best, mega: mg };
   }
-  function aiSwitchIdx(s, side) { const p = s.sides[side].party; let best = -1, bl = -1; p.forEach((m, i) => { if (m.hp > 0 && m.lvl > bl) { bl = m.lvl; best = i; } }); return best; }
+  function matchup(m, o) { const mt = monTypesOf(m), ot = monTypesOf(o); let off = 0;
+    for (const x of m.moves) { const mv = D.moves[x.n]; if (mv && mv.c !== 't' && mv.p) off = Math.max(off, mv.p * eff(mv.t, ot) * (mt.includes(mv.t) ? 1.5 : 1)); }
+    let def = 0; for (const ty of ot) def = Math.max(def, eff(ty, mt)); return off - def * 70 + m.hp / maxhp(m) * 30; }
+  function monTypesOf(m) { return (typeof monTypes === 'function' ? monTypes(m) : D.mons[m.id].t); }
+  function aiSwitchIdx(s, side) { const sd = s.sides[side], p = sd.party;
+    if (sd.ai === 2) { const o = s.sides[1 - side].b.m; let bi = -1, bv = -1e9; p.forEach((m, i) => { if (m.hp > 0) { const v = matchup(m, o); if (v > bv) { bv = v; bi = i; } } }); if (bi >= 0) return bi; } let best = -1, bl = -1; p.forEach((m, i) => { if (m.hp > 0 && m.lvl > bl) { bl = m.lvl; best = i; } }); return best; }
   // ---------- XP / níveis / evolução ----------
   function xpGain(def, trainer, share) { return Math.max(1, Math.floor(D.mons[def.id].x * def.lvl / 7 * (trainer ? 1.5 : 1) / share)); }
   function addXP(m, amt) {
@@ -252,11 +301,13 @@
       out.push({ lvl: m.lvl, learn: [...new Set(learn)] }); }
     return out;
   }
-  function levelEvo(m) { const e = (D.mons[m.id].e || []).find(x => x.lvl && m.lvl >= x.lvl); return e ? e.to : null; }
+  function levelEvo(m, tod) { const st = calcStats(m);
+    const e = (D.mons[m.id].e || []).find(x => x.lvl && m.lvl >= x.lvl && (!x.tod || !tod || x.tod === tod || (x.tod === 'day' && tod !== 'night')) && (x.rps == null || x.rps === Math.sign(st[1] - st[2])));
+    return e ? e.to : null; }
   function stoneEvo(m, item) { const e = (D.mons[m.id].e || []).find(x => x.item === item); return e ? e.to : null; }
   function evolve(m, to) { const oldMax = maxhp(m); m.id = to; m.hp = Math.max(1, m.hp + maxhp(m) - oldMax); return m; }
 
-  const API = { TYPES, eff, rnd, ri, xpFor, calcStats, maxhp, makeMon, movesAt, createBattle, step, needSwitch, forceSwitch, aiAction, aiSwitchIdx,
-    xpGain, addXP, levelEvo, stoneEvo, evolve, ballName, BALLS, HEAL, statusName };
+  const API = { movePower, TYPES, eff, rnd, ri, xpFor, calcStats, maxhp, makeMon, movesAt, createBattle, step, needSwitch, forceSwitch, aiAction, aiSwitchIdx,
+    monTypes, abilityOf, megaFormFor, canMega, revertMega, xpGain, addXP, levelEvo, stoneEvo, evolve, ballName, BALLS, HEAL, statusName };
   G.PE = API; if (typeof module !== 'undefined') module.exports = API;
 })(typeof window !== 'undefined' ? window : globalThis);

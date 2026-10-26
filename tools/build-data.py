@@ -1,5 +1,5 @@
 import json,urllib.request,concurrent.futures as cf,os,re
-IDS=list(range(1,152))+list(range(152,161))+list(range(243,261))+list(range(377,385))+list(range(387,396))
+IDS=[700,470,471]+list(range(1,261))+list(range(377,385))+list(range(387,396))
 API='https://pokeapi.co/api/v2/'
 def get(u):
     for i in range(4):
@@ -18,6 +18,7 @@ def mon(i):
       types=[t['type']['name'] for t in p['types']],
       stats=[x['base_stat'] for x in p['stats']],capture=s['capture_rate'],xp=p['base_experience'] or 100,
       growth=s['growth_rate']['name'],legend=s['is_legendary'] or s['is_mythical'],chain=s['evolution_chain']['url'],
+      eggs=[g['name'] for g in s['egg_groups']],gender=s['gender_rate'],hatch=s['hatch_counter'] or 20,abil=p['abilities'][0]['ability']['name'],
       genus=next((n['genus'] for n in s['genera'] if n['language']['name']=='en'),''),learn=mv)
 with cf.ThreadPoolExecutor(16) as ex: mons=list(ex.map(mon,IDS))
 chains={}
@@ -34,10 +35,18 @@ def walk(n):
             elif d.get('min_level'): e['lvl']=d['min_level']
             elif d.get('trigger',{}).get('name')=='trade': e['lvl']=38
             else: e['lvl']=30
+            if d.get('time_of_day'): e['tod']=d['time_of_day']
+            if d.get('relative_physical_stats') is not None: e['rps']=d['relative_physical_stats']
+            if d.get('trigger',{}).get('name')=='trade' and d.get('held_item'): e.pop('lvl',None); e['item']=d['held_item']['name']
             evo.setdefault(fid,[]).append(e)
         walk(t)
 for c in chains.values(): walk(c['chain'])
-names=set(n for m in mons for _,n in m['learn'])|{'tackle','struggle'}
+MEGA={3:['venusaur-mega'],6:['charizard-mega-x','charizard-mega-y'],9:['blastoise-mega'],15:['beedrill-mega'],18:['pidgeot-mega'],65:['alakazam-mega'],80:['slowbro-mega'],94:['gengar-mega'],115:['kangaskhan-mega'],127:['pinsir-mega'],130:['gyarados-mega'],142:['aerodactyl-mega'],150:['mewtwo-mega-x','mewtwo-mega-y'],181:['ampharos-mega'],208:['steelix-mega'],212:['scizor-mega'],214:['heracross-mega'],229:['houndoom-mega'],248:['tyranitar-mega'],254:['sceptile-mega'],257:['blaziken-mega'],260:['swampert-mega'],380:['latias-mega'],381:['latios-mega'],384:['rayquaza-mega']}
+def mega(f):
+    p=get(API+'pokemon/'+f); return dict(form=f,types=[t['type']['name'] for t in p['types']],stats=[x['base_stat'] for x in p['stats']],abil=p['abilities'][0]['ability']['name'])
+with cf.ThreadPoolExecutor(8) as ex: megas={b:list(ex.map(mega,fs)) for b,fs in MEGA.items()}
+names=set(n for m in mons for _,n in m['learn'])|{'tackle','struggle','dragon-ascent','moonblast','hyper-voice','calm-mind','shadow-ball'}
+abils=set(m['abil'] for m in mons)|set(x['abil'] for v in megas.values() for x in v)
 def move(n):
     d=get(API+'move/'+n)
     meta=d.get('meta') or {}
@@ -52,5 +61,5 @@ with cf.ThreadPoolExecutor(16) as ex: moves=dict(ex.map(move,sorted(names)))
 for m in mons:
     m['evo']=evo.get(m['id'],[]); del m['chain']
     m['learn']=[[l,n] for l,n in m['learn'] if n in moves]
-json.dump({'mons':mons,'moves':moves},open('data/raw.json','w'))
+json.dump({'mons':mons,'moves':moves,'megas':megas,'abils':sorted(abils)},open('data/raw.json','w'))
 print(len(mons),len(moves))

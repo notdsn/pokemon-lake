@@ -309,3 +309,23 @@ textarea{resize:vertical;min-height:90px;font-size:.8rem}
 .giftmon img{height:56px;image-rendering:pixelated}.giftmon small{display:block;font-size:.65rem;line-height:1.2}
 @keyframes giftpop{0%{opacity:0;transform:scale(.3) translateY(20px)}100%{opacity:1;transform:none}}
 .giftwin{position:relative}
+/* ===== v2: Mega, itens, Nat ===== */
+.megatog{background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;border:2px solid #f0abfc66}.megatog.on{box-shadow:0 0 0 3px #f0abfc,0 0 24px #e879f9;animation:megapulse 1s infinite alternate}
+@keyframes megapulse{to{filter:brightness(1.3)}}
+.megaorb{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px;border-radius:50%;background:conic-gradient(#f87171,#fbbf24,#4ade80,#38bdf8,#a78bfa,#f472b6,#f87171);box-shadow:0 0 40px #fff,0 0 80px #e879f9;animation:megaorb 1.5s ease-in forwards;z-index:3}
+@keyframes megaorb{60%{transform:scale(6) rotate(360deg);opacity:.9}100%{transform:scale(9) rotate(720deg);opacity:0}}
+.megaevo img{animation:megashake .15s infinite;filter:brightness(2) saturate(0)}@keyframes megashake{50%{transform:translateX(3px)}}
+.megaflash::after{content:'';position:absolute;inset:0;background:#fff;z-index:30;animation:mflash .5s forwards;pointer-events:none}@keyframes mflash{to{opacity:0}}
+.helditem{display:inline-flex;align-items:center;gap:4px;font-size:.75rem;color:var(--mut)}.helditem img{width:24px;height:24px;image-rendering:pixelated}
+.mds{display:block;color:var(--mut);font-size:.7rem;margin-top:2px;line-height:1.3}
+.megarow{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.megarow img{width:56px;height:56px;object-fit:contain}
+.seg.region{margin-bottom:10px}.megab{font-size:3rem}
+.natcard{display:flex;gap:12px;align-items:center;text-align:left;background:linear-gradient(120deg,#3b0764,#831843 45%,#0f172a);border:1px solid #f0abfc55;overflow:hidden;position:relative}
+.natcard img{height:110px;width:auto;filter:drop-shadow(0 4px 10px #000a)}.natcard small{color:#f9a8d4;font-weight:800;letter-spacing:.15em;font-size:.65rem}.natcard h3{font-size:1.4rem;margin:2px 0}.natcard p{font-size:.8rem;color:#e9d5ff;margin:0 0 6px}.natcard .arrow{font-size:2rem;margin-left:auto;color:#f0abfc}
+.intro.nat{background:radial-gradient(circle at 70% 50%,#a21caf,#3b0764 45%,#020617)}
+.natsplash{position:absolute;inset:0;overflow:hidden}.natrays{position:absolute;inset:-50%;background:repeating-conic-gradient(from 0deg,#fff1 0 8deg,transparent 8deg 16deg);animation:spin 12s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.natart{position:absolute;right:2%;bottom:0;height:96%;animation:natin .8s cubic-bezier(.2,.9,.2,1);filter:drop-shadow(0 0 25px #f0abfc)}@keyframes natin{from{transform:translateX(60%);opacity:0}}
+.natme{position:absolute;left:6%;bottom:10%;height:30%;image-rendering:pixelated;animation:vsL .6s}
+.natvs{position:absolute;left:30%;top:38%;font-size:3.4rem;font-weight:900;font-style:italic;color:#ffd84d;text-shadow:0 4px 0 #b45309,0 0 30px #ffcb05;animation:vsB .7s cubic-bezier(.2,1.6,.4,1)}
+.nattxt{position:absolute;left:5%;top:8%;display:flex;flex-direction:column;color:#fff;text-shadow:0 3px 12px #000}.nattxt small{letter-spacing:.3em;color:#f9a8d4;font-weight:800}.nattxt b{font-size:3.6rem;font-weight:900;line-height:1;background:linear-gradient(90deg,#f87171,#fbbf24,#4ade80,#38bdf8,#a78bfa,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}.nattxt span{font-size:.85rem;color:#e9d5ff}
+.natwin .natwimg{height:150px}.natbadge{font-size:2.6rem}.ttitle{display:inline-block;font-size:.7rem;font-weight:800;color:#f0abfc;margin-left:6px}.badge.natb{display:inline-grid;place-items:center;font-size:.8rem;width:auto;padding:0 4px;background:linear-gradient(135deg,#a855f7,#ec4899);clip-path:none;border-radius:6px}
