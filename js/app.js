@@ -116,7 +116,7 @@
     $$('.acc').forEach(b => b.onclick = () => { $('#au').value = b.dataset.u; $('#ap').focus(); });
     $('#accForm').onsubmit = e => { e.preventDefault(); try { const u = mode === 'login' ? PS.login($('#au').value, $('#ap').value) : PS.createAccount($('#au').value, $('#ap').value); startUser(u); } catch (er) { $('#aerr').textContent = er.message; } };
   }
-  function startUser(u) { user = u; sessionStorage.setItem(SESSION_KEY, u); S = PS.read(u); sessionStart = Date.now(); if (!S.trainer) onboarding(); else { checkDaily(); go('home'); } }
+  function startUser(u) { user = u; sessionStorage.setItem(SESSION_KEY, u); S = PS.read(u); sessionStart = Date.now(); if (!S.trainer) onboarding(); else { checkDaily(); repairMoves(); go('home'); } }
   ACT.logout = () => { save(); sessionStorage.removeItem(SESSION_KEY); accountsScreen(); };
 
   // ---------- novo jogo ----------
@@ -200,7 +200,7 @@
       <div class="mdh"><img class="bigspr ${m.shiny ? 'shiny-glow' : ''}" src="${spr(m)}" alt=""><div class="grow"><h2>${esc(pn(m))} ${m.shiny ? '✨' : ''}</h2><p class="mut">#${String(m.id).padStart(3, '0')} ${d.n} • Nv ${m.lvl}</p><div class="types">${d.t.map(typeChip).join('')}${stChip(m.status)}</div>
       <div class="hpbar"><i style="width:${hpPct(m)}%;background:${hpCol(hpPct(m))}"></i></div><small>${m.hp}/${s[0]} HP</small><div class="xpbar"><i style="width:${xp}%"></i></div><small class="mut">XP ${m.xp - x0}/${x1 - x0} p/ próximo nível</small></div></div>
       <div class="stats">${s.map((v, k) => `<div><small>${SN[k]}</small><div class="sbar"><i style="width:${Math.min(100, d.s[k] / 1.6)}%"></i></div><b>${v}</b></div>`).join('')}</div>
-      <h4>Golpes</h4><div class="moves">${m.moves.map(x => { const mv = D.moves[x.n]; return `<div class="mv" style="--tc:${C.TYPE_COLOR[mv.t]}"><b>${mv.n}</b><small>${C.TYPE_PT[mv.t]} • ${mv.c === 's' ? 'Status' : mv.c === 'p' ? 'Físico' : 'Especial'}${mv.p ? ' • Poder ' + mv.p : ''} • PP ${x.pp}/${mv.pp}</small></div>`; }).join('')}</div>
+      <h4>Golpes</h4><div class="moves">${m.moves.map(x => { const mv = D.moves[x.n]; return `<div class="mv" style="--tc:${C.TYPE_COLOR[mv.t]}"><b>${mv.n}</b><small>${C.TYPE_PT[mv.t]} • ${mv.c === 't' ? 'Status' : mv.c === 'p' ? 'Físico' : 'Especial'}${mv.p ? ' • Poder ' + mv.p : ''} • PP ${x.pp}/${mv.pp}</small></div>`; }).join('')}</div>
       ${evo ? `<p class="mut small">Evolui para: ${evo}</p>` : ''}<p class="mut small">Treinador original: ${esc(m.ot || '-')} • ${esc(m.caughtAt || '')}</p>
       <div class="mbtns wrap">${w === 'p' ? `${i > 0 ? `<button class="btn small" data-k="lead">⭐ Líder</button>` : ''}${S.party.length > 1 ? `<button class="btn small" data-k="tobox">💻 Mandar p/ PC</button>` : ''}` : `<button class="btn small" ${S.party.length >= 6 ? 'disabled' : ''} data-k="toparty">➕ Pôr no time</button><button class="btn small danger" data-k="release">Soltar</button>`}
       <button class="btn small" data-k="nick">✏️ Apelido</button><button class="btn small primary" data-k="item">🎒 Usar item</button></div></div>`, 'wide');
@@ -373,13 +373,38 @@
       <form id="giftForm" class="row gift"><input id="giftCode" autocapitalize="characters" autocomplete="off" placeholder="XXXX-XXXX" aria-label="Código de presente"><button class="btn primary">Resgatar</button></form><p id="giftErr" class="err"></p></div>`;
   }
   // ---------- códigos de presente (hash sha256, validado no cliente) ----------
+  // golpes fortes e coerentes para Pokémon de presente
+  const GIFT_MOVES = { 144: ['ice-beam', 'blizzard', 'hurricane', 'roost'], 145: ['thunderbolt', 'drill-peck', 'heat-wave', 'roost'], 146: ['flamethrower', 'air-slash', 'heat-wave', 'roost'],
+    150: ['psychic', 'aura-sphere', 'ice-beam', 'recover'], 151: ['psychic', 'aura-sphere', 'flamethrower', 'nasty-plot'], 243: ['thunderbolt', 'extrasensory', 'shadow-ball', 'calm-mind'],
+    244: ['flamethrower', 'extrasensory', 'stone-edge', 'calm-mind'], 245: ['surf', 'ice-beam', 'extrasensory', 'calm-mind'], 249: ['aeroblast', 'psychic', 'ice-beam', 'roost'],
+    250: ['sacred-fire', 'brave-bird', 'earthquake', 'recover'], 251: ['psychic', 'energy-ball', 'earth-power', 'recover'], 377: ['stone-edge', 'superpower', 'earthquake', 'iron-defense'],
+    378: ['ice-beam', 'thunderbolt', 'focus-blast', 'amnesia'], 379: ['iron-head', 'flash-cannon', 'earthquake', 'iron-defense'], 380: ['dragon-pulse', 'psychic', 'surf', 'calm-mind'],
+    381: ['dragon-pulse', 'psychic', 'surf', 'calm-mind'], 382: ['surf', 'ice-beam', 'thunder', 'calm-mind'], 383: ['earthquake', 'stone-edge', 'fire-punch', 'bulk-up'],
+    384: ['outrage', 'dragon-claw', 'extreme-speed', 'dragon-dance'], 385: ['iron-head', 'psychic', 'thunderbolt', 'calm-mind'], 386: ['psycho-boost', 'superpower', 'ice-beam', 'extreme-speed'],
+    6: ['flamethrower', 'air-slash', 'dragon-claw', 'heat-wave'], 700: ['moonblast', 'hyper-voice', 'calm-mind', 'shadow-ball'],
+    134: ['surf', 'ice-beam', 'shadow-ball', 'wish'], 135: ['thunderbolt', 'shadow-ball', 'signal-beam', 'calm-mind'], 136: ['flare-blitz', 'superpower', 'fire-fang', 'quick-attack'],
+    196: ['psychic', 'dazzling-gleam', 'shadow-ball', 'calm-mind'], 197: ['foul-play', 'dark-pulse', 'moonlight', 'wish'], 470: ['leaf-blade', 'x-scissor', 'swords-dance', 'quick-attack'],
+    471: ['ice-beam', 'blizzard', 'shadow-ball', 'ice-shard'] };
+  const giftMoves = id => { const l = (GIFT_MOVES[id] || []).filter(n => D.moves[n]); if (l.length < 4) for (const n of PE.makeMon(id, 50, { seed: 1 }).moves.map(x => x.n)) if (l.length < 4 && !l.includes(n)) l.push(n); return l; };
+  const IV31 = [31, 31, 31, 31, 31, 31], GO = () => ({ ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false });
+  // reparo único de saves: corrige golpes fracos/status-only (bug de golpes especiais) sem remover nenhum Pokémon
+  function repairMoves() {
+    if (S.fixMoves1) return; let n = 0;
+    for (const m of [...S.party, ...S.box]) { if (!m || !D.mons[m.id]) continue;
+      const gift = (m.caughtAt || '').includes('Presente'), dmg = m.moves.filter(x => D.moves[x.n] && D.moves[x.n].c !== 't' && D.moves[x.n].p).length;
+      if (gift) { m.moves = giftMoves(m.id).map(k => ({ n: k, pp: D.moves[k].pp })); m.hp = PE.maxhp(m); n++; }
+      else if (dmg < 2) { m.moves = PE.makeMon(m.id, m.lvl, { seed: 7 }).moves.map(x => ({ n: x.n, pp: D.moves[x.n].pp })); n++; }
+      m.hp = Math.min(m.hp, PE.maxhp(m)); }
+    S.fixMoves1 = Date.now(); save(); if (n) setTimeout(() => toast(`Golpes de ${n} Pokémon foram atualizados!`, 'good'), 600);
+  }
   const GIFTS = { 'dac1e434edd06c55a24826838ea64907fd92279994a369734519122db8e2754c': { name: 'Lendas do Edson', build: () => {
     const seen = new Set(), list = [];
     C.MAPS.forEach(mp => mp.enc.forEach(e => { if (e[4] && e[4].legend && !seen.has(e[0])) { seen.add(e[0]); list.push([e[0], e[2]]); } }));
-    const out = list.map(([id, l]) => PE.makeMon(id, l, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false }));
+    const out = list.map(([id, l]) => PE.makeMon(id, l, st, { ...GO(), moves: giftMoves(id) }));
     out.push(PE.makeMon(6, 50, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false, iv: [31, 31, 31, 31, 31, 31], moves: ['flamethrower', 'air-slash', 'dragon-claw', 'heat-wave'] }));
     return out; } },
-    '96fb1f08d72fdb10d1c524db3b9981ae48a271ef7831d240f0390208882108b9': { name: 'Sylveon do Edson', build: () => [PE.makeMon(700, 50, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false, iv: [31, 31, 31, 31, 31, 31], moves: ['moonblast', 'hyper-voice', 'calm-mind', 'shadow-ball'] })] } };
+    '96fb1f08d72fdb10d1c524db3b9981ae48a271ef7831d240f0390208882108b9': { name: 'Sylveon do Edson', build: () => [PE.makeMon(700, 50, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false, iv: [31, 31, 31, 31, 31, 31], moves: ['moonblast', 'hyper-voice', 'calm-mind', 'shadow-ball'] })] },
+    '01aea158d891de1fd0c6ec8b42ba842caf7aa770452629662a4b036852608d56': { name: 'Eeveelutions + Mew do Edson', build: () => [134, 135, 136, 196, 197, 470, 471, 700, 151].map(id => PE.makeMon(id, 50, st, { ...GO(), iv: IV31, moves: giftMoves(id) })) } };
   async function redeemGift(code) {
     const h = sha256(code.trim().toUpperCase()), g = GIFTS[h], err = $('#giftErr');
     if (!g) { if (err) err.textContent = 'Código inválido.'; return; }
@@ -463,7 +488,7 @@
   }
   function showMoves() {
     const m = B.s.sides[0].b.m, e = B.s.sides[1].b.m; const known = S.dex.caught[e.id] || B.o.kind === 'trainer';
-    $('#bctl').innerHTML = `<div class="bmoves">${m.moves.map(x => { const mv = D.moves[x.n]; const ef = mv.c !== 's' ? PE.eff(mv.t, D.mons[e.id].t) : 1;
+    $('#bctl').innerHTML = `<div class="bmoves">${m.moves.map(x => { const mv = D.moves[x.n]; const ef = mv.c !== 't' ? PE.eff(mv.t, D.mons[e.id].t) : 1;
       return `<button class="mvb" style="--tc:${C.TYPE_COLOR[mv.t]}" data-b="mv" data-n="${x.n}" ${x.pp <= 0 ? 'disabled' : ''}><b>${mv.n}</b><small>${C.TYPE_PT[mv.t]} • ${mv.p ? 'Pod ' + mv.p : 'Status'} • PP ${x.pp}/${mv.pp}</small>${known ? (ef > 1 ? '<em class="ef up">Super!</em>' : ef < 1 ? `<em class="ef dn">${ef === 0 ? 'Imune' : 'Fraco'}</em>` : '') : ''}</button>`; }).join('')}</div><button class="bb back" data-b="back">← Voltar</button>`;
     bindCtl();
   }
@@ -519,7 +544,7 @@
       const mon = side => bq(side ? '.emon' : '.pmon');
       switch (e.e) {
         case 'use': { log(e.text); await wait(420); const el = mon(e.side); el.classList.add('lunge'); setTimeout(() => el.classList.remove('lunge'), 450);
-          if (e.cat !== 's') await projectile(e.side, e.type); else { auraFx(e.side, e.type); SFX.status(); await wait(550); } break; }
+          if (e.cat !== 't') await projectile(e.side, e.type); else { auraFx(e.side, e.type); SFX.status(); await wait(550); } break; }
         case 'hp': { const el = mon(e.side); if (e.dmg > 0) { el.classList.add('hit'); if (e.eff > 1 || e.crit) { SFX.superhit(); ov.classList.add('shake'); } else if (e.eff < 1) SFX.weak(); else SFX.hit();
             dmgNum(e.side, e.dmg, e.crit, e.eff); setTimeout(() => { el.classList.remove('hit'); ov.classList.remove('shake'); }, 500); }
           setHP(e.side, e.hp, e.max); await wait(650); break; }
