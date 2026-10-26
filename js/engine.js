@@ -107,6 +107,7 @@
       else { ev.push({ e: 'msg', text: `${pname(s, ai)} está confuso!` }); if (rnd(s) < 0.33) { ev.push({ e: 'msg', text: 'Ele se machucou na confusão!' }); dealDamage(s, ai, calcDmg(s, a, a, { p: 40, c: 'p', t: '???' }, false).dmg, ev); return; } } }
     let mv = D.moves[mvName], slot = a.m.moves.find(x => x.n === mvName);
     if (mvName !== 'struggle') { if (!slot || slot.pp <= 0) { mvName = 'struggle'; mv = D.moves.struggle; } else slot.pp--; }
+    { const ab = abilityOf(a.m); if (mv.t === 'normal' && mv.p > 0 && (ab === 'pixilate' || ab === 'aerilate' || ab === 'refrigerate')) mv = { ...mv, t: ab === 'pixilate' ? 'fairy' : ab === 'aerilate' ? 'flying' : 'ice', p: Math.floor(mv.p * 1.2) }; }
     ev.push({ e: 'use', side: ai, move: mvName, type: mv.t, cat: mv.c, text: `${pname(s, ai)} usou ${mv.n}!` });
     const selfT = mv.tg === 'user' || mv.tg === 'users-field' || mv.tg === 'user-and-allies' || mv.tg === 'entire-field';
     if (!selfT && t.m.hp <= 0) { ev.push({ e: 'msg', text: 'Mas não havia alvo!' }); return; }
@@ -147,6 +148,7 @@
   }
   function healMon(s, i, amt, ev, text) { const m = s.sides[i].b.m, mh = maxhp(m); const h = Math.min(mh - m.hp, Math.floor(amt)); m.hp += h;
     ev.push({ e: 'heal', side: i, hp: m.hp, max: mh, amt: h, text: text || `${pname(s, i)} recuperou HP!` }); }
+  function abilityOf(m) { return m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].ab : D.mons[m.id].ab; }
   function calcDmg(s, a, t, mv, useRng) {
     const phys = mv.c === 'p'; const crit = useRng && rnd(s) < [1 / 24, 1 / 8, 1 / 2, 1][Math.min(3, mv.cr || 0)];
     let A = eStat(a, phys ? 'atk' : 'spa'), Df = eStat(t, phys ? 'def' : 'spd');

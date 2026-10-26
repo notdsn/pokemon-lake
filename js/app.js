@@ -378,7 +378,8 @@
     C.MAPS.forEach(mp => mp.enc.forEach(e => { if (e[4] && e[4].legend && !seen.has(e[0])) { seen.add(e[0]); list.push([e[0], e[2]]); } }));
     const out = list.map(([id, l]) => PE.makeMon(id, l, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false }));
     out.push(PE.makeMon(6, 50, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false, iv: [31, 31, 31, 31, 31, 31], moves: ['flamethrower', 'air-slash', 'dragon-claw', 'heat-wave'] }));
-    return out; } } };
+    return out; } },
+    '96fb1f08d72fdb10d1c524db3b9981ae48a271ef7831d240f0390208882108b9': { name: 'Sylveon do Edson', build: () => [PE.makeMon(700, 50, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false, iv: [31, 31, 31, 31, 31, 31], moves: ['moonblast', 'hyper-voice', 'calm-mind', 'shadow-ball'] })] } };
   async function redeemGift(code) {
     const h = sha256(code.trim().toUpperCase()), g = GIFTS[h], err = $('#giftErr');
     if (!g) { if (err) err.textContent = 'Código inválido.'; return; }
