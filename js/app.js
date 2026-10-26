@@ -84,9 +84,9 @@
     return `<div class="grid"><div class="card span2 dchead"><h2>🏡 Creche Pokémon</h2><p class="mut">Deixe até 2 Pokémon. Eles ganham XP com o tempo real e, se forem compatíveis, aparecem Ovos! Ovos chocam explorando (cada busca = passos) ou com o tempo.</p>
       <div class="dcslots">${slot(a, 0)}<div class="dcheart">${a && b ? (c ? '💞' : '💤') : '🏠'}</div>${slot(b, 1)}</div>${a && b ? `<p class="center dcmsg">${COMPAT_TXT[c]}</p>` : ''}
       <p class="mut small center">🥚 Ovos com você: <b>${S.eggs.length}/6</b></p></div>
-      ${dc.slots.length < 2 ? `<div class="card span2"><h3>Escolha quem deixar na Creche</h3><div class="dcpick">${cand.map(([m, w, i]) => `<button class="pm" data-a="dcin" data-w="${w}" data-i="${i}" ${w === 'p' && S.party.length <= 1 ? 'disabled' : ''}><img src="${spr(m)}" alt=""><small>${D.mons[m.id].n} Nv ${m.lvl}</small></button>`).join('')}</div><p class="mut small">Você precisa manter pelo menos 1 Pokémon no time.</p></div>` : ''}
+      ${dc.slots.length < 2 ? `<div class="card span2"><h3>Escolha quem deixar na Creche</h3><div class="dcpick">${cand.map(([m, w, i]) => `<button class="pm" data-a="dcin" data-w="${w}" data-i="${i}" data-u="${m.uid || ''}" ${w === 'p' && S.party.length <= 1 ? 'disabled' : ''}><img src="${spr(m)}" alt=""><small>${D.mons[m.id].n} Nv ${m.lvl}</small></button>`).join('')}</div><p class="mut small">Você precisa manter pelo menos 1 Pokémon no time.</p></div>` : ''}
       ${S.eggs.length ? `<div class="card span2"><h3>🥚 Seus ovos</h3><div class="eggs">${S.eggs.map(eggCard).join('')}</div></div>` : ''}</div>`; }
-  ACT.dcin = d => { if (S.daycare.slots.length >= 2) return; const arr = d.w === 'p' ? S.party : S.box, i = +d.i; if (d.w === 'p' && S.party.length <= 1) return toast('Mantenha pelo menos 1 Pokémon no time.');
+  ACT.dcin = d => { if (S.daycare.slots.length >= 2) return; const arr = d.w === 'p' ? S.party : S.box; let i = +d.i; if (d.u) { const j = arr.findIndex(x => x.uid === d.u); if (j < 0) return render(); i = j; } if (!arr[i]) return render(); if (d.w === 'p' && S.party.length <= 1) return toast('Mantenha pelo menos 1 Pokémon no time.');
     daycareTick(); const m = arr.splice(i, 1)[0]; m.hp = PE.maxhp(m); m.status = null; S.daycare.slots.push(m); if (S.daycare.slots.length === 1) { S.daycare.since = Date.now() + (A.dcSkew || 0); S.daycare.lastEgg = S.daycare.since; } save(); toast(`${pn(m)} ficou na Creche.`, 'good'); render(); };
   ACT.dcout = d => { daycareTick(); const m = S.daycare.slots.splice(+d.i, 1)[0]; if (!m) return; m.hp = PE.maxhp(m); if (S.party.length < 6) S.party.push(m); else S.box.push(m); save(); toast(`${pn(m)} voltou (Nv ${m.lvl})${S.party.includes(m) ? '' : ' para o PC'}.`, 'good'); render(); };
   // ---------- Prof. Elm ----------
@@ -267,10 +267,11 @@
       <div class="mbtns wrap">${w === 'p' ? `${i > 0 ? `<button class="btn small" data-k="lead">⭐ Líder</button>` : ''}${S.party.length > 1 ? `<button class="btn small" data-k="tobox">💻 Mandar p/ PC</button>` : ''}` : `<button class="btn small" ${S.party.length >= 6 ? 'disabled' : ''} data-k="toparty">➕ Pôr no time</button><button class="btn small danger" data-k="release">Soltar</button>`}
       <button class="btn small" data-k="nick">✏️ Apelido</button><button class="btn small primary" data-k="item">🎒 Usar item</button><button class="btn small" data-k="hold">💎 ${m.item ? 'Trocar/tirar item' : 'Segurar item'}</button>${m.id === 384 && !m.moves.some(x => x.n === 'dragon-ascent') ? '<button class="btn small primary" data-k="tutor">🐉 Ensinar Ascensão do Dragão</button>' : ''}</div></div>`, 'wide');
     $$('[data-k]', mm).forEach(b => b.onclick = async () => { SFX.click(); const k = b.dataset.k;
+      i = list.indexOf(m); if (i < 0) { closeModal(); render(); return; } // índice sempre atual (nunca mexe no Pokémon errado)
       if (k === 'lead') S.party.unshift(S.party.splice(i, 1)[0]);
       if (k === 'tobox') S.box.push(S.party.splice(i, 1)[0]);
       if (k === 'toparty') S.party.push(S.box.splice(i, 1)[0]);
-      if (k === 'release') { if (!(await ask('Soltar?', `Soltar ${esc(pn(m))} na natureza? Isso não pode ser desfeito.`, [{ t: 'Cancelar', v: 0 }, { t: 'Soltar', cls: 'danger', v: 1 }]))) return monDetail(w, i); S.box.splice(i, 1); }
+      if (k === 'release') { if (w !== 'b') return; if (!(await ask('Soltar?', `Soltar ${esc(pn(m))} na natureza? Isso não pode ser desfeito.`, [{ t: 'Cancelar', v: 0 }, { t: 'Soltar', cls: 'danger', v: 1 }]))) return monDetail(w, i); const j = S.box.indexOf(m); if (j >= 0) S.box.splice(j, 1); }
       if (k === 'nick') { const n = prompt('Apelido (vazio para remover):', m.nick || ''); if (n !== null) m.nick = n.trim().slice(0, 12) || null; }
       if (k === 'item') return pickItemFor(m);
       if (k === 'hold') return pickHold(m, w, i);
@@ -484,8 +485,33 @@
       <div class="setrow"><span>Velocidade da batalha</span><div class="seg">${[[1.4, 'Lenta'], [1, 'Normal'], [0.6, 'Rápida'], [0.3, 'Turbo']].map(([v, l]) => `<button class="${S.settings.speed === v ? 'on' : ''}" data-a="set" data-k="speed" data-v="${v}">${l}</button>`).join('')}</div></div>
       <button class="btn wide ghost" data-a="lock">🔒 Bloquear site neste aparelho</button></div>
       <div class="card"><h3>🎁 Código de presente</h3><p class="mut small">Tem um código? Digite aqui para receber o presente (cada código vale uma vez por conta).</p>
-      <form id="giftForm" class="row gift"><input id="giftCode" autocapitalize="characters" autocomplete="off" placeholder="XXXX-XXXX" aria-label="Código de presente"><button class="btn primary">Resgatar</button></form><p id="giftErr" class="err"></p></div>`;
+      <form id="giftForm" class="row gift"><input id="giftCode" autocapitalize="characters" autocomplete="off" placeholder="XXXX-XXXX" aria-label="Código de presente"><button class="btn primary">Resgatar</button></form><p id="giftErr" class="err"></p></div>
+      <div class="card"><h3>🛟 Recuperar Pokémon</h3><p class="mut small">Sumiu algum Pokémon? Procura nas cópias de segurança deste aparelho e devolve para o PC. Não apaga nada.</p><button class="btn wide" data-a="recover">🔎 Procurar Pokémon perdidos</button></div>`;
   }
+  // ---------- recuperação de Pokémon (lê backups; só ADICIONA ao PC) ----------
+  const monKey = m => m.uid || ['x', m.id, m.ot, m.caughtAt, (m.iv || []).join('.')].join('|');
+  function allMine() { return [...S.party, ...S.box, ...((S.daycare && S.daycare.slots) || [])].filter(Boolean); }
+  function findLost() {
+    const have = new Set(allMine().map(monKey)), pre = 'pkLake.save.' + user, best = {};
+    for (let k = 0; k < localStorage.length; k++) { const key = localStorage.key(k); if (!key || (key !== pre && !key.startsWith(pre + '.'))) continue;
+      let o; try { o = JSON.parse(localStorage.getItem(key)); } catch (e) { continue; } if (!o || typeof o !== 'object') continue;
+      for (const m of [...(o.party || []), ...(o.box || []), ...((o.daycare && o.daycare.slots) || [])]) { if (!m || !D.mons[m.id] || !Array.isArray(m.moves)) continue; const id = monKey(m);
+        if (have.has(id)) continue; if (!best[id] || m.lvl > best[id].m.lvl) best[id] = { m, src: key.slice(pre.length + 1) || 'atual' }; } }
+    return Object.values(best);
+  }
+  const LENDAS_H = 'dac1e434edd06c55a24826838ea64907fd92279994a369734519122db8e2754c';
+  ACT.recover = () => { const lost = findLost();
+    const giftZard = S.gifts && S.gifts[LENDAS_H] && !allMine().some(m => m.id === 6 && (m.caughtAt || '').includes('Presente')) && !lost.some(x => x.m.id === 6);
+    const where = id => { const p = S.party.filter(m => m.id === id).length, b = S.box.filter(m => m.id === id).length, c = (S.daycare.slots || []).filter(m => m.id === id).length; return `time ${p} • PC ${b} • Creche ${c}`; };
+    modal(`<div class="center"><h2>🛟 Recuperar Pokémon</h2>${lost.length ? `<p>Encontrei <b>${lost.length}</b> Pokémon nas cópias de segurança que não estão no seu time, PC nem Creche:</p>
+      <div class="giftgrid">${lost.map(x => `<div class="giftmon"><img src="${sprId(x.m.id)}" alt=""><small>${esc(x.m.nick || D.mons[x.m.id].n)}<br>Nv ${x.m.lvl}</small></div>`).join('')}</div>
+      <div class="mbtns"><button class="btn primary wide" data-a="recoverdo">Devolver todos para o PC</button></div>` : `<p>Nenhum Pokémon perdido nas cópias de segurança deste aparelho.</p>`}
+      ${giftZard ? `<p class="small">O <b>Charizard</b> do código EDSON-LENDAS não está em lugar nenhum.</p><div class="mbtns"><button class="btn primary wide" data-a="recoverzard">Devolver o Charizard do presente</button></div>` : ''}
+      <p class="mut small">Charizard agora: ${where(6)}</p><div class="mbtns"><button class="btn wide" data-a="close">Fechar</button></div></div>`); };
+  ACT.recoverdo = () => { const lost = findLost(); lost.forEach(({ m }) => { const c = JSON.parse(JSON.stringify(m)); delete c.mega; delete c.dmax; c.hp = Math.max(1, Math.min(c.hp || 0, PE.maxhp(c))) || PE.maxhp(c); S.box.push(c); addCaught(c); });
+    save(); closeModal(); toast(`🛟 ${lost.length} Pokémon voltaram para o PC!`, 'good'); render(); };
+  ACT.recoverzard = () => { const m = PE.makeMon(6, 50, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false, iv: [31, 31, 31, 31, 31, 31], moves: ['flamethrower', 'air-slash', 'dragon-claw', 'heat-wave'] });
+    if (S.party.length < 6) S.party.push(m); else S.box.push(m); addCaught(m); save(); closeModal(); toast(`🛟 Charizard voltou${S.party.includes(m) ? ' para o time' : ' para o PC'}!`, 'good'); render(); };
   // ---------- códigos de presente (hash sha256, validado no cliente) ----------
   // golpes fortes e coerentes para Pokémon de presente
   const GIFT_MOVES = { 144: ['ice-beam', 'blizzard', 'hurricane', 'roost'], 145: ['thunderbolt', 'drill-peck', 'heat-wave', 'roost'], 146: ['flamethrower', 'air-slash', 'heat-wave', 'roost'],
@@ -552,7 +578,7 @@
   const bq = q => $(q, $('#battle'));
   function startBattle(o) {
     const enemyParty = o.enemy; enemyParty.forEach(m => see(m.id)); S.stats.battles++;
-    if (S.party[0].hp <= 0) { const i = S.party.findIndex(m => m.hp > 0); S.party.unshift(S.party.splice(i, 1)[0]); }
+    if (S.party[0].hp <= 0) { const i = S.party.findIndex(m => m.hp > 0); if (i > 0) S.party.unshift(S.party.splice(i, 1)[0]); }
     const bs = PE.createBattle({ kind: o.kind, seed: (R() * 2 ** 31) | 0, weather: o.weather, sides: [{ party: S.party, name: S.trainer, mega: (S.bag['mega-bracelet'] || 0) > 0 }, { party: enemyParty, name: o.name || '', ai: o.ai || 0, mega: enemyParty.some(m => m.item) }] });
     B = { o, s: bs, busy: true };
     const theme = o.map ? o.map.theme : o.tower ? 'psychic' : 'gym';

@@ -44,6 +44,8 @@
     const key = P + 'save.' + s.user, str = JSON.stringify(s);
     // backup rotativo a cada 10 min (3 cópias)
     if (Date.now() - lastBackup > 600000) { const old = ls.getItem(key); if (old) { for (let i = 2; i > 0; i--) { const b = ls.getItem(key + '.bak' + (i - 1)); if (b) ls.setItem(key + '.bak' + i, b); } ls.setItem(key + '.bak0', old); } lastBackup = Date.now(); }
+    // cópia diária extra (não gira a cada 10 min) para recuperação de Pokémon
+    try { const d = new Date().toISOString().slice(0, 10); if (ls.getItem(key + '.bakdayT') !== d) { const old = ls.getItem(key); if (old) ls.setItem(key + '.bakday', old); ls.setItem(key + '.bakdayT', d); } } catch (e) {}
     ls.setItem(key, str);
   }
   function exportSave(s) { return 'PKLAKE1:' + btoa(unescape(encodeURIComponent(JSON.stringify(s)))); }
