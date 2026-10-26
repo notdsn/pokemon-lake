@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const D = PDATA, C = PC;
-  const PASS_HASH = '6d3c4ed2d598297e9ec96f04c794d8cfd22f18ff14731cfd206a13b63ef48cc5';
+  const PASS_HASH = '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5';
   const UNLOCK_KEY = 'pkLake.unlock', SESSION_KEY = 'pkLake.session';
   const $ = (q, r = document) => r.querySelector(q), $$ = (q, r = document) => [...r.querySelectorAll(q)];
   const app = $('#app');
