@@ -518,15 +518,21 @@
     out.push(PE.makeMon(6, 50, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false, iv: [31, 31, 31, 31, 31, 31], moves: ['flamethrower', 'air-slash', 'dragon-claw', 'heat-wave'] }));
     return out; } },
     '96fb1f08d72fdb10d1c524db3b9981ae48a271ef7831d240f0390208882108b9': { name: 'Sylveon do Edson', build: () => [PE.makeMon(700, 50, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false, iv: [31, 31, 31, 31, 31, 31], moves: ['moonblast', 'hyper-voice', 'calm-mind', 'shadow-ball'] })] },
-    '01aea158d891de1fd0c6ec8b42ba842caf7aa770452629662a4b036852608d56': { name: 'Eeveelutions + Mew do Edson', build: () => [134, 135, 136, 196, 197, 470, 471, 700, 151].map(id => PE.makeMon(id, 50, st, { ...GO(), iv: IV31, moves: giftMoves(id) })) } };
+    '01aea158d891de1fd0c6ec8b42ba842caf7aa770452629662a4b036852608d56': { name: 'Eeveelutions + Mew do Edson', build: () => [134, 135, 136, 196, 197, 470, 471, 700, 151].map(id => PE.makeMon(id, 50, st, { ...GO(), iv: IV31, moves: giftMoves(id) })) },
+    'c8715b3a2989f1ee29a31fa5b86846f118984c807eecea6a7f13e7a16481bc40': { name: 'Mega Kit do Edson', items: { 'mega-bracelet': 1, 'charizardite-x': 1, 'charizardite-y': 1 }, build: () => [] } };
   async function redeemGift(code) {
     const h = sha256(code.trim().toUpperCase()), g = GIFTS[h], err = $('#giftErr');
     if (!g) { if (err) err.textContent = 'Código inválido.'; return; }
     S.gifts = S.gifts || {};
     if (S.gifts[h]) { if (err) err.textContent = 'Este código já foi resgatado nesta conta.'; return; }
     const mons = g.build(); let toBox = 0;
+    const its = Object.entries(g.items || {}); its.forEach(([k, v]) => { S.bag[k] = k === 'mega-bracelet' ? 1 : (S.bag[k] || 0) + v; });
     mons.forEach(m => { addCaught(m); S.stats.caught++; if (S.party.length < 6) S.party.push(m); else { S.box.push(m); toBox++; } });
-    S.gifts[h] = { at: Date.now(), n: mons.length }; save(); SFX.caught();
+    S.gifts[h] = { at: Date.now(), n: mons.length, items: its.length || undefined }; save(); SFX.caught();
+    if (!mons.length) { modal(`<div class="center giftwin"><div class="burstbg"></div><h2>🎁 ${g.name}!</h2><p>Você recebeu:</p>
+      <div class="giftgrid">${its.map(([k, v], i) => `<div class="giftmon" style="animation-delay:${i * 0.15}s"><img src="img/items/${k}.png" alt="" style="image-rendering:pixelated;width:56px;height:56px"><small>${k === 'mega-bracelet' ? 'Mega Pulseira' : C.ITEM_NAME[k]}${k === 'mega-bracelet' ? '' : '<br>x' + v}</small></div>`).join('')}</div>
+      <p class="mut small">🧬 Dê uma Charizardita para o Charizard segurar e toque em <b>Mega Evoluir</b> no menu de golpes!</p>
+      <div class="mbtns"><button class="btn primary wide" data-a="close">Incrível!</button></div></div>`); render(); return; }
     modal(`<div class="center giftwin"><div class="burstbg"></div><h2>🎁 ${g.name}!</h2><p>Você recebeu <b>${mons.length} Pokémon</b>!${toBox ? ` ${toBox} foram para o PC.` : ''}</p>
       <div class="giftgrid">${mons.map((m, i) => `<div class="giftmon" style="animation-delay:${i * 0.12}s"><img src="${spr(m)}" alt=""><small>${D.mons[m.id].n}<br>Nv ${m.lvl}</small></div>`).join('')}</div>
       <div class="mbtns"><button class="btn primary wide" data-a="close">Incrível!</button></div></div>`);
