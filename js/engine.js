@@ -31,10 +31,15 @@
   }
   const monTypes = m => (m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].t : D.mons[m.id].t);
   const SN = ['hp','atk','def','spa','spd','spe'];
+  // 25 naturezas: [nome, stat+ , stat-] (1=Atk 2=Def 3=AtE 4=DfE 5=Vel); iguais = neutra
+  const NATURES = [['Firme',1,1],['Solitária',1,2],['Corajosa',1,5],['Inflexível',1,3],['Travessa',1,4],['Ousada',2,1],['Dócil',2,2],['Relaxada',2,5],['Marota',2,3],['Frouxa',2,4],
+    ['Tímida',5,1],['Apressada',5,2],['Séria',5,5],['Alegre',5,3],['Ingênua',5,4],['Modesta',3,1],['Branda',3,2],['Quieta',3,5],['Acanhada',3,3],['Precipitada',3,4],
+    ['Calma',4,1],['Gentil',4,2],['Atrevida',4,5],['Cuidadosa',4,3],['Peculiar',4,4]];
+  const natMul = (m, i) => { const n = m.nat == null ? null : NATURES[m.nat]; if (!n || n[1] === n[2]) return 1; return n[1] === i ? 1.1 : n[2] === i ? 0.9 : 1; };
   function calcStats(m) {
     const b = (m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].s : D.mons[m.id].s), L = m.lvl, iv = m.iv, ev = m.ev || [0,0,0,0,0,0];
     return b.map((bs, i) => i === 0 ? (m.id === 292 ? 1 : Math.floor((2 * bs + iv[i] + Math.floor(ev[i] / 4)) * L / 100) + L + 10)
-      : Math.floor((2 * bs + iv[i] + Math.floor(ev[i] / 4)) * L / 100) + 5);
+      : Math.floor((Math.floor((2 * bs + iv[i] + Math.floor(ev[i] / 4)) * L / 100) + 5) * natMul(m, i)));
   }
   // moveset "inteligente": até 3 golpes de dano fortes (tipos variados, STAB preferido) + 1 de status útil
   const BAD = new Set(['self-destruct', 'explosion', 'memento', 'final-gambit', 'healing-wish', 'lunar-dance', 'struggle', 'focus-punch', 'hyper-beam', 'giga-impact', 'solar-beam', 'sky-attack', 'skull-bash', 'razor-wind', 'dream-eater', 'snore', 'belch', 'last-resort', 'synchronoise', 'natural-gift', 'fling', 'spit-up']);
@@ -57,11 +62,11 @@
   function makeMon(id, lvl, st, o = {}) {
     const iv = o.iv || [0,0,0,0,0,0].map(() => ri(st, 0, 31));
     const shiny = o.shiny ?? (rnd(st) < (o.shinyRate || 1 / 512));
-    const m = { uid: o.uid || ('m' + Date.now().toString(36) + (uidc++).toString(36) + Math.floor(rnd(st) * 1e6).toString(36)), id, lvl, xp: xpFor(D.mons[id].g, lvl), iv, ev: [0,0,0,0,0,0], shiny,
+    const m = { uid: o.uid || ('m' + Date.now().toString(36) + (uidc++).toString(36) + Math.floor(rnd(st) * 1e6).toString(36)), id, lvl, xp: xpFor(D.mons[id].g, lvl), iv, ev: [0,0,0,0,0,0], shiny, nat: o.nat ?? ri(st, 0, 24),
       moves: (o.moves || movesAt(id, lvl)).map(n => ({ n, pp: D.moves[n].pp })), status: null, nick: null, ot: o.ot || null, caughtAt: o.caughtAt || null };
     m.hp = calcStats(m)[0]; return m;
   }
-  const maxhp = m => calcStats(m)[0] * (m.dmax ? 2 : 1);
+  const maxhp = m => Math.floor(calcStats(m)[0] * (m.dmax ? 2 : 1) * (m.raidHp || 1));
 
   // ---------- batalha ----------
   function bm(m) { return { m, st: { atk:0,def:0,spa:0,spd:0,spe:0,acc:0,eva:0 }, conf: 0, flinch: false, sleep: 0, toxic: 0 }; }
@@ -104,7 +109,8 @@
     ev.push({ e: 'stat', side: ti, stat: k, d, text: `${STATPT[k]} de ${pname(s, ti)} ${w}!` });
   }
   function dealDamage(s, ti, dmg, ev, extra) {
-    const m = s.sides[ti].b.m; dmg = Math.max(0, Math.min(m.hp, Math.floor(dmg))); m.hp -= dmg;
+    const m = s.sides[ti].b.m; if (m.shield > 0 && dmg > 0) { dmg *= 0.25; m.shield--; ev.push({ e: 'msg', side: ti, text: m.shield ? `🛡️ A barreira absorveu o golpe! (${m.shield} restante${m.shield > 1 ? 's' : ''})` : '💥 A barreira do chefe se partiu!' }); }
+    dmg = Math.max(0, Math.min(m.hp, Math.floor(dmg))); m.hp -= dmg;
     ev.push(Object.assign({ e: 'hp', side: ti, hp: m.hp, max: maxhp(m), dmg }, extra || {}));
     if (m.hp <= 0) { m.status = null; if (m.dmax) delete m.dmax; ev.push({ e: 'faint', side: ti, text: `${pname(s, ti)} desmaiou!` }); }
     return dmg;
@@ -369,7 +375,7 @@
   function stoneEvo(m, item) { const e = (D.mons[m.id].e || []).find(x => x.item === item); return e ? e.to : null; }
   function evolve(m, to) { const oldMax = maxhp(m); m.id = to; m.hp = Math.max(1, m.hp + maxhp(m) - oldMax); return m; }
 
-  const API = { movePower, TYPES, eff, rnd, ri, xpFor, calcStats, maxhp, makeMon, movesAt, createBattle, step, needSwitch, forceSwitch, aiAction, aiSwitchIdx,
+  const API = { NATURES, natMul, movePower, TYPES, eff, rnd, ri, xpFor, calcStats, maxhp, makeMon, movesAt, createBattle, step, needSwitch, forceSwitch, aiAction, aiSwitchIdx,
     monTypes, abilityOf, megaFormFor, canMega, revertMega, canDyna, gmaxOf, maxMoveOf, GMAX, MAXN, xpGain, addXP, levelEvo, stoneEvo, evolve, ballName, BALLS, HEAL, statusName };
   G.PE = API; if (typeof module !== 'undefined') module.exports = API;
 })(typeof window !== 'undefined' ? window : globalThis);

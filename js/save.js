@@ -1,11 +1,13 @@
 // Saves versionados. NUNCA apagar saves: para mudar o formato, incremente SAVE_VERSION e adicione uma migração.
 (function (G) {
   const ls = G.localStorage;
-  const SAVE_VERSION = 4, P = 'pkLake.';
+  const SAVE_VERSION = 5, P = 'pkLake.';
   const MIGRATIONS = {
     // v1 -> v2: Johto, Creche/Ovos, Mega Evolução, Pontos de Batalha. Só ADICIONA campos (S.gifts e tudo mais é mantido).
     // v2 -> v3: Dinamax/Gigantamax. Só remove estado temporário de batalha (dmax) se tiver sobrado.
     // v3 -> v4: Missões, marcos da Pokédex, conquistas, pesca, mini-jogos, música. Só ADICIONA campos.
+    // v4 -> v5: Safári, Raides, Lendas, Torneio, Estilo/Casa, Naturezas (aplicadas no jogo com natFix). Só ADICIONA.
+    4: s => s,
     3: s => s,
     2: s => { [...(s.party || []), ...(s.box || [])].forEach(m => { if (m && m.dmax) delete m.dmax; }); return s; },
     1: s => { [...(s.party || []), ...(s.box || [])].forEach(m => { if (m && m.mega) delete m.mega; }); return s; },
@@ -14,9 +16,10 @@
     return { v: SAVE_VERSION, user, created: Date.now(), trainer: null, avatar: 'red', money: 3000, party: [], box: [],
       bag: { 'poke-ball': 5, potion: 3 }, badges: [], elite: 0, champion: false, champs: 0, dex: { seen: {}, caught: {}, shiny: {} },
       trainersBeaten: {}, stats: { battles: 0, wins: 0, caught: 0, shinies: 0, steps: 0, playMs: 0, fished: 0, hatched: 0, quizRight: 0, questsDone: 0, megas: 0, dmaxes: 0 }, daily: { last: null, streak: 0 },
-      tower: { best: 0, cur: 0 }, settings: { sound: true, speed: 1, music: true, mvol: 0.35, svol: 0.8 }, lastMap: null,
+      tower: { best: 0, cur: 0 }, settings: { sound: true, speed: 1, music: true, mvol: 0.35, svol: 0.8, follow: true }, lastMap: null,
       gifts: {}, jbadges: [], jelite: 0, jchampion: false, jchamps: 0, region: 'kanto', elmGift: false, rewards: {}, bp: 0, eggs: [], daycare: { slots: [], since: 0, lastEgg: 0 },
-      quests: {}, dexm: {}, ach: {}, achInit: 0, title: null, mini: {} };
+      quests: {}, dexm: {}, ach: {}, achInit: 0, title: null, mini: {},
+      safari: null, raids: {}, legq: {}, tour: {}, rematch: {}, trophies: 0, style: { color: 'c0', hat: 'h0', aura: 'a0', owned: { c0: 1, h0: 1, a0: 1 } }, house: { slots: [null, null, null, null, null, null, null, null], owned: {}, wall: 'w0', walls: { w0: 1 } } };
   }
   function migrate(s) {
     if (!s || typeof s !== 'object') throw new Error('save inválido');
@@ -25,7 +28,7 @@
     while (v < SAVE_VERSION) { s = MIGRATIONS[v](s); v++; s.v = v; }
     // campos novos são aditivos: completa o que faltar sem sobrescrever
     const f = fresh(s.user); for (const k in f) if (s[k] === undefined) s[k] = f[k];
-    for (const k of ['stats', 'dex', 'daily', 'tower', 'settings', 'daycare']) for (const kk in f[k]) if (s[k][kk] === undefined) s[k][kk] = f[k][kk];
+    for (const k of ['stats', 'dex', 'daily', 'tower', 'settings', 'daycare', 'style', 'house']) for (const kk in f[k]) if (s[k][kk] === undefined) s[k][kk] = f[k][kk];
     [...(s.party || []), ...(s.box || [])].forEach(m => { if (m && m.mega) delete m.mega; if (m && m.dmax) delete m.dmax; });
     return s;
   }

@@ -15,7 +15,7 @@ const W = ms => new Promise(r => setTimeout(r, ms));
       s.champion = true; s.badges = [0, 1, 2, 3, 4, 5, 6, 7]; s.party[0].lvl = 100; s.party[0].mega = 'charizard-mega-x'; s.party[0].moves = [{ n: 'growl', pp: 40 }]; delete s.bag['mega-bracelet']; localStorage.setItem(k, JSON.stringify(s)); });
     await p.goto(URL); await W(2500); await shot('johto-0-migracao');
     const mg = await p.evaluate(() => { const S = PokeApp.debug.S; return { v: S.v, eggs: Array.isArray(S.eggs), dc: !!S.daycare, bracelet: S.bag['mega-bracelet'], party: S.party.length, mega: S.party[0].mega || null, moves: S.party[0].moves.map(x => x.n) }; });
-    ok(mg.v === 2 && mg.eggs && mg.dc && mg.party === 1 && !mg.mega, 'migração v1→v2 sem perder Pokémon ' + JSON.stringify(mg)); ok(mg.bracelet === 1, 'Mega Pulseira retroativa'); ok(!mg.moves.includes('growl') || mg.moves.length > 1, 'golpes reparados ' + mg.moves);
+    ok(mg.v >= 2 && mg.eggs && mg.dc && mg.party === 1 && !mg.mega, 'migração v1→v2 sem perder Pokémon ' + JSON.stringify(mg)); ok(mg.bracelet === 1, 'Mega Pulseira retroativa'); ok(!mg.moves.includes('growl') || mg.moves.length > 1, 'golpes reparados ' + mg.moves);
     await clr();
     // 2) Johto + Prof. Elm
     await p.evaluate(() => PokeApp.debug.go('maps')); await W(300); await p.click('.seg.region button[data-k="johto"]'); await W(500); await shot('johto-1-mapas');

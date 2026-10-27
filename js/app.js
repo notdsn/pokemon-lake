@@ -120,13 +120,13 @@
   const battleWeather = w => w === 'rain' || w === 'storm' ? 'rain' : w === 'sun' ? 'sun' : null;
 
   // ---------- navegação ----------
-  const MORE_TABS = ['shop', 'center', 'bag', 'dex', 'card', 'saves', 'settings', 'daycare', 'quests', 'games', 'ach'];
+  const MORE_TABS = ['shop', 'center', 'bag', 'dex', 'card', 'saves', 'settings', 'daycare', 'quests', 'games', 'ach', 'safari', 'raid', 'legends', 'arena', 'house', 'style'];
   const moreOk = k => k !== 'daycare' || FEAT.daycare;
   function go(t, s) { tab = t; sub = s || null; render(); window.scrollTo(0, 0); }
   function render() {
     if (!S) return;
     const nav = [['home', '🏠', 'Início'], ['team', '🎒', 'Time'], ['maps', '🗺️', 'Mapas'], ['battle', '⚔️', 'Batalha'], ['more', '☰', 'Mais']];
-    const V = { quests: vQuests, games: vGames, ach: vAch, daycare: vDaycare, home: vHome, team: vTeam, maps: vMaps, battle: vBattle, more: vMore, shop: vShop, center: vCenter, bag: vBag, dex: vDex, card: vCard, saves: vSaves, settings: vSettings, explore: vExplore };
+    const V = { safari: vSafari, raid: vRaid, legends: vLegends, arena: vArena, house: vHouse, style: vStyle, quests: vQuests, games: vGames, ach: vAch, daycare: vDaycare, home: vHome, team: vTeam, maps: vMaps, battle: vBattle, more: vMore, shop: vShop, center: vCenter, bag: vBag, dex: vDex, card: vCard, saves: vSaves, settings: vSettings, explore: vExplore };
     ensureQuests(); const nbadge = questClaimable() + dexClaimable();
     const on = k => tab === k || (k === 'more' && MORE_TABS.includes(tab)) || (k === 'maps' && tab === 'explore');
     app.innerHTML = `<header class="top"><div class="brand" data-a="tab" data-t="home"><img src="img/items/poke-ball.png" alt=""><b>Pokémon <i>Lake</i></b></div>
@@ -173,7 +173,7 @@
     $$('.acc').forEach(b => b.onclick = () => { $('#au').value = b.dataset.u; $('#ap').focus(); });
     $('#accForm').onsubmit = e => { e.preventDefault(); try { const u = mode === 'login' ? PS.login($('#au').value, $('#ap').value) : PS.createAccount($('#au').value, $('#ap').value); startUser(u); } catch (er) { $('#aerr').textContent = er.message; } };
   }
-  function startUser(u) { user = u; sessionStorage.setItem(SESSION_KEY, u); S = PS.read(u); sessionStart = Date.now(); if (!S.trainer) onboarding(); else { retroRewards(); checkDaily(); try { ensureQuests(); checkAch(); } catch (e) {} repairMoves(); try { daycareTick(); setTimeout(checkEggs, 1500); } catch (e) {} go('home'); } }
+  function startUser(u) { user = u; sessionStorage.setItem(SESSION_KEY, u); S = PS.read(u); sessionStart = Date.now(); if (!S.trainer) onboarding(); else { retroRewards(); try { retroNatures(); } catch (e) {} checkDaily(); try { ensureQuests(); checkAch(); } catch (e) {} repairMoves(); try { daycareTick(); setTimeout(checkEggs, 1500); } catch (e) {} go('home'); } }
   function retroBand() { if (S.champion && S.bag['mega-bracelet'] && !S.bag['dynamax-band']) { S.bag['dynamax-band'] = 1; save(); setTimeout(() => modal(`<div class="center badgewin"><div class="bigbadge megab"><img src="img/items/dynamax-band.png" alt=""></div><h2>Pulseira Dinamax!</h2><p>Como Campeão, você também recebeu a <b>Pulseira Dinamax</b>. Uma vez por batalha, toque em <b>⬣ Dinamax</b> no menu de golpes: o Pokémon fica gigante por 3 turnos, com o dobro de HP e Golpes Max!</p><p class="mut small">Charizard, Venusaur, Blastoise, Pikachu, Eevee, Snorlax e outros viram <b>Gigantamax</b> com golpes G-Max exclusivos. Não dá para usar Mega e Dinamax na mesma batalha.</p><button class="btn primary wide" data-a="close">Incrível!</button></div>`), 1400); } }
   function retroRewards() { retroBand(); if (S.champion && !S.bag['mega-bracelet']) { S.bag['mega-bracelet'] = 1; save(); setTimeout(() => modal(`<div class="center badgewin"><div class="bigbadge megab"><img src="img/items/mega-bracelet.png" alt=""></div><h2>Mega Pulseira!</h2><p>Como Campeão de Kanto, você recebeu a <b>Mega Pulseira</b>. Faça um Pokémon segurar a Mega Pedra certa e toque em <b>🧬 Mega Evoluir</b> no menu de golpes!</p><p class="mut small">Mega Pedras: achados raros nos mapas, prêmios de Ginásios/Elite e loja de Pontos da Torre de Batalha. Johto também foi liberado!</p><button class="btn primary wide" data-a="close">Incrível!</button></div>`), 900); } }
   ACT.logout = () => { save(); sessionStorage.removeItem(SESSION_KEY); accountsScreen(); };
@@ -199,14 +199,14 @@
   }
 
   // ---------- recompensa diária ----------
-  const DAILY = [{ money: 1000 }, { 'poke-ball': 5 }, { potion: 3, money: 500 }, { 'great-ball': 3 }, { 'super-potion': 3 }, { 'ultra-ball': 2 }, { 'rare-candy': 1, money: 2000 }];
+  const DAILY = [{ money: 1000, 'poke-ball': 5 }, { money: 1500, 'great-ball': 3 }, { money: 2000, 'super-potion': 3 }, { money: 2500, 'ultra-ball': 3 }, { money: 3000, 'rare-candy': 1 }, { money: 4000, 'ultra-ball': 5, 'rare-candy': 2 }, { money: 10000, 'master-ball': 1, 'rare-candy': 3, 'wishing-piece': 1 }];
   const dailyText = r => Object.entries(r).map(([k, v]) => k === 'money' ? fmt(v) : `${v}x ${C.ITEM_NAME[k]}`).join(' + ');
   const streakHtml = () => `<div class="streak">${DAILY.map((x, i) => `<span class="${i < ((S.daily.streak - 1) % 7) + 1 ? 'on' : ''}">${i === 6 ? '🎁' : i + 1}</span>`).join('')}</div>`;
   function checkDaily() {
     const today = new Date().toDateString(); if (S.daily.last === today) return;
     const y = new Date(Date.now() - 864e5).toDateString(); S.daily.streak = S.daily.last === y ? S.daily.streak + 1 : 1; S.daily.last = today;
     const r = DAILY[(S.daily.streak - 1) % 7]; giveReward(r); save();
-    setTimeout(() => { SFX.coin(); modal(`<div class="daily center"><div class="gift">🎁</div><h3>Recompensa diária — dia ${S.daily.streak}</h3><p><b>${dailyText(r)}</b></p>${streakHtml()}<p class="mut small">Volte todo dia para manter a sequência!</p><button class="btn primary wide" data-a="close">Pegar!</button></div>`); render(); }, 400);
+    setTimeout(() => { SFX.coin(); modal(`<div class="daily center"><div class="gift">🎁</div><h3>Recompensa diária — dia ${S.daily.streak}</h3><p><b>${dailyText(r)}</b></p>${calendarHtml()}<p class="mut small">Volte todo dia para manter a sequência!</p><button class="btn primary wide" data-a="close">Pegar!</button></div>`); render(); }, 400);
   }
   function giveReward(r) { for (const [k, v] of Object.entries(r)) { if (k === 'money') S.money += v; else S.bag[k] = (S.bag[k] || 0) + v; } }
 
@@ -222,7 +222,7 @@
   const dexCount = () => [Object.keys(S.dex.seen).length, Object.keys(S.dex.caught).length];
   function trainerCard(big) {
     const [se, ca] = dexCount(); const h = Math.floor(S.stats.playMs / 36e5), mi = Math.floor(S.stats.playMs / 6e4) % 60;
-    return `<div class="tcard ${big ? 'big' : ''}"><div class="tcl"><img src="img/tr/${S.avatar}.png" alt=""></div><div class="tcr"><small>CARTÃO DE TREINADOR</small>${titleOf() ? `<span class="ttitle">🏆 ${titleOf()}</span>` : S.nat && S.nat.wins ? '<span class="ttitle">🌈 Mestre Eevee</span>' : ''}<h2>${esc(S.trainer)}${S.champion ? ' 👑' : ''}</h2>
+    return `<div class="tcard ${big ? 'big' : ''}"><div class="tcl ${auraOf() ? 'au-' + auraOf() : ''}">${trImg()}</div><div class="tcr"><small>CARTÃO DE TREINADOR</small>${titleOf() ? `<span class="ttitle">🏆 ${titleOf()}</span>` : S.nat && S.nat.wins ? '<span class="ttitle">🌈 Mestre Eevee</span>' : ''}<h2>${esc(S.trainer)}${S.champion ? ' 👑' : ''}</h2>
       <div class="badges">${C.BADGES.map((_, i) => badgeHtml(i, S.badges.includes(i))).join('')}</div>${S.nat && S.nat.wins ? '<span class="badge natb on" title="Insígnia Nat">🌈</span>' : ''}${S.champion && FEAT.johto ? `<div class="badges j">${C.JBADGES.map((_, i) => jbadgeHtml(i, S.jbadges.includes(i))).join('')}</div>` : ''}
       <div class="tstats"><span><b>${ca}</b> capturados</span><span><b>${se}</b> vistos</span><span><b>${Object.keys(S.dex.shiny).length}</b> ✨</span>${big ? `<span><b>${S.stats.wins}</b> vitórias</span><span><b>${h}h${String(mi).padStart(2, '0')}</b> jogadas</span><span><b>${S.tower.best}</b> torre</span>` : ''}</div></div></div>`;
   }
@@ -238,7 +238,7 @@
         ${hurt ? `<button class="btn wide heal" data-a="tab" data-t="center">❤️ Curar no Centro Pokémon</button>` : ''}</div>
       <button class="card scene-card theme-${lm.theme} per-${period()}" data-a="enter" data-id="${lm.id}"><div class="sc-mons">${lm.enc.filter(e => !e[4]?.legend).slice(0, 3).map(e => `<img src="${sprId(e[0])}" class="${S.dex.seen[e[0]] ? '' : 'sil'}" alt="">`).join('')}</div><div class="sc-over"><small>CONTINUAR EXPLORANDO</small><h3>${lm.emoji} ${lm.name}</h3><p>${WEATHER[w][1]} ${WEATHER[w][0]} • ${PERIOD_PT[period()]}</p></div></button>
       <div class="card quick"><button class="qb" data-a="tab" data-t="shop">🛒<small>Loja</small></button><button class="qb" data-a="tab" data-t="dex">📕<small>Pokédex</small></button><button class="qb" data-a="tab" data-t="bag">🎒<small>Mochila</small></button><button class="qb" data-a="tab" data-t="card">🪪<small>Perfil</small></button></div>
-      <div class="card"><h3>Sequência diária 🔥 ${S.daily.streak} dia(s)</h3>${streakHtml()}<p class="mut small">Amanhã: ${dailyText(DAILY[S.daily.streak % 7])}</p></div>
+      <div class="card"><h3>Sequência diária 🔥 ${S.daily.streak} dia(s)</h3>${calendarHtml()}<p class="mut small">Amanhã: ${dailyText(DAILY[S.daily.streak % 7])}</p></div>
     </div>`;
   }
   function monCard(m, i, where) {
@@ -262,14 +262,14 @@
     const mm = modal(`<div class="mdet" style="--tc:${C.TYPE_COLOR[d.t[0]]}"><button class="x" data-a="close">✕</button>
       <div class="mdh"><img class="bigspr ${m.shiny ? 'shiny-glow' : ''}" src="${spr(m)}" alt=""><div class="grow"><h2>${esc(pn(m))} ${m.shiny ? '✨' : ''}</h2><p class="mut">#${String(m.id).padStart(3, '0')} ${d.n} • Nv ${m.lvl}</p><div class="types">${d.t.map(typeChip).join('')}${stChip(m.status)}</div>
       <div class="hpbar"><i style="width:${hpPct(m)}%;background:${hpCol(hpPct(m))}"></i></div><small>${m.hp}/${s[0]} HP</small><div class="xpbar"><i style="width:${xp}%"></i></div><small class="mut">XP ${m.xp - x0}/${x1 - x0} p/ próximo nível</small></div></div>
-      <div class="stats">${s.map((v, k) => `<div><small>${SN[k]}</small><div class="sbar"><i style="width:${Math.min(100, d.s[k] / 1.6)}%"></i></div><b>${v}</b></div>`).join('')}</div>
-      <p class="small abil">✨ Habilidade: <b>${abName(d.ab)}</b> <span class="mut">${D.abils && D.abils[d.ab] ? D.abils[d.ab].d : ''}</span></p>
+      <div class="stats">${s.map((v, k) => `<div><small class="${PE.natMul(m, k) > 1 ? 'nup' : PE.natMul(m, k) < 1 ? 'ndn' : ''}">${SN[k]}</small><div class="sbar"><i style="width:${Math.min(100, d.s[k] / 1.6)}%"></i></div><b>${v}</b></div>`).join('')}</div>
+      <p class="small natl">🧬 Natureza: <b>${natTxt(m)}</b> <button class="btn small ghost" data-k="judge">⚖️ Avaliação</button></p><p class="small abil">✨ Habilidade: <b>${abName(d.ab)}</b> <span class="mut">${D.abils && D.abils[d.ab] ? D.abils[d.ab].d : ''}</span></p>
       <p class="small">🎒 Segurando: <b>${m.item ? C.ITEM_NAME[m.item] || m.item : 'nada'}</b>${megaHint(m)}</p>
       <h4>Golpes</h4><div class="moves">${m.moves.map(x => { const mv = D.moves[x.n]; return `<div class="mv" style="--tc:${C.TYPE_COLOR[mv.t]}"><b>${mv.n}</b><small>${C.TYPE_PT[mv.t]} • ${mv.c === 't' ? 'Status' : mv.c === 'p' ? 'Físico' : 'Especial'}${mv.p ? ' • Poder ' + mv.p : ''} • PP ${x.pp}/${mv.pp}</small>${mv.ds ? `<small class="mds">${mv.ds}</small>` : ''}</div>`; }).join('')}</div>
       ${evo ? `<p class="mut small">Evolui para: ${evo}</p>` : ''}<p class="mut small">Treinador original: ${esc(m.ot || '-')} • ${esc(m.caughtAt || '')}</p>
       <div class="mbtns wrap">${w === 'p' ? `${i > 0 ? `<button class="btn small" data-k="lead">⭐ Líder</button>` : ''}${S.party.length > 1 ? `<button class="btn small" data-k="tobox">💻 Mandar p/ PC</button>` : ''}` : `<button class="btn small" ${S.party.length >= 6 ? 'disabled' : ''} data-k="toparty">➕ Pôr no time</button><button class="btn small danger" data-k="release">Soltar</button>`}
       <button class="btn small" data-k="nick">✏️ Apelido</button><button class="btn small primary" data-k="item">🎒 Usar item</button><button class="btn small" data-k="hold">💎 ${m.item ? 'Trocar/tirar item' : 'Segurar item'}</button>${m.id === 384 && !m.moves.some(x => x.n === 'dragon-ascent') ? '<button class="btn small primary" data-k="tutor">🐉 Ensinar Ascensão do Dragão</button>' : ''}</div></div>`, 'wide');
-    $$('[data-k]', mm).forEach(b => b.onclick = async () => { SFX.click(); const k = b.dataset.k;
+    $$('[data-k]', mm).forEach(b => b.onclick = async () => { SFX.click(); const k = b.dataset.k; if (k === 'judge') return judge(m);
       i = list.indexOf(m); if (i < 0) { closeModal(); render(); return; } // índice sempre atual (nunca mexe no Pokémon errado)
       if (k === 'lead') S.party.unshift(S.party.splice(i, 1)[0]);
       if (k === 'tobox') S.box.push(S.party.splice(i, 1)[0]);
@@ -353,9 +353,9 @@
     const mp = C.MAPS.find(m => m.id === sub) || C.MAPS[0], w = weatherOf(mp), ws = encWeights(mp, w), tot = ws.reduce((a, b) => a + b, 0);
     const tr = mp.trainers || [];
     return `<div class="grid"><div class="card span2 explore theme-${mp.theme} w-${w} per-${period()}" id="scene"><div class="sky"><i class="sun"></i></div><div class="wx"></div><div class="ground"></div>
-      <div class="grass-row">${'<i></i>'.repeat(12)}</div><img class="me" src="img/tr/${S.avatar}.png" alt=""><div class="alertmark">!</div>
+      <div class="grass-row">${'<i></i>'.repeat(12)}</div>${meHtml()}${followerHtml()}<div class="alertmark">!</div>
       <div class="ex-top"><button class="btn small ghost" data-a="tab" data-t="maps">← Mapas</button><span class="chip">${WEATHER[w][1]} ${WEATHER[w][0]}</span><span class="chip">${PERIOD_PT[period()]}</span></div>
-      <div class="ex-bot"><h2>${mp.emoji} ${mp.name}</h2><p>${mp.desc}</p><div class="exbtns"><button class="btn primary big" data-a="search" id="searchBtn">🔍 Procurar Pokémon</button>${isWater(mp) ? '<button class="btn big fishbtn" data-a="fish" id="fishBtn0">🎣 Pescar</button>' : ''}</div></div></div>
+      <div class="ex-bot"><h2>${mp.emoji} ${mp.name}</h2><p>${mp.desc}</p><div class="exbtns"><button class="btn primary big" data-a="search" id="searchBtn">🔍 Procurar Pokémon</button>${isWater(mp) ? '<button class="btn big fishbtn" data-a="fish" id="fishBtn0">🎣 Pescar</button>' : ''}${mp.id === 'safari' ? '<button class="btn big sfbtn" data-a="tab" data-t="safari">🦏 Jogo do Safári</button>' : ''}${legendHunts(mp).map(([q, sp]) => `<button class="btn big legbtn" data-a="leghunt" data-q="${q.id}">${sp.btn}</button>`).join('')}</div></div></div>
       <div class="card"><h3>Pokémon desta área</h3><div class="enc">${mp.enc.map((e, i) => { const sn = S.dex.seen[e[0]], leg = e[4]?.legend; if (leg && !sn) return ''; const pc = ws[i] / tot * 100;
         return `<div class="encm ${sn ? '' : 'unk'}"><img src="${sprId(e[0])}" class="${sn ? '' : 'sil'}" alt="" loading="lazy"><small>${sn ? D.mons[e[0]].n : '???'}</small><small class="mut">${pc < 1 ? 'raro' : Math.round(pc) + '%'}${S.dex.caught[e[0]] ? ' ●' : ''}</small></div>`; }).join('')}${mp.enc.some(e => e[4]?.legend && !S.dex.seen[e[0]]) ? '<div class="encm unk"><span class="q">⭐</span><small>Lendário?</small></div>' : ''}</div>
         <p class="mut small">${w !== 'clear' ? `${WEATHER[w][1]} O clima de agora favorece alguns tipos.` : 'Clima estável.'} ● = já capturado</p></div>
@@ -396,7 +396,7 @@
         <button class="btn primary wide" ${nb >= 4 ? '' : 'disabled'} data-a="tower">${nb >= 4 ? 'Próxima batalha' : '🔒 Precisa de 4 insígnias'}</button><button class="btn wide" data-a="bpshop">💎 Loja de Pontos (Mega Pedras)</button></div>
       <div class="card soon"><h3>🌐 Em breve</h3><p class="mut small">Batalhas ao vivo entre amigos, trocas e chat. O motor de batalha já foi feito pensando nisso.</p></div></div>`;
   }
-  const mkTeam = (team, mul, iv) => team.map(([id, l, o]) => { const m = PE.makeMon(id, Math.min(100, Math.round(l * mul)), st, { shiny: false, iv: Array(6).fill(iv) }); if (o && o.item) m.item = o.item; return m; });
+  const mkTeam = (team, mul, iv) => team.map(([id, l, o]) => { const m = PE.makeMon(id, Math.min(100, Math.round(l * mul)), st, { shiny: false, iv: Array(6).fill(iv), nat: bestNat(id) }); if (o && o.item) m.item = o.item; return m; });
   function vBattleJ() {
     const nb = S.jbadges.length;
     return `<div class="grid"><div class="card span2"><div class="row between wrap"><h3>🏟️ Ginásios de Johto</h3>${regionSeg()}</div><p class="mut small">Pós-jogo de Kanto: times no estilo HeartGold/SoulSilver com níveis turbinados. Cada vitória inédita dá uma Mega Pedra!</p><div class="gyms">${C.JGYMS.map((g, i) => { const won = S.jbadges.includes(i), ok = i <= nb;
@@ -434,7 +434,7 @@
   // ---------- Mais ----------
   function vMore() {
     const qc = questClaimable(), dc = dexClaimable(), gq = quizState();
-    const it = [['quests', '📜', 'Missões', qc ? `🎁 ${qc} recompensa(s) para resgatar!` : 'Diárias e semanais'], ['games', '🎮', 'Mini-jogos', `Quem é esse Pokémon? (${QUIZ_ROUNDS - gq.n} hoje) • Pesca`], ['ach', '🏆', 'Conquistas', `${Object.keys(S.ach || {}).length}/${ACH.length} • títulos`], ['shop', '🛒', 'Loja Pokémon', 'Bolas, poções, pedras'], ['center', '❤️', 'Centro Pokémon', 'Cura grátis do time'], ['bag', '🎒', 'Mochila', 'Seus itens'], ['dex', '📕', 'Pokédex', dc ? `🏅 ${dc} marco(s) para resgatar!` : 'Vistos, capturados e marcos'],
+    const it = [['quests', '📜', 'Missões', qc ? `🎁 ${qc} recompensa(s) para resgatar!` : 'Diárias e semanais'], ['games', '🎮', 'Mini-jogos', `Quem é esse Pokémon? (${QUIZ_ROUNDS - gq.n} hoje) • Pesca`], ['ach', '🏆', 'Conquistas', `${Object.keys(S.ach || {}).length}/${ACH.length} • títulos`], ['legends', '⭐', 'Lendas', 'Histórias, enigmas e lendários'], ['raid', '⬣', 'Raides Dinamax', `${raidsLeft()} raide(s) hoje • chefes gigantes`], ['arena', '🏟️', 'Torneio e Revanches', 'Torneio semanal • líderes mais fortes'], ['safari', '🦏', 'Zona Safári', 'Sem batalhas: iscas, pedras e raros'], ['house', '🏠', 'Minha Casa', 'Decore e exiba troféus'], ['style', '👕', 'Boutique', 'Cores, chapéus e auras'], ['shop', '🛒', 'Loja Pokémon', 'Bolas, poções, pedras'], ['center', '❤️', 'Centro Pokémon', 'Cura grátis do time'], ['bag', '🎒', 'Mochila', 'Seus itens'], ['dex', '📕', 'Pokédex', dc ? `🏅 ${dc} marco(s) para resgatar!` : 'Vistos, capturados e marcos'],
       ['daycare', '🏡', 'Creche Pokémon', `Deixe 2 Pokémon, ganhe XP e ovos${S.eggs.length ? ' • ' + S.eggs.length + ' ovo(s)' : ''}`], ['card', '🪪', 'Cartão de Treinador', 'Perfil e insígnias'], ['saves', '💾', 'Salvar / Backup', 'Exportar e importar save'], ['settings', '⚙️', 'Configurações', 'Som e velocidade']];
     return `<div class="grid">${it.map(([k, i, t, dsc]) => `<button class="card morec ${(k === 'quests' && qc) || (k === 'dex' && dc) ? 'hasrw' : ''}" data-a="tab" data-t="${k}"><span class="mi">${i}</span><div><b>${t}</b><small class="mut">${dsc}</small></div></button>`).join('')}<button class="card morec" data-a="logout"><span class="mi">🚪</span><div><b>Trocar de conta</b><small class="mut">Sair de ${esc(S.trainer)}</small></div></button></div>`;
   }
@@ -486,7 +486,7 @@
   ACT.imp = () => doImport($('#imp').value);
   document.addEventListener('change', e => { if (e.target.id === 'impf' && e.target.files[0]) e.target.files[0].text().then(doImport); });
   function vSettings() {
-    return `<div class="card"><h3>⚙️ Configurações</h3><div class="setrow"><span>Som</span><div class="seg">${[[true, 'Ligado'], [false, 'Desligado']].map(([v, l]) => `<button class="${S.settings.sound === v ? 'on' : ''}" data-a="set" data-k="sound" data-v="${v}">${l}</button>`).join('')}</div></div>${audioSettings()}
+    return `<div class="card"><h3>⚙️ Configurações</h3><div class="setrow"><span>Som</span><div class="seg">${[[true, 'Ligado'], [false, 'Desligado']].map(([v, l]) => `<button class="${S.settings.sound === v ? 'on' : ''}" data-a="set" data-k="sound" data-v="${v}">${l}</button>`).join('')}</div></div>${audioSettings()}<div class="setrow"><span>🐾 Pokémon seguindo no mapa</span><div class="seg">${[[true, 'Sim'], [false, 'Não']].map(([v, l]) => `<button class="${(S.settings.follow !== false) === v ? 'on' : ''}" data-a="setfollow" data-v="${v}">${l}</button>`).join('')}</div></div>
       <div class="setrow"><span>Velocidade da batalha</span><div class="seg">${[[1.4, 'Lenta'], [1, 'Normal'], [0.6, 'Rápida'], [0.3, 'Turbo']].map(([v, l]) => `<button class="${S.settings.speed === v ? 'on' : ''}" data-a="set" data-k="speed" data-v="${v}">${l}</button>`).join('')}</div></div>
       <button class="btn wide ghost" data-a="lock">🔒 Bloquear site neste aparelho</button></div>
       <div class="card"><h3>🎁 Código de presente</h3><p class="mut small">Tem um código? Digite aqui para receber o presente (cada código vale uma vez por conta).</p>
@@ -585,7 +585,7 @@
   function startBattle(o) {
     const enemyParty = o.enemy; enemyParty.forEach(m => see(m.id)); S.stats.battles++; MUS.want('battle');
     if (S.party[0].hp <= 0) { const i = S.party.findIndex(m => m.hp > 0); if (i > 0) S.party.unshift(S.party.splice(i, 1)[0]); }
-    const bs = PE.createBattle({ kind: o.kind, seed: (R() * 2 ** 31) | 0, weather: o.weather, sides: [{ party: S.party, name: S.trainer, mega: (S.bag['mega-bracelet'] || 0) > 0, dyna: (S.bag['dynamax-band'] || 0) > 0 }, { party: enemyParty, name: o.name || '', ai: o.ai || 0, mega: enemyParty.some(m => m.item), dyna: !!o.dyna }] });
+    const bs = PE.createBattle({ kind: o.kind, seed: (R() * 2 ** 31) | 0, weather: o.weather, sides: [{ party: o.party || S.party, name: S.trainer, mega: (S.bag['mega-bracelet'] || 0) > 0 && !o.raid, dyna: (S.bag['dynamax-band'] || 0) > 0 || !!o.raid }, { party: enemyParty, name: o.name || '', ai: o.ai || 0, mega: enemyParty.some(m => m.item), dyna: !!o.dyna }] });
     B = { o, s: bs, busy: true };
     const theme = o.map ? o.map.theme : o.tower ? 'psychic' : 'gym';
     const ov = document.createElement('div'); ov.id = 'battle'; ov.className = `battle theme-${theme} ${o.weather ? 'w-' + o.weather : ''} per-${o.map ? period() : 'day'} ${o.gym != null || o.elite != null || o.jgym != null || o.jelite != null ? 'boss' : ''}`;
@@ -604,7 +604,7 @@
   function drawInfo(side) {
     const m = B.s.sides[side].b.m, p = hpPct(m), el = $(side ? '#einfo' : '#pinfo');
     const x0 = PE.xpFor(D.mons[m.id].g, m.lvl), x1 = PE.xpFor(D.mons[m.id].g, m.lvl + 1);
-    el.innerHTML = `<div class="row between"><b class="bnm">${esc(bname(m))}${m.shiny ? ' ✨' : ''}${m.dmax ? ` <span class="dmt">⬣${m.dmax.t}</span>` : ''}</b><small>Nv${m.lvl}</small></div><div class="row"><small class="hpl">HP</small><div class="hpbar"><i style="width:${p}%;background:${hpCol(p)}"></i></div></div>
+    el.innerHTML = `<div class="row between"><b class="bnm">${esc(bname(m))}${m.shiny ? ' ✨' : ''}${m.raidStars ? ` <span class="dmt">${'★'.repeat(m.raidStars)}</span>${m.shield ? ` <span class="dmt shd">🛡️${m.shield}</span>` : ''}` : m.dmax ? ` <span class="dmt">⬣${m.dmax.t}</span>` : ''}</b><small>Nv${m.lvl}</small></div><div class="row"><small class="hpl">HP</small><div class="hpbar"><i style="width:${p}%;background:${hpCol(p)}"></i></div></div>
       <div class="row between"><span>${stChip(m.status)}${B.o.kind === 'wild' && side === 1 && S.dex.caught[m.id] ? '<img class="caughtmark" src="img/items/poke-ball.png" alt="">' : ''}</span>${side ? '' : `<small class="hpn">${m.hp}/${PE.maxhp(m)}</small>`}</div>${side ? '' : `<div class="xpbar"><i style="width:${m.lvl >= 100 ? 100 : (m.xp - x0) / (x1 - x0) * 100}%"></i></div>`}`;
   }
   function setHP(side, hp, max) { const el = $(side ? '#einfo' : '#pinfo'); const i = $('.hpbar i', el); const p = Math.max(0, hp / max * 100); i.style.width = p + '%'; i.style.background = hpCol(p);
@@ -619,12 +619,12 @@
     else if (o.kind === 'trainer') { SFX.win(); await wait(1500); intro.classList.add('out'); log(`<b>${esc(o.name)}</b> quer batalhar!`); await wait(1100);
       $('#foe').classList.add('leave'); log(`${esc(o.name)} enviou <b>${D.mons[e.id].n}</b>!`); await sendOut(1, e); }
     else { await wait(750); intro.classList.add('out'); const em = bq('.emon'); em.classList.remove('hidden'); em.classList.add('slidein'); bq('#einfo').classList.add('show'); cry(e.id);
-      log(o.legend ? `⭐ Um <b>${D.mons[e.id].n}</b> lendário apareceu!` : `Um <b>${D.mons[e.id].n}</b> selvagem apareceu!`);
+      log(o.raid ? `⬣ Um <b>${D.mons[e.id].n}</b> Dinamax ${'★'.repeat(o.raid.den.stars)} bloqueia a toca!` : o.legend ? `⭐ Um <b>${D.mons[e.id].n}</b> lendário apareceu!` : `Um <b>${D.mons[e.id].n}</b> selvagem apareceu!`);
       if (o.legend) $('#battle').classList.add('legend-aura');
       await wait(900);
       if (e.shiny) { sparkle(1); SFX.shiny(); shinyBurst(); S.stats.shinies++; log(`✨ Uau! É um ${D.mons[e.id].n} <b>SHINY</b>! ✨`); await wait(1300); }
       em.classList.remove('slidein'); }
-    $('#metr').classList.add('leave'); log(`Vai, <b>${esc(pn(p))}</b>!`); await sendOut(0, p); B.busy = false; showMain();
+    if (!B || !$('#metr')) return; $('#metr').classList.add('leave'); log(`Vai, <b>${esc(pn(p))}</b>!`); await sendOut(0, p); B.busy = false; showMain();
   }
   async function sendOut(side, m) {
     const el = bq(side ? '.emon' : '.pmon'), img = $(side ? '#esp' : '#psp');
@@ -650,7 +650,7 @@
     bindCtl();
   }
   function showBag() {
-    const it = Object.entries(S.bag).filter(([k, v]) => v > 0 && C.ITEM_NAME[k] && (PE.BALLS[k] ? B.o.kind === 'wild' : (PE.HEAL[k] || ['revive', 'antidote', 'full-heal'].includes(k))));
+    const it = Object.entries(S.bag).filter(([k, v]) => v > 0 && C.ITEM_NAME[k] && (PE.BALLS[k] ? B.o.kind === 'wild' && !B.o.raid && k !== 'safari-ball' : (PE.HEAL[k] || ['revive', 'antidote', 'full-heal'].includes(k))));
     $('#bctl').innerHTML = `<div class="bitems">${it.length ? it.map(([k, v]) => `<button class="irow" data-b="item" data-id="${k}">${itemImg(k)}<b>${C.ITEM_NAME[k]}</b><small>x${v}</small></button>`).join('') : '<p class="mut">Nada útil na mochila.</p>'}</div><button class="bb back" data-b="back">← Voltar</button>`;
     if (B.o.kind !== 'wild') log('Não dá para capturar Pokémon de outro treinador!');
     bindCtl();
@@ -674,7 +674,7 @@
     else if (k === 'sw') { if (B.forced) { B.forced = false; doForced(+b.dataset.i); } else act({ type: 'switch', i: +b.dataset.i }); } }); }
   async function act(a) {
     B.busy = true; $('#bctl').innerHTML = ''; const s = B.s;
-    const ev = PE.step(s, [a, PE.aiAction(s, 1)]); await play(ev); if (B) await postTurn();
+    const ev = PE.step(s, [a, PE.aiAction(s, 1)]); await play(ev); if (B && B.o.raid && !s.over) await raidAfterTurn(); if (B) await postTurn();
   }
   async function postTurn() {
     const s = B.s;
@@ -764,6 +764,7 @@
     for (let i = 0; i < 8; i++) { const s = document.createElement('span'); s.className = 'star'; s.textContent = '★'; s.style.cssText = `left:${x}px;top:${y}px;--dx:${(i - 3.5) * 22}px;--dy:${-50 - Math.random() * 40}px`; $('#fxl').appendChild(s); setTimeout(() => s.remove(), 1300); } }
   async function endBattle() {
     const s = B.s, o = B.o; let msg = '';
+    if (o.raid) return raidEnd();
     if (s.ran) return closeBattle();
     if (s.caught) { const m = s.caught; m.ot = S.trainer; m.caughtAt = (o.map ? o.map.name : '') + ' • ' + new Date().toLocaleDateString('pt-BR'); const isNew = !S.dex.caught[m.id]; addCaught(m); S.stats.caught++; track('catch', 1, m); if (isNew) track('newdex');
       let where; if (S.party.length < 6) { S.party.push(m); where = 'entrou no seu time'; } else { S.box.push(m); where = 'foi enviado para o PC'; }
@@ -784,6 +785,7 @@
         if (o.jelite != null) { if (o.jelite < 4) { S.jelite = o.jelite + 1; msg = 'jelite'; } else { S.jelite = 0; S.jchampion = true; S.jchamps++; msg = 'jchamp'; } }
         if (msg === 'champ' && !S.bag['mega-bracelet']) { S.bag['mega-bracelet'] = 1; }
         if (msg === 'champ' && !S.bag['dynamax-band']) { S.bag['dynamax-band'] = 1; B.gotBand = 1; }
+        rematchTourWin(o);
         if (s.goldRush) { S.money += s.goldRush; log(`💰 Chuva de Ouro G-Max: +${fmt(s.goldRush)}!`); }
         if (o.reward && o.rkey && !S.rewards[o.rkey]) { S.rewards[o.rkey] = Date.now(); S.bag[o.reward] = (S.bag[o.reward] || 0) + 1; B.gotReward = o.reward; }
       } else { const coin = Math.floor(s.sides[1].party[0].lvl * 10); S.money += coin; log(`Você ganhou ${fmt(coin)} de bônus de pesquisa.`); await wait(900); }
@@ -801,8 +803,8 @@
       if (msg === 'champ') modal(`<div class="center badgewin"><div class="bigbadge crown">👑</div><h2>Novo Campeão!</h2><p>Parabéns, ${esc(S.trainer)}! Você é o Campeão da Liga Pokémon!</p><p>🧬 Você ganhou a <b>Mega Pulseira</b> e a <b>Pulseira Dinamax</b>! Agora seus Pokémon podem Mega Evoluir ou Dinamaxar.</p><p class="mut small">A região de <b>Johto</b>, a Caverna Celeste e o Pilar Celeste foram liberados!</p><button class="btn primary wide" data-a="close">🏆</button></div>`);
       if (msg === 'tower5') toast('🗼 5 vitórias seguidas! +1 Bala Rara', 'good');
     } else {
-      const lost = Math.floor(S.money / 2); S.money -= lost; log(`Você não tem mais Pokémon em condições... Perdeu ${fmt(lost)}.`); await wait(1800);
-      if (o.elite != null) S.elite = 0; if (o.tower) S.tower.cur = 0;
+      const lost = o.tour || o.rematch ? 0 : Math.floor(S.money / 2); S.money -= lost; log(`Você não tem mais Pokémon em condições... Perdeu ${fmt(lost)}.`); await wait(1800);
+      if (o.elite != null) S.elite = 0; if (o.tower) S.tower.cur = 0; tourLoss(o);
       healAll(); save(); closeBattle(); toast('Você correu para o Centro Pokémon. Seu time foi curado.', 'bad');
     }
   }
@@ -1080,6 +1082,310 @@
       <div class="setrow"><span>Volume da música</span><div class="seg">${vs.slice(1).map(([v, l]) => `<button class="${(S.settings.mvol ?? 0.35) === v ? 'on' : ''}" data-a="setvol" data-k="mvol" data-v="${v}">${l}</button>`).join('')}</div></div>
       <div class="setrow"><span>Volume dos efeitos</span><div class="seg">${[[0.4, 'Baixo'], [0.8, 'Médio'], [1.2, 'Alto']].map(([v, l]) => `<button class="${(S.settings.svol ?? 0.8) === v ? 'on' : ''}" data-a="setvol" data-k="svol" data-v="${v}">${l}</button>`).join('')}</div></div>`;
   }
+
+  // =====================================================================
+  // v5: Safári, Raides Dinamax, Lendas, Revanche/Torneio, Seguidor, Estilo/Casa, Login, Naturezas/IVs
+  // =====================================================================
+  Object.assign(C.ITEM_NAME, { 'safari-ball': 'Safari Ball', 'silver-wing': 'Asa Prateada', 'rainbow-wing': 'Asa Arco-Íris', 'wishing-piece': 'Peça dos Desejos' });
+  Object.assign(KEY_ITEMS, { 'silver-wing': 'Uma pena que acalma o guardião dos mares. Leve às Ilhas Redemoinho.', 'rainbow-wing': 'Brilha com sete cores. O guardião do céu responde a ela na Torre do Sino.',
+    'wishing-piece': 'Jogue numa Toca Dinamax para abrir um Raide extra hoje.', 'safari-ball': 'Só funciona dentro da Zona Safári.' });
+  const SNP = ['HP', 'Ataque', 'Defesa', 'At. Esp.', 'Def. Esp.', 'Veloc.'];
+  const natTxt = m => { const n = PE.NATURES[m.nat ?? 0]; return n[1] === n[2] ? `${n[0]} (neutra)` : `${n[0]} (+${SNP[n[1]]} −${SNP[n[2]]})`; };
+  const pickCount = (arr, n, r) => { const a = arr.slice(), o = []; while (o.length < n && a.length) o.push(a.splice(Math.floor(r() * a.length), 1)[0]); return o; };
+  const avgLvl = () => Math.round(S.party.reduce((a, m) => a + m.lvl, 0) / Math.max(1, S.party.length));
+  const bestNat = id => { const b = D.mons[id].s, phys = b[1] >= b[3], fast = b[5] >= 85; return phys ? (fast ? 13 : 3) : (fast ? 10 : 15); };
+
+  // ---------- naturezas: retro para Pokémon antigos ----------
+  function retroNatures() {
+    if (S.natFix) return; let n = 0;
+    for (const m of [...S.party, ...S.box, ...(S.daycare.slots || []).map(x => x && (x.m || x))].filter(Boolean)) { if (!m.id || m.nat != null) continue;
+      const gift = /Presente|Prêmio|Elm|Laboratório/i.test(m.caughtAt || '') || (m.iv && m.iv.every(v => v >= 31));
+      const old = PE.maxhp(m); m.nat = gift ? bestNat(m.id) : Math.floor(R() * 25); if (!m.iv) m.iv = [0, 0, 0, 0, 0, 0].map(() => Math.floor(R() * 32));
+      if (gift) m.iv = m.iv.map(v => Math.max(v, 25)); m.hp = Math.max(m.hp > 0 ? 1 : 0, Math.min(PE.maxhp(m), m.hp + PE.maxhp(m) - old)); n++; }
+    S.natFix = Date.now(); save(); if (n) setTimeout(() => toast(`🧬 Naturezas reveladas para ${n} Pokémon! Veja no resumo de cada um.`, 'good'), 2200);
+  }
+  A.retroNatures = retroNatures;
+  function judge(m) {
+    const iv = m.iv || [0, 0, 0, 0, 0, 0], tot = iv.reduce((a, b) => a + b, 0), pct = Math.round(tot / 186 * 100);
+    const g = v => v >= 31 ? ['Perfeito!', 'p'] : v >= 30 ? ['Fantástico', 'f'] : v >= 26 ? ['Muito bom', 'm'] : v >= 16 ? ['Bom', 'b'] : v >= 1 ? ['Razoável', 'r'] : ['Nada bom...', 'n'];
+    const verdict = pct >= 81 ? 'Tem um potencial maravilhoso! Isso é coisa rara.' : pct >= 65 ? 'Está bem acima da média. Que belo Pokémon!' : pct >= 49 ? 'Um Pokémon decente, com algo a mostrar.' : 'Tem um potencial modesto... mas carinho faz milagres!';
+    modal(`<div class="judge"><div class="jhead"><img src="img/tr/acetrainer.png" alt=""><div><small class="mut">JUIZ DE AVALIAÇÃO</small><h3>${esc(pn(m))}</h3><p>“${verdict}”</p></div></div>
+      <p class="small">🧬 Natureza: <b>${natTxt(m)}</b></p><div class="ivs">${iv.map((v, k) => { const [t, c] = g(v); return `<div class="ivr"><small>${SNP[k]}</small><div class="sbar"><i class="iv-${c}" style="width:${v / 31 * 100}%"></i></div><b class="iv-${c}">${t}</b></div>`; }).join('')}</div>
+      <p class="mut small center">Potencial total: ${pct}% • Os números exatos o juiz guarda em segredo 😉</p><button class="btn primary wide" data-a="close">Obrigado!</button></div>`);
+  }
+  A.judge = judge;
+  ACT.setfollow = d => { S.settings.follow = d.v === 'true'; save(); render(); };
+
+  // ---------- login diário (calendário) ----------
+  const DAILY2 = [{ money: 1000, 'poke-ball': 5 }, { money: 1500, 'great-ball': 3 }, { money: 2000, 'super-potion': 3 }, { money: 2500, 'ultra-ball': 3 }, { money: 3000, 'rare-candy': 1 }, { money: 4000, 'ultra-ball': 5, 'rare-candy': 2 }, { money: 10000, 'master-ball': 1, 'rare-candy': 3, 'wishing-piece': 1 }];
+  function calendarHtml() {
+    const cur = ((S.daily.streak - 1) % 7 + 7) % 7, claimedToday = S.daily.last === new Date().toDateString();
+    return `<div class="cal">${DAILY2.map((r, i) => `<div class="cday ${i < cur || (i === cur && claimedToday) ? 'got' : ''} ${i === cur && claimedToday ? 'today' : ''} ${i === 6 ? 'big' : ''}"><small>Dia ${i + 1}</small><div class="crw">${i === 6 ? '<span class="cbig">🎁</span>' : ''}${rewardIcons(r)}</div>${i < cur || (i === cur && claimedToday) ? '<i>✓</i>' : ''}</div>`).join('')}</div>
+      <p class="mut small">🔥 Sequência: <b>${S.daily.streak}</b> dia(s) • perder um dia volta para o Dia 1.</p>`;
+  }
+
+  // ---------- Zona Safári ----------
+  const SAFARI_FEE = 1000, SAFARI_BALLS = 30, SAFARI_STEPS = 80;
+  const SAFARI_POOL = [[115, 6, 25, 33], [128, 7, 25, 33], [113, 4, 25, 33], [123, 7, 25, 33], [127, 7, 25, 33], [147, 4, 22, 30], [148, 1, 32, 36], [111, 8, 25, 33], [102, 9, 24, 32], [49, 7, 26, 33], [30, 8, 24, 30], [33, 8, 24, 30],
+    [84, 8, 22, 30], [241, 6, 25, 33], [203, 6, 25, 33], [214, 5, 25, 33], [234, 6, 25, 33], [246, 3, 22, 28], [179, 7, 20, 28], [207, 5, 25, 33], [227, 4, 26, 33], [231, 6, 22, 30], [143, 1, 30, 35], [132, 3, 25, 30]];
+  const safariOk = () => S.badges.length >= 4;
+  function vSafari() {
+    const sf = S.safari;
+    if (!sf) return `<div class="card safari-hero theme-safari per-${period()}"><div class="sfsky"></div><div class="sfmons">${[115, 128, 113, 123, 147, 214].map(id => `<img src="${sprId(id)}" class="${S.dex.seen[id] ? '' : 'sil'}" alt="">`).join('')}</div>
+      <h2>🦏 Zona Safári</h2><p>Sem batalhas! Você recebe <b>${SAFARI_BALLS} Safari Balls</b> e <b>${SAFARI_STEPS} passos</b>. Jogue <b>Isca</b> (foge menos, captura mais difícil) ou <b>Pedra</b> (captura mais fácil, foge mais).</p>
+      <p class="small">🌟 Raros: Kangaskhan, Tauros, Chansey, Scyther, Pinsir, Dratini, Heracross, Miltank, Larvitar, Skarmory…</p>
+      ${safariOk() ? `<button class="btn primary big wide" data-a="sfenter" ${S.money >= SAFARI_FEE ? '' : 'disabled'}>Entrar • ${fmt(SAFARI_FEE)}</button>` : '<p class="err">🔒 Precisa de 4 insígnias.</p>'}<p class="mut small">Capturados nesta reserva: ${S.stats.safari || 0}</p></div>`;
+    return `<div class="card explore theme-safari per-${period()} safari-run" id="scene"><div class="sky"><i class="sun"></i></div><div class="ground"></div><div class="grass-row tall">${'<i></i>'.repeat(12)}</div>${meHtml()}${followerHtml()}
+      <div class="ex-top"><span class="chip">${itemImg('safari-ball')} ${sf.balls}</span><span class="chip">👣 ${sf.steps}</span><span class="chip">🎯 ${sf.caught.length}</span></div>
+      <div class="ex-bot"><h2>🦏 Zona Safári</h2><p>Ande pela grama alta e encontre Pokémon raros!</p><div class="exbtns"><button class="btn primary big" data-a="sfwalk" id="sfwalk">👣 Andar na grama</button><button class="btn big ghost" data-a="sfleave">Sair</button></div></div></div>
+      ${sf.caught.length ? `<div class="card"><h3>Capturados hoje no Safári</h3><div class="enc">${sf.caught.map(id => `<div class="encm"><img src="${sprId(id)}" alt=""><small>${D.mons[id].n}</small></div>`).join('')}</div></div>` : ''}`;
+  }
+  ACT.sfenter = () => { if (!safariOk() || S.money < SAFARI_FEE) return; S.money -= SAFARI_FEE; S.safari = { balls: SAFARI_BALLS, steps: SAFARI_STEPS, caught: [] }; SFX.coin(); toast('Bem-vindo à Zona Safári! Boa caçada!', 'good'); save(); render(); };
+  ACT.sfleave = () => safariEnd('Você saiu da Zona Safári.');
+  function safariEnd(why) { const sf = S.safari; if (!sf) return; S.safari = null; save(); render();
+    modal(`<div class="center"><h2>🦏 Fim do Safári</h2><p>${why}</p><p>Capturados: <b>${sf.caught.length}</b></p><div class="enc">${sf.caught.map(id => `<div class="encm"><img src="${sprId(id)}" alt=""><small>${D.mons[id].n}</small></div>`).join('')}</div><button class="btn primary wide" data-a="close">OK</button></div>`); }
+  let sfBusy = false;
+  ACT.sfwalk = async () => {
+    const sf = S.safari; if (!sf || sfBusy) return; sfBusy = true; const sc = $('#scene'); sc.classList.add('walking'); $('#sfwalk').disabled = true;
+    const n = 3 + Math.floor(R() * 3); for (let i = 0; i < n; i++) { SFX.rustle(); const g = $$('.grass-row i', sc)[Math.floor(R() * 12)]; g?.classList.add('rustle'); setTimeout(() => g?.classList.remove('rustle'), 600); await sleep(330); }
+    sf.steps = Math.max(0, sf.steps - n); track('steps', n); sc.classList.remove('walking'); sfBusy = false;
+    if (R() < 0.75) { const tot = SAFARI_POOL.reduce((a, b) => a + b[1], 0); let r = R() * tot, k = 0; while (k < SAFARI_POOL.length - 1 && r > SAFARI_POOL[k][1]) r -= SAFARI_POOL[k++][1];
+      const e = SAFARI_POOL[k], m = PE.makeMon(e[0], PE.ri(st, e[2], e[3]), st, { shinyRate: A.shinyRate || shinyP() }); m.caughtAt = 'Zona Safári'; see(m.id); return safariEnc(m); }
+    toast('Nada por aqui… continue andando.'); if (sf.steps <= 0) return safariEnd('Acabaram seus passos!'); save(); render();
+  };
+  function safariEnc(m) {
+    const sf = S.safari, d = D.mons[m.id]; let mood = 0, moodT = 0, done = false; if (m.shiny) { SFX.shiny(); S.stats.shinies++; } else cry(m.id);
+    const mm = modal(`<div class="sfenc"><div class="sfstage per-${period()}"><img id="sfm" class="${m.shiny ? 'shiny-glow' : ''}" src="${spr(m)}" alt=""><div id="sfball" class="sfball hidden">${itemImg('safari-ball')}</div><div id="sffx" class="sffx"></div></div>
+      <h3>${d.n}${m.shiny ? ' ✨' : ''} <small class="mut">Nv ${m.lvl}</small> <span id="sfmood" class="chip"></span></h3><p id="sfmsg">Um ${d.n} selvagem apareceu!</p>
+      <div class="sfbtns"><button class="btn primary" data-s="ball">${itemImg('safari-ball')} Bola (<span id="sfb">${sf.balls}</span>)</button><button class="btn" data-s="bait">🍓 Isca</button><button class="btn" data-s="rock">🪨 Pedra</button><button class="btn ghost" data-s="run">🏃 Fugir</button></div></div>`, 'sfm');
+    mm.dataset.lock = 1; const msg = t => $('#sfmsg', mm).innerHTML = t;
+    const moodUI = () => $('#sfmood', mm).textContent = mood > 0 ? '😠 Irritado' : mood < 0 ? '😋 Comendo' : '😐 Atento';
+    moodUI(); if (m.shiny) msg(`✨ Um ${d.n} <b>SHINY</b> apareceu!`);
+    const finish = async why => { done = true; await sleep(1100); closeModal(); if (why) toast(why); if (sf.balls <= 0) return safariEnd('Acabaram suas Safari Balls!'); if (sf.steps <= 0) return safariEnd('Acabaram seus passos!'); save(); render(); };
+    $$('.sfbtns button', mm).forEach(b => b.onclick = async () => { if (done || mm.dataset.busy) return; mm.dataset.busy = 1; const a = b.dataset.s; $$('.sfbtns button', mm).forEach(x => x.disabled = true);
+      const img = $('#sfm', mm);
+      if (a === 'run') { msg('Você se afastou devagar…'); return finish(); }
+      if (a === 'bait') { mood = -1; moodT = 1 + Math.floor(R() * 4); msg(`Você jogou uma Isca. ${d.n} está comendo!`); $('#sffx', mm).textContent = '🍓'; tone(700, 0.1, 'sine', 0.05); }
+      if (a === 'rock') { mood = 1; moodT = 1 + Math.floor(R() * 4); msg(`Você jogou uma Pedra. ${d.n} ficou irritado!`); $('#sffx', mm).textContent = '💢'; noise(0.1, 0.12); img.classList.add('shake'); setTimeout(() => img.classList.remove('shake'), 400); }
+      if (a === 'ball') { sf.balls--; $('#sfb', mm).textContent = sf.balls; SFX.throw(); const bl = $('#sfball', mm); bl.classList.remove('hidden'); bl.classList.add('toss'); await sleep(550); img.classList.add('absorb'); await sleep(350);
+        const p = Math.min(0.92, d.c / 255 * 1.6 * (mood > 0 ? 2 : mood < 0 ? 0.5 : 1) + 0.04); const shakes = R() < p ? 3 : Math.floor(R() * 3);
+        for (let i = 0; i < shakes; i++) { bl.classList.add('wob'); SFX.shake(); await sleep(520); bl.classList.remove('wob'); await sleep(150); }
+        if (shakes === 3) { SFX.caught(); msg(`🎉 Pegou! ${d.n} foi capturado!`); m.ot = S.trainer; m.caughtAt = 'Zona Safári • ' + new Date().toLocaleDateString('pt-BR'); const isNew = !S.dex.caught[m.id]; addCaught(m); S.stats.caught++; S.stats.safari = (S.stats.safari || 0) + 1;
+          if (S.party.length < 6) S.party.push(m); else S.box.push(m); sf.caught.push(m.id); track('catch', 1, m); if (isNew) track('newdex'); return finish(isNew ? `🆕 ${d.n} registrado na Pokédex!` : ''); }
+        bl.classList.add('hidden'); bl.classList.remove('toss'); img.classList.remove('absorb'); SFX.escape(); msg(['Ah, não! Escapou da bola!', 'Quase! Tão perto!', 'Argh! Foi por pouco!'][shakes]); }
+      await sleep(700); $('#sffx', mm).textContent = '';
+      const fl = Math.min(0.6, (0.06 + d.s[5] / 700) * (mood > 0 ? 2 : mood < 0 ? 0.35 : 1)); if (moodT > 0 && --moodT === 0) mood = 0; moodUI();
+      if (R() < fl) { SFX.escape(); img.classList.add('flee'); msg(`${d.n} fugiu!`); return finish(); }
+      if (sf.balls <= 0) { msg('Suas Safari Balls acabaram!'); return finish(); }
+      delete mm.dataset.busy; $$('.sfbtns button', mm).forEach(x => x.disabled = false); if (a !== 'ball') msg(msg === null ? '' : $('#sfmsg', mm).innerHTML + ' O que fazer?'); });
+  }
+
+  // ---------- Raides Dinamax ----------
+  const RAID_LV = [20, 32, 45, 58, 70], RAID_HP = [2, 2.6, 3.2, 3.8, 4.5], RAID_TURNS = [12, 12, 11, 10, 10], RAID_PER_DAY = 3;
+  const RAID_POOL = [[1, 4, 7, 25, 133, 52, 66, 92, 129], [2, 5, 8, 58, 63, 74, 95, 111, 133], [3, 6, 9, 68, 94, 99, 12, 26, 130, 143, 131], [6, 9, 3, 131, 143, 94, 68, 149, 248, 130, 112], [6, 3, 9, 25, 52, 68, 94, 99, 131, 133, 143, 12, 149, 248]];
+  function raidState() { S.raids = S.raids || {}; const dk = dayKey(); if (S.raids.day !== dk) { S.raids.day = dk; S.raids.used = 0; S.raids.extra = 0; S.raids.done = {}; } return S.raids; }
+  function dens() { const r = srng(hseed((S.user || S.trainer) + 'den' + dayKey())), maxS = Math.min(5, 1 + Math.floor(S.badges.length / 2) + (S.champion ? 1 : 0)), out = [];
+    for (let i = 0; i < 4; i++) { const stars = Math.max(1, Math.min(maxS, maxS - Math.floor(r() * 3) + (i === 3 ? 1 : 0))), pool = RAID_POOL[Math.min(5, stars) - 1], id = pool[Math.floor(r() * pool.length)];
+      out.push({ i, stars: Math.min(5, stars), id, gmax: !!PE.GMAX[id] && r() < 0.6, name: ['Toca do Bosque', 'Toca do Lago', 'Toca da Montanha', 'Toca Lendária'][i] }); }
+    return out; }
+  const raidsLeft = () => { const r = raidState(); return RAID_PER_DAY + r.extra - r.used; };
+  function vRaid() {
+    const r = raidState(), ds = dens(), left = raidsLeft();
+    return `<div class="card raidhead"><div class="row between"><h3>⬣ Raides Dinamax</h3><span class="chip">${left > 0 ? `${left} raide(s) hoje` : 'volte amanhã'}</span></div><p class="mut small">Monte um time de até 3 Pokémon contra um chefe gigante! Ele tem barreiras, pode agir duas vezes e a tempestade Dinamax dura poucos turnos. Vença para tentar capturá-lo.</p>
+      ${S.bag['wishing-piece'] ? `<button class="btn small" data-a="wish">${itemImg('wishing-piece')} Usar Peça dos Desejos (${S.bag['wishing-piece']})</button>` : ''}</div>
+      <div class="grid dens">${ds.map(d => { const done = r.done[d.i]; return `<div class="card den ${done ? 'done' : ''} s${d.stars}"><div class="denbeam"></div><div class="denimg"><img class="${S.dex.seen[d.id] || done ? '' : 'sil'}" src="${d.gmax ? 'img/gmax/front/' + PE.GMAX[d.id].k + '.gif' : sprId(d.id)}" alt=""></div>
+        <div class="grow"><b>${d.name}</b><div class="stars">${'★'.repeat(d.stars)}<i>${'★'.repeat(5 - d.stars)}</i></div><small class="mut">${d.gmax ? '🌩️ Energia Gigamax!' : S.dex.seen[d.id] ? D.mons[d.id].n + ' Dinamax' : 'Pokémon misterioso'} • Nv ${RAID_LV[d.stars - 1]}</small></div>
+        ${done ? '<span class="qok">✅</span>' : `<button class="btn small primary" ${left > 0 ? '' : 'disabled'} data-a="raidgo" data-i="${d.i}">Entrar</button>`}</div>`; }).join('')}</div>`;
+  }
+  ACT.wish = () => { if (!S.bag['wishing-piece']) return; S.bag['wishing-piece']--; raidState().extra++; SFX.sparkle(); toast('✨ A toca brilhou! +1 raide hoje.', 'good'); save(); render(); };
+  ACT.raidgo = d => {
+    const den = dens()[+d.i]; if (!den || raidsLeft() <= 0 || raidState().done[den.i]) return; const alive = S.party.filter(m => m.hp > 0); if (!alive.length) return toast('Cure seus Pokémon primeiro!', 'bad');
+    let sel = alive.slice(0, 3).map(m => m.uid);
+    const mm = modal(`<h3>⬣ ${den.name} ${'★'.repeat(den.stars)}</h3><p class="mut small">Escolha até 3 Pokémon (Nv ${RAID_LV[den.stars - 1]} recomendado). Todos podem Dinamaxar uma vez na toca!</p><div class="mgrid" id="rsel">${S.party.map((m, i) => `<button class="pm rs ${sel.includes(m.uid) ? 'on' : ''}" data-u="${m.uid}" ${m.hp > 0 ? '' : 'disabled'}><img src="${spr(m)}" alt=""><small>${esc(pn(m))} Nv${m.lvl}</small></button>`).join('')}</div>
+      <div class="mbtns"><button class="btn" data-a="close">Cancelar</button><button class="btn primary" id="rgo">⬣ Começar raide</button></div>`);
+    $$('.rs', mm).forEach(b => b.onclick = () => { const u = b.dataset.u; if (sel.includes(u)) sel = sel.filter(x => x !== u); else if (sel.length < 3) sel.push(u); $$('.rs', mm).forEach(x => x.classList.toggle('on', sel.includes(x.dataset.u))); });
+    $('#rgo', mm).onclick = () => { if (!sel.length) return; closeModal(); const party = sel.map(u => S.party.find(m => m.uid === u)); raidState().used++; save(); startRaid(den, party); };
+  };
+  function startRaid(den, party) {
+    const i = den.stars - 1, boss = PE.makeMon(den.id, RAID_LV[i], st, { shiny: false, iv: Array(6).fill(31) }); boss.dmax = { t: 999, g: den.gmax ? 1 : 0 }; boss.raidHp = RAID_HP[i]; boss.raidStars = den.stars; boss.hp = PE.maxhp(boss);
+    startBattle({ kind: 'wild', enemy: [boss], party, raid: { den, left: RAID_TURNS[i], shields: 0, turn: 0 }, ai: 2, weather: null });
+    const ov = $('#battle'); ov.classList.add('raid', 'dsky'); ov.querySelector('.emon').classList.add('dmax'); if (den.gmax) ov.querySelector('.emon').classList.add('gmax'); const t = document.createElement('div'); t.className = 'raidt'; t.id = 'raidt'; ov.querySelector('.bscene').appendChild(t); raidHud();
+  }
+  function raidHud() { const t = $('#raidt'); if (!t || !B || !B.o.raid) return; const rd = B.o.raid, bm = B.s.sides[1].b.m; t.innerHTML = `<span>🌩️ ${rd.left} turno(s)</span>${bm.shield ? `<span class="shd">${'🛡️'.repeat(bm.shield)}</span>` : ''}`; }
+  async function raidAfterTurn() {
+    const s = B.s, rd = B.o.raid, bm = s.sides[1].b.m, st0 = rd.den.stars; rd.turn++; rd.left--;
+    if (bm.hp > 0 && !bm.shield) { const fr = bm.hp / PE.maxhp(bm); const marks = st0 >= 4 ? [0.6, 0.3] : st0 >= 2 ? [0.5] : [];
+      if (rd.shields < marks.length && fr <= marks[rd.shields]) { rd.shields++; bm.shield = st0 + 1; SFX.status(); log(`🛡️ ${D.mons[bm.id].n} ergueu uma <b>barreira Dinamax</b>! (${bm.shield} golpes)`); drawInfo(1); raidHud(); await wait(1300); } }
+    if (bm.hp > 0 && st0 >= 3 && rd.turn % (st0 >= 5 ? 1 : 2) === 0 && s.sides[0].b.m.hp > 0 && !s.over) { log(`⚡ ${D.mons[bm.id].n} está furioso e age de novo!`); await wait(900); await play(PE.step(s, [null, PE.aiAction(s, 1)])); rd.left++; }
+    raidHud(); if (!s.over && rd.left <= 0) { s.over = true; s.winner = 1; rd.timeout = 1; }
+  }
+  async function raidEnd() {
+    const s = B.s, o = B.o, rd = o.raid, den = rd.den; raidState().done[den.i] = 1;
+    if (s.ran) { save(); return closeBattle(); }
+    if (s.winner !== 0) { log(rd.timeout ? '🌩️ A tempestade Dinamax ficou forte demais e expulsou você da toca!' : 'Seu time foi derrotado na toca...'); await wait(2200); s.sides[0].party.forEach(m => { if (m.hp <= 0) m.hp = 1; }); save(); closeBattle(); return toast('O raide falhou. Tente outra toca!', 'bad'); }
+    await award(); S.stats.wins++; S.stats.raids = (S.stats.raids || 0) + 1; track('win'); MUS.victory(); SFX.win();
+    const rw = { money: 1500 * den.stars, 'rare-candy': den.stars, ...(R() < 0.25 + den.stars * 0.05 ? { 'wishing-piece': 1 } : {}) }; giveReward(rw); S.bp = (S.bp || 0) + den.stars;
+    log(`🏆 Você venceu o raide! ${rewardText(rw)}`); await wait(1800); save(); await finishEvos(); closeBattle();
+    const chance = [1, 0.9, 0.75, 0.6, 0.45][den.stars - 1], name = den.gmax ? PE.GMAX[den.id].n : D.mons[den.id].n + ' Dinamax';
+    const mm = modal(`<div class="center raidwin"><div class="burstbg"></div><img class="bigspr" id="rwimg" src="${den.gmax ? 'img/gmax/front/' + PE.GMAX[den.id].k + '.gif' : sprId(den.id)}" alt=""><h2>${name} foi derrotado!</h2><p>${rewardText(rw)} + ${den.stars} PB</p>
+      <p class="mut small">Ele está fraco… jogue uma bola! Chance ~${Math.round(chance * 100)}%${S.bag['master-ball'] ? ' (Master Ball garante)' : ''}.</p><div class="mbtns wrap"><button class="btn primary" data-r="poke-ball">${itemImg('poke-ball')} Poké Ball</button>${S.bag['master-ball'] ? `<button class="btn" data-r="master-ball">${itemImg('master-ball')} Master</button>` : ''}<button class="btn ghost" data-r="no">Deixar ir</button></div></div>`);
+    mm.dataset.lock = 1;
+    $$('[data-r]', mm).forEach(b => b.onclick = async () => { const ball = b.dataset.r; if (ball === 'no') { closeModal(); return; } if (ball === 'master-ball') S.bag['master-ball']--;
+      $$('[data-r]', mm).forEach(x => x.disabled = true); SFX.throw(); await sleep(500); $('#rwimg', mm).classList.add('absorb'); for (let i = 0; i < 3; i++) { SFX.shake(); await sleep(450); }
+      if (ball === 'master-ball' || R() < chance) { const iv = [0, 0, 0, 0, 0, 0].map(() => Math.floor(R() * 32)); pickCount([0, 1, 2, 3, 4, 5], Math.min(5, den.stars), R).forEach(k => iv[k] = 31);
+        const m = PE.makeMon(den.id, RAID_LV[den.stars - 1], st, { shinyRate: A.shinyRate || shinyP(), iv, ot: S.trainer, caughtAt: `Raide ${'★'.repeat(den.stars)} • ${new Date().toLocaleDateString('pt-BR')}` }); if (den.gmax) m.gfactor = 1;
+        const isNew = !S.dex.caught[m.id]; addCaught(m); S.stats.caught++; if (m.shiny) S.stats.shinies++; if (S.party.length < 6) S.party.push(m); else S.box.push(m); track('catch', 1, m); if (isNew) track('newdex'); save(); SFX.caught();
+        modal(`<div class="center caughtm"><div class="burstbg"></div><img class="bigspr ${m.shiny ? 'shiny-glow' : ''}" src="${spr(m)}" alt=""><h2>${D.mons[m.id].n} capturado!${m.shiny ? ' ✨' : ''}</h2>${den.gmax ? '<p class="newdex">🌩️ Tem o Fator Gigamax!</p>' : ''}<p class="mut small">${Math.min(5, den.stars)} IV(s) perfeitos garantidos • Natureza ${natTxt(m).split(' (')[0]}</p><button class="btn primary wide" data-a="close">Incrível!</button></div>`); }
+      else { SFX.escape(); closeModal(); toast(`${D.mons[den.id].n} escapou e voltou para a toca…`, 'bad'); } render(); });
+  }
+
+  // ---------- Lendas (missões) ----------
+  const roamMap = id => { const js = C.MAPS.filter(m => m.region === 'johto' && unlocked(m)); if (!js.length) return null; return js[hseed(dayKey() + id) % js.length]; };
+  const LEGQ = [
+    { id: 'birds', n: 'As Três Aves Lendárias', ico: '🕊️', mons: [144, 145, 146], req: () => S.badges.length >= 5, reqT: '5 insígnias', steps: [
+      { t: 'talk', npc: 'birdkeeper', who: 'Ornitólogo Bento', lines: ['Você já ouviu falar das três aves lendárias de Kanto?', 'Gelo, trovão e fogo... Cada uma se esconde onde seu elemento é mais forte.', 'Eu juntei pistas antigas. Resolva cada uma e siga as penas!'] },
+      { t: 'riddle', q: '❄️ “Onde ilhas gêmeas dormem sob o mar gelado e as ondas congelam em silêncio...”', opts: ['Ilhas Seafoam', 'Mt. Moon', 'Cabo de Cerulean', 'Monte Brasa'], a: 0 },
+      { t: 'hunt', id: 144, lvl: 50, map: 'seafoam', btn: '❄️ Seguir as penas congeladas', intro: 'Um vento gélido sopra... penas de gelo brilham no chão!' },
+      { t: 'riddle', q: '⚡ “Onde as máquinas zumbem abandonadas e o ar estala de energia...”', opts: ['Torre Pokémon', 'Usina Elétrica', 'Floresta de Viridian', 'Estrada Vitória'], a: 1 },
+      { t: 'hunt', id: 145, lvl: 50, map: 'usina', btn: '⚡ Investigar os raios no teto', intro: 'As luzes piscam... um grito elétrico ecoa pela usina!' },
+      { t: 'riddle', q: '🔥 “Onde a terra sangra fogo e o céu fica laranja de calor...”', opts: ['Caverna Celeste', 'Ilhas Seafoam', 'Monte Brasa', 'Zona Safári'], a: 2 },
+      { t: 'hunt', id: 146, lvl: 50, map: 'vulcao', btn: '🔥 Subir até a cratera', intro: 'Chamas dançam no topo do vulcão... algo enorme abre as asas!' }] },
+    { id: 'mewtwo', n: 'O Diário de Cinnabar', ico: '🧬', mons: [150], req: () => !!S.champion, reqT: 'ser Campeão', steps: [
+      { t: 'talk', npc: 'scientist', who: 'Cientista Fuji', lines: ['Campeão... preciso confessar algo.', 'Anos atrás, na Mansão de Cinnabar, criamos um Pokémon a partir do DNA de Mew.', 'Ele fugiu. As páginas do meu diário se espalharam... ponha-as em ordem e você saberá onde ele está.'] },
+      { t: 'order', q: 'Toque nas páginas do diário na ordem certa:', items: ['📄 5 de julho: descobrimos um Pokémon novo na selva.', '📄 10 de julho: batizamos de Mew.', '📄 6 de fevereiro: Mew deu à luz. Chamamos de Mewtwo.', '📄 1 de setembro: Mewtwo é forte demais. Fugiu para uma caverna perto de Cerulean.'] },
+      { t: 'hunt', id: 150, lvl: 70, map: 'cerulcave', btn: '🧬 Entrar no fundo da caverna', intro: 'Uma pressão psíquica esmagadora enche a caverna...' }] },
+    { id: 'dogs', n: 'Os Cães Errantes', ico: '🐾', mons: [243, 244, 245], req: () => isJohtoOpen(), reqT: 'abrir Johto', steps: [
+      { t: 'talk', npc: 'psychic', who: 'Eusine, o caçador místico', lines: ['Raikou, Entei e Suicune renasceram das cinzas da Torre Queimada.', 'Eles correm por Johto e mudam de lugar todo dia!', 'Vou te contar onde foram vistos hoje. Corra antes que sumam!'] },
+      { t: 'hunt', id: 243, lvl: 55, roam: 1, btn: '⚡ Rastrear Raikou', intro: 'Um trovão sem nuvens! Raikou está aqui!' },
+      { t: 'hunt', id: 244, lvl: 55, roam: 1, btn: '🔥 Rastrear Entei', intro: 'O chão ferve... Entei rugiu!' },
+      { t: 'hunt', id: 245, lvl: 55, roam: 1, btn: '💧 Rastrear Suicune', intro: 'Um vento norte purifica a água... Suicune!' }] },
+    { id: 'lugia', n: 'O Guardião dos Mares', ico: '🌊', mons: [249], req: () => isJohtoOpen() && S.jbadges.length >= 4, reqT: '4 insígnias de Johto', steps: [
+      { t: 'talk', npc: 'kimonogirl', who: 'Moça de Kimono', lines: ['Nas Ruínas de Alph os Unown guardam uma palavra antiga.', 'Quem descobri-la recebe a Asa Prateada... e o guardião dos mares ouvirá seu chamado.'] },
+      { t: 'riddle', q: '🔤 Os Unown formam as letras: <b class="unown">A • R • P • T • A • A • E • D • A</b> — que palavra é?', opts: ['PRATEADA', 'TAPERADA', 'PADARIA', 'ESTRADA'], a: 0 },
+      { t: 'item', item: 'silver-wing', text: 'Uma pena prateada caiu das ruínas! Você recebeu a Asa Prateada.' },
+      { t: 'hunt', id: 249, lvl: 70, map: 'j_redemoinho', btn: '🌀 Erguer a Asa Prateada', intro: 'O mar gira... das profundezas surge LUGIA!' }] },
+    { id: 'hooh', n: 'As Cores do Arco-Íris', ico: '🌈', mons: [250], req: () => isJohtoOpen() && S.jbadges.length >= 6, reqT: '6 insígnias de Johto', steps: [
+      { t: 'talk', npc: 'sage', who: 'Monge da Torre do Sino', lines: ['Ho-Oh só pousa para quem conhece as cores do arco-íris.', 'Observe as luzes do sino e repita a sequência sem errar.'] },
+      { t: 'simon', n: 5 },
+      { t: 'item', item: 'rainbow-wing', text: 'O sino tocou sozinho! Você recebeu a Asa Arco-Íris.' },
+      { t: 'hunt', id: 250, lvl: 70, map: 'j_sino', btn: '🌈 Tocar o sino com a Asa Arco-Íris', intro: 'Um arco-íris corta o céu... HO-OH desce até o topo da torre!' }] },
+  ];
+  function legStep(q) { S.legq = S.legq || {}; let i = S.legq[q.id] || 0; while (i < q.steps.length && q.steps[i].t === 'hunt' && S.dex.caught[q.steps[i].id]) i++; S.legq[q.id] = i; return i; }
+  const huntMap = sp => sp.roam ? roamMap(sp.id) : C.MAPS.find(m => m.id === sp.map);
+  function legendHunts(mp) { const out = []; for (const q of LEGQ) { if (!q.req()) continue; const i = legStep(q), sp = q.steps[i]; if (sp && sp.t === 'hunt') { const hm = huntMap(sp); if (hm && hm.id === mp.id) out.push([q, sp]); } } return out; }
+  function vLegends() {
+    return `<div class="card"><h3>⭐ Lendas</h3><p class="mut small">Siga as histórias, resolva enigmas e encontre os Pokémon lendários. Quem você já tem conta como concluído!</p></div>
+      <div class="grid legs">${LEGQ.map(q => { const ok = q.req(), i = legStep(q), done = i >= q.steps.length, sp = q.steps[i], hm = sp && sp.t === 'hunt' ? huntMap(sp) : null;
+        return `<div class="card leg ${done ? 'done' : ''} ${ok ? '' : 'locked'}"><div class="legmons">${q.mons.map(id => `<img class="${S.dex.caught[id] ? '' : 'sil'}" src="${sprId(id)}" alt="">`).join('')}</div><h3>${q.ico} ${q.n}</h3>
+          <div class="progress gold"><i style="width:${i / q.steps.length * 100}%"></i></div><small class="mut">Etapa ${Math.min(i + 1, q.steps.length)}/${q.steps.length}</small>
+          <p class="small">${!ok ? `🔒 Requer ${q.reqT}.` : done ? '✅ Lenda concluída!' : sp.t === 'hunt' ? (hm ? `📍 Vá até <b>${hm.name}</b> e toque em “${sp.btn}”.${sp.roam ? ' <i>(muda todo dia)</i>' : ''}` : '📍 Libere mais mapas.') : sp.t === 'talk' ? `💬 ${sp.who} quer falar com você.` : '🧩 Um enigma espera por você.'}</p>
+          ${ok && !done ? (sp.t === 'hunt' ? (hm && unlocked(hm) ? `<button class="btn small" data-a="enter" data-id="${hm.id}">Ir para ${hm.name}</button>` : '') : `<button class="btn small primary" data-a="legstep" data-q="${q.id}">Continuar</button>`) : ''}</div>`; }).join('')}</div>`;
+  }
+  ACT.legstep = async d => {
+    const q = LEGQ.find(x => x.id === d.q); if (!q || !q.req()) return; const i = legStep(q), sp = q.steps[i]; if (!sp) return; const next = () => { S.legq[q.id] = i + 1; save(); render(); };
+    if (sp.t === 'talk') { for (let k = 0; k < sp.lines.length; k++) { const last = k === sp.lines.length - 1; const v = await new Promise(res => { const m = modal(`<div class="npc"><img src="img/tr/${sp.npc}.png" alt=""><div class="bubble"><small>${sp.who}</small><p>${sp.lines[k]}</p></div></div><div class="mbtns"><button class="btn primary wide" id="nx">${last ? 'Entendi!' : 'Continuar ▶'}</button></div>`, 'npcm'); m.dataset.lock = 1; tone(500 + k * 60, 0.05, 'square', 0.03); $('#nx', m).onclick = () => res(1); }); } closeModal(); return next(); }
+    if (sp.t === 'item') { S.bag[sp.item] = (S.bag[sp.item] || 0) + 1; SFX.caught(); modal(`<div class="center badgewin"><div class="bigbadge megab">${itemImg(sp.item)}</div><h2>${C.ITEM_NAME[sp.item]}</h2><p>${sp.text}</p><button class="btn primary wide" data-a="close">Guardar</button></div>`); return next(); }
+    if (sp.t === 'riddle') { const m = modal(`<div class="riddle"><h3>🧩 Enigma</h3><p>${sp.q}</p><div class="qopts">${sp.opts.map((o, k) => `<button class="btn" data-k="${k}">${o}</button>`).join('')}</div><p id="rr" class="center"></p></div>`);
+      $$('.qopts .btn', m).forEach(b => b.onclick = async () => { if (+b.dataset.k === sp.a) { b.classList.add('right'); SFX.caught(); $('#rr', m).innerHTML = '<b>Isso mesmo!</b> A pista aponta para lá.'; await sleep(1100); closeModal(); next(); } else { b.classList.add('wrong'); b.disabled = true; SFX.escape(); $('#rr', m).textContent = 'Hmm… não parece ser isso. Tente de novo.'; } }); return; }
+    if (sp.t === 'order') { const sh = sp.items.map((t, k) => [t, k]).sort(() => R() - 0.5); let pos = 0; const m = modal(`<div class="riddle"><h3>📖 Diário</h3><p>${sp.q}</p><div class="ordl">${sh.map(([t, k]) => `<button class="btn ordb" data-k="${k}">${t}</button>`).join('')}</div><p id="rr" class="center"></p></div>`);
+      $$('.ordb', m).forEach(b => b.onclick = async () => { if (+b.dataset.k === pos) { pos++; b.disabled = true; b.classList.add('right'); b.insertAdjacentHTML('afterbegin', `<i class="ordn">${pos}</i>`); tone(500 + pos * 120, 0.08, 'square', 0.05); if (pos === sp.items.length) { SFX.caught(); $('#rr', m).innerHTML = '<b>Caverna Celeste!</b> Mewtwo está lá.'; await sleep(1300); closeModal(); next(); } }
+        else { SFX.escape(); pos = 0; $$('.ordb', m).forEach(x => { x.disabled = false; x.classList.remove('right'); x.querySelector('.ordn')?.remove(); }); $('#rr', m).textContent = 'As datas não batem... recomece.'; } }); return; }
+    if (sp.t === 'simon') { const COL = [['#ef4444', 392], ['#f59e0b', 494], ['#22c55e', 587], ['#3b82f6', 698], ['#a855f7', 784]]; const seq = Array.from({ length: sp.n }, () => Math.floor(R() * 5)); let inp = [], ready = false;
+      const m = modal(`<div class="riddle center"><h3>🔔 As Cores do Sino</h3><p id="rr">Observe…</p><div class="simon">${COL.map(([c], k) => `<button class="sim" data-k="${k}" style="--c:${c}"></button>`).join('')}</div><button class="btn small ghost" id="rep">↻ Ver de novo</button></div>`);
+      const flash = async k => { const b = $$('.sim', m)[k]; b.classList.add('lit'); tone(COL[k][1], 0.3, 'triangle', 0.08); await sleep(420); b.classList.remove('lit'); await sleep(160); };
+      const show = async () => { ready = false; inp = []; $('#rr', m).textContent = 'Observe…'; await sleep(500); for (const k of seq) await flash(k); ready = true; $('#rr', m).textContent = 'Sua vez! Repita as cores.'; };
+      $('#rep', m).onclick = () => ready && show(); m.dataset.seq = seq.join('');
+      $$('.sim', m).forEach(b => b.onclick = async () => { if (!ready) return; const k = +b.dataset.k; flash(k); inp.push(k); if (inp[inp.length - 1] !== seq[inp.length - 1]) { SFX.escape(); $('#rr', m).textContent = 'Errou a cor… o sino silenciou. Observe de novo.'; ready = false; await sleep(900); return show(); }
+        if (inp.length === seq.length) { ready = false; SFX.heal(); $('#rr', m).innerHTML = '<b>O sino respondeu!</b> 🌈'; await sleep(1300); closeModal(); next(); } });
+      show(); return; }
+  };
+  ACT.leghunt = d => { const q = LEGQ.find(x => x.id === d.q), sp = q && q.steps[legStep(q)]; if (!sp || sp.t !== 'hunt') return; if (!S.party.some(m => m.hp > 0)) return toast('Seus Pokémon estão sem energia!', 'bad');
+    const mp = C.MAPS.find(m => m.id === sub); const m = PE.makeMon(sp.id, sp.lvl, st, { shinyRate: A.shinyRate || shinyP() }); m.caughtAt = mp.name;
+    modal(`<div class="center legintro"><img class="bigspr sil" src="${sprId(sp.id)}" alt=""><p>${sp.intro}</p><button class="btn primary wide" id="lgo">Enfrentar!</button></div>`).querySelector('#lgo').onclick = () => { closeModal(); startBattle({ kind: 'wild', enemy: [m], map: mp, weather: battleWeather(weatherOf(mp)), legend: true }); }; };
+
+  // ---------- Revanche dos ginásios + Torneio semanal ----------
+  const finalEvo = id => { let x = id, g = 0; while (D.mons[x].e && D.mons[x].e.length && g++ < 3) x = D.mons[x].e[0].to; return D.mons[x] ? x : id; };
+  function rematchTeam(g, base, key) { const r = srng(hseed('rm' + key)); const ids = [...new Set(g.team.map(([id]) => finalEvo(id)))];
+    const ofType = Object.keys(D.mons).map(Number).filter(i => i <= 251 && !D.mons[i].L && D.mons[i].t.includes(g.type) && !(D.mons[i].e || []).length && !ids.includes(i)).sort((a, b) => D.mons[b].s.reduce((x, y) => x + y) - D.mons[a].s.reduce((x, y) => x + y));
+    for (const i of pickCount(ofType.slice(0, 10), 6 - ids.length, r)) ids.push(i);
+    return ids.slice(0, 6).map((id, k) => { const m = PE.makeMon(id, base + k + (k === 5 ? 3 : 0), st, { shiny: false, iv: Array(6).fill(28), nat: bestNat(id) }); return m; }); }
+  const RM_LIST = () => [...C.GYMS.map((g, i) => ({ g, key: 'k' + i, base: 58 + i, region: 'Kanto' })), ...(S.jchampion ? C.JGYMS.map((g, i) => ({ g, key: 'j' + i, base: 66 + i, region: 'Johto' })) : [])];
+  const TOUR_NAMES = [['Ás Rafael', 'acetrainer'], ['Ás Bia', 'acetrainerf'], ['Faixa-preta Kenji', 'blackbelt'], ['Médium Luna', 'psychic'], ['Beldade Sofia', 'beauty'], ['Alpinista Tião', 'hiker'], ['Ornitóloga Clara', 'birdkeeper'], ['Malabarista Leo', 'juggler'], ['Esquiadora Nina', 'skier'], ['Pokémaníaco Davi', 'pokemaniac'], ['Nadadora Iara', 'swimmer'], ['Pescador Zé', 'fisherman']];
+  function tourState() { const wk = weekKey(); S.tour = S.tour || {}; if (S.tour.week !== wk) { const last = S.tour.week ? S.tour.place : null; S.tour = { week: wk, round: 0, out: false, place: null, entered: false, best: S.tour.best || null, wins: S.tour.wins || 0, lastPlace: last }; } return S.tour; }
+  function tourField() { const r = srng(hseed((S.user || S.trainer) + tourState().week)), names = pickCount(TOUR_NAMES, 7, r), L = Math.max(15, Math.min(95, avgLvl() + 2));
+    return names.map(([n, sp], k) => { const pool = Object.keys(D.mons).map(Number).filter(i => i <= 251 && !D.mons[i].L && !(D.mons[i].e || []).length); const team = pickCount(pool, 3 + (k % 2), r);
+      return { n, sp, team, lvl: L + Math.floor(r() * 4) - 1, str: r() }; }); }
+  function tourBracket() { const t = tourState(), f = tourField(), r = srng(hseed('b' + t.week + (S.user || S.trainer))); const P = { n: S.trainer, sp: S.avatar, me: 1 };
+    const r1 = [[P, f[0]], [f[1], f[2]], [f[3], f[4]], [f[5], f[6]]]; const win = (a, b, rnd, myRes) => a.me ? (myRes ? a : b) : b.me ? (myRes ? b : a) : (rnd() < 0.5 + (a.str - b.str) / 2 ? a : b);
+    const w1 = r1.map(([a, b]) => win(a, b, r, t.round >= 1)), r2 = [[w1[0], w1[1]], [w1[2], w1[3]]], w2 = r2.map(([a, b]) => win(a, b, r, t.round >= 2)), w3 = win(w2[0], w2[1], r, t.round >= 3);
+    return { r1, r2, r3: [w2], w1, w2, w3 }; }
+  const TOUR_PRIZE = [{ money: 2000 }, { money: 5000, 'ultra-ball': 3 }, { money: 10000, 'rare-candy': 3 }, { money: 25000, 'master-ball': 1, 'rare-candy': 5 }];
+  function vArena() {
+    const t = tourState(), b = tourBracket(), rl = RM_LIST(); S.rematch = S.rematch || {}; const wk = weekKey();
+    const opp = t.out || t.round >= 3 ? null : t.round === 0 ? b.r1[0][1] : t.round === 1 ? (b.r2[0][0].me ? b.r2[0][1] : b.r2[0][0]) : (b.r3[0][0].me ? b.r3[0][1] : b.r3[0][0]);
+    const nm = x => `<span class="bn ${x.me ? 'me' : ''}"><img src="img/tr/${x.sp}.png" alt="">${esc(x.n)}</span>`;
+    const pair = (p, w, rd) => `<div class="bpair">${p.map(x => `<div class="${t.round >= rd && w && w !== x ? 'lost' : ''} ${t.out && x.me && t.round === rd - 1 ? 'lost' : ''}">${nm(x)}</div>`).join('')}</div>`;
+    const bracket = `<div class="bracket"><div class="bcol"><small>Quartas</small>${b.r1.map((p, k) => pair(p, b.w1[k], 1)).join('')}</div><div class="bcol"><small>Semi</small>${t.round >= 1 && !t.out || t.round >= 1 ? b.r2.map((p, k) => pair(p, b.w2[k], 2)).join('') : '<div class="bpair q">?</div><div class="bpair q">?</div>'}</div><div class="bcol"><small>Final</small>${t.round >= 2 ? pair(b.r3[0], b.w3, 3) : '<div class="bpair q">?</div>'}${t.round >= 3 ? `<div class="champ">🏆 ${nm(b.w3)}</div>` : ''}</div></div>`;
+    return `<div class="card tour"><div class="row between"><h3>🏆 Torneio Semanal</h3><span class="chip">Renova segunda</span></div><p class="mut small">8 treinadores, mata-mata. Seu time é curado antes de cada luta. Prêmios: semi ${fmt(5000)}, final ${fmt(10000)}, campeão ${fmt(25000)} + Master Ball.</p>${bracket}
+      ${t.round >= 3 ? '<p class="newdex center">👑 Você é o campeão desta semana!</p>' : t.out ? `<p class="center">Você caiu ${['nas quartas', 'na semi', 'na final'][t.round]}. Volte na segunda!</p>` : `<button class="btn primary big wide" data-a="tourgo">${t.round === 0 ? 'Inscrever e lutar' : 'Próxima luta'} vs ${esc(opp.n)}</button>`}
+      <p class="mut small">Títulos de torneio: <b>${t.wins || 0}</b>${t.best != null ? ` • melhor: ${['quartas', 'semi', 'vice', 'campeão'][t.best]}` : ''}</p></div>
+      <div class="card"><h3>🔁 Revanche dos Ginásios</h3>${S.champion ? `<p class="mut small">Os líderes voltaram mais fortes (Nv 58+), com times completos. Cada um aceita 1 revanche por semana.</p><div class="rmlist">${rl.map(x => { const done = S.rematch[x.key] === wk;
+        return `<div class="trow ${done ? 'done' : ''}"><img src="img/tr/${x.g.sprite}.png" alt=""><div class="grow"><b>${x.g.leader}</b> <small class="mut">${x.region} • ${C.TYPE_PT[x.g.type] || ''} • Nv ${x.base}+</small><small>${done ? '✅ Vencido esta semana' : `Prêmio ${fmt(x.g.prize * 5)} + 2 Balas Raras`}</small></div>${done ? '' : `<button class="btn small primary" data-a="rematch" data-k="${x.key}">Revanche</button>`}</div>`; }).join('')}</div>` : '<p class="mut">🔒 Torne-se Campeão da Liga para liberar as revanches.</p>'}</div>`;
+  }
+  ACT.rematch = d => { const x = RM_LIST().find(r => r.key === d.k); if (!x || !S.champion || (S.rematch || {})[x.key] === weekKey()) return;
+    startBattle({ kind: 'trainer', name: 'Líder ' + x.g.leader, sprite: x.g.sprite, enemy: rematchTeam(x.g, x.base, x.key), prize: x.g.prize * 5, ai: 2, intro: 'Revanche do Ginásio', rematch: x.key }); };
+  ACT.tourgo = () => { const t = tourState(); if (t.out || t.round >= 3) return; const b = tourBracket(); const opp = t.round === 0 ? b.r1[0][1] : t.round === 1 ? (b.r2[0][0].me ? b.r2[0][1] : b.r2[0][0]) : (b.r3[0][0].me ? b.r3[0][1] : b.r3[0][0]);
+    t.entered = true; healAll(); const enemy = opp.team.map(id => PE.makeMon(id, Math.min(100, opp.lvl + t.round * 2), st, { shiny: false, iv: Array(6).fill(20 + t.round * 4), nat: bestNat(id) }));
+    startBattle({ kind: 'trainer', name: opp.n, sprite: opp.sp, enemy, prize: TOUR_PRIZE[t.round].money, ai: t.round >= 1 ? 2 : 1, intro: ['Torneio • Quartas de final', 'Torneio • Semifinal', 'Torneio • GRANDE FINAL'][t.round], tour: 1 }); };
+  function rematchTourWin(o) { if (o.rematch) { S.rematch = S.rematch || {}; S.rematch[o.rematch] = weekKey(); giveReward({ 'rare-candy': 2 }); S.bp = (S.bp || 0) + 3; log('🎁 Revanche: +2 Balas Raras e 3 PB!'); }
+    if (o.tour) { const t = tourState(); const rw = TOUR_PRIZE[t.round + 1] || {}; t.round++; const { money, ...items } = rw; giveReward(items); t.best = Math.max(t.best ?? -1, t.round); if (t.round >= 3) { t.wins = (t.wins || 0) + 1; S.trophies = (S.trophies || 0) + 1; S.bag['master-ball'] = (S.bag['master-ball'] || 0) + 0; } } }
+  function tourLoss(o) { if (o.tour) { const t = tourState(); t.out = true; t.place = t.round; t.best = Math.max(t.best ?? -1, t.round); } }
+
+  // ---------- Pokémon seguidor ----------
+  function followerHtml() { if (S.settings.follow === false) return ''; const m = S.party.find(x => x.hp > 0) || S.party[0]; if (!m) return '';
+    const p = period(), h = hpPct(m), e = h < 30 ? '💦' : p === 'night' ? (R() < 0.5 ? '💤' : '🌙') : R() < 0.35 ? '♥' : R() < 0.5 ? '♪' : R() < 0.5 ? '!' : '✨';
+    return `<div class="follow ${m.shiny ? 'shiny-glow' : ''}" data-a="pet"><img src="${spr(m)}" alt=""><span class="emo">${e}</span></div>`; }
+  ACT.pet = () => { const m = S.party.find(x => x.hp > 0) || S.party[0]; if (!m) return; cry(m.id); const el = $('.follow'); if (el) { el.classList.remove('hop'); void el.offsetWidth; el.classList.add('hop'); const s = $('.emo', el); s.textContent = '♥'; s.classList.add('show'); setTimeout(() => s.classList.remove('show'), 1500); }
+    toast(`${esc(pn(m))} ${['adorou o carinho!', 'pulou de alegria!', 'está muito feliz com você!', 'fez um barulhinho fofo!'][Math.floor(R() * 4)]}`); };
+
+  // ---------- Estilo do treinador ----------
+  const STYLE = { colors: [['c0', 'Original', 0, 0], ['c1', 'Azul Oceano', 200, 1500], ['c2', 'Verde Floresta', 100, 1500], ['c3', 'Roxo Fantasma', 260, 2500], ['c4', 'Rosa Fada', 310, 2500], ['c5', 'Dourado', 40, 8000], ['c6', 'Sombra', -1, 6000]],
+    hats: [['h0', 'Nada', '', 0], ['h1', 'Boné', '🧢', 1000], ['h2', 'Chapéu de Palha', '👒', 1500], ['h3', 'Cartola', '🎩', 4000], ['h4', 'Laço', '🎀', 1200], ['h5', 'Óculos Escuros', '🕶️', 2500], ['h6', 'Coroa', '👑', 25000], ['h7', 'Chapéu de Festa', '🥳', 3000]],
+    auras: [['a0', 'Nenhuma', '', 0], ['a1', 'Brilhos', 'sparkle', 5000], ['a2', 'Fogo', 'fire', 8000], ['a3', 'Arco-Íris', 'rainbow', 15000]] };
+  const sty = () => { S.style = S.style || { color: 'c0', hat: 'h0', aura: 'a0', owned: { c0: 1, h0: 1, a0: 1 } }; return S.style; };
+  const meFilter = () => { const c = STYLE.colors.find(x => x[0] === sty().color); return !c || !c[2] ? '' : c[2] === -1 ? 'filter:brightness(.55) contrast(1.3) drop-shadow(0 0 6px #a855f7)' : `filter:hue-rotate(${c[2]}deg) saturate(1.2) drop-shadow(0 6px 4px rgba(0,0,0,.4))`; };
+  const hatOf = () => (STYLE.hats.find(x => x[0] === sty().hat) || [])[2] || '';
+  const auraOf = () => (STYLE.auras.find(x => x[0] === sty().aura) || [])[2] || '';
+  function meHtml() { const h = hatOf(); return `<img class="me" src="img/tr/${S.avatar}.png" style="${meFilter()}" alt="">${h ? `<span class="mehat ${sty().hat}">${h}</span>` : ''}${auraOf() ? `<span class="meaura au-${auraOf()}"></span>` : ''}`; }
+  function vStyle() { const s = sty();
+    const sec = (k, t, list, prev) => `<div class="card"><h3>${t}</h3><div class="stygrid">${list.map(([id, n, v, pr]) => { const own = s.owned[id], on = s[k] === id; return `<button class="sty ${on ? 'on' : ''} ${own ? 'own' : ''}" data-a="stybuy" data-k="${k}" data-id="${id}">${prev(v, id)}<b>${n}</b><small>${on ? '✅ Usando' : own ? 'Usar' : fmt(pr)}</small></button>`; }).join('')}</div></div>`;
+    return `<div class="card stylehead"><div class="stypreview theme-grass"><div class="tcl styc">${trImg()}</div></div><div><h3>👕 Boutique do Treinador</h3><p class="mut small">Compre cores, chapéus e auras. Aparecem no mapa e no seu Cartão de Treinador.</p><span class="chip money">${fmt(S.money)}</span></div></div>
+      ${sec('color', '🎨 Cores da roupa', STYLE.colors, v => `<img src="img/tr/${S.avatar}.png" style="${!v ? '' : v === -1 ? 'filter:brightness(.55) contrast(1.3)' : `filter:hue-rotate(${v}deg) saturate(1.2)`}" alt="">`)}
+      ${sec('hat', '🧢 Chapéus e acessórios', STYLE.hats, v => `<span class="sem">${v || '∅'}</span>`)}${sec('aura', '✨ Auras', STYLE.auras, v => `<span class="sem aura-prev au-${v}">${v ? '' : '∅'}</span>`)}`; }
+  ACT.stybuy = d => { const s = sty(), list = STYLE[d.k + 's'], it = list.find(x => x[0] === d.id); if (!it) return;
+    if (!s.owned[d.id]) { if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; s.owned[d.id] = 1; SFX.coin(); toast(`Comprou ${it[1]}!`, 'good'); }
+    s[d.k] = d.id; save(); render(); };
+  const trImg = () => { const h = hatOf(); return `<img src="img/tr/${S.avatar}.png" style="${meFilter()}" alt="">${h ? `<span class="tchat ${sty().hat}">${h}</span>` : ''}`; };
+
+  // ---------- Casa / base ----------
+  const FURN = [['bed', 'Cama Pokébola', '🛏️', 2000], ['sofa', 'Sofá', '🛋️', 3000], ['plant', 'Planta', '🪴', 800], ['tv', 'TV', '📺', 4000], ['game', 'Videogame', '🎮', 5000], ['books', 'Estante', '📚', 2500], ['aqua', 'Aquário', '🐠', 6000],
+    ['lamp', 'Luminária', '💡', 1200], ['rug', 'Tapete', '🟥', 1500], ['clock', 'Relógio', '🕰️', 2000], ['doll25', 'Boneco Pikachu', 'img:25', 3500], ['doll133', 'Boneco Eevee', 'img:133', 3500], ['doll143', 'Snorlax de pelúcia', 'img:143', 9000], ['doll150', 'Estátua Mewtwo', 'img:150', 30000]];
+  const WALLS = [['w0', 'Creme', '#f5e6c8', 0], ['w1', 'Céu', '#9fd3f5', 2000], ['w2', 'Menta', '#a7f3d0', 2000], ['w3', 'Noite Estrelada', '#1e1b4b', 5000], ['w4', 'Pokébola', '#ef4444', 6000]];
+  const house = () => { S.house = S.house || { slots: Array(8).fill(null), owned: {}, wall: 'w0', walls: { w0: 1 } }; return S.house; };
+  const furnIco = (v, big) => v.startsWith('img:') ? `<img src="${sprId(+v.slice(4))}" alt="">` : `<span class="fe">${v}</span>`;
+  function vHouse() { const h = house(), w = WALLS.find(x => x[0] === h.wall) || WALLS[0];
+    const nAch = Object.keys(S.ach || {}).length; const trophies = `${S.badges.map(i => badgeHtml(i, 1)).join('')}${(S.jbadges || []).map(i => jbadgeHtml(i, 1)).join('')}`;
+    return `<div class="card room-card"><div class="row between"><h3>🏠 Minha Casa</h3><button class="btn small" data-a="tab" data-t="team">💻 PC</button></div>
+      <div class="room" style="--wall:${w[2]}"><div class="wall"><div class="window per-${period()}"></div><div class="shelf"><div class="trophies">${trophies || '<small class="mut">Sem insígnias ainda</small>'}</div><div class="cups">${S.champion ? '👑' : ''}${'🏆'.repeat(Math.min(5, S.trophies || 0))}${nAch ? `<span class="achn">🏅${nAch}</span>` : ''}</div></div></div>
+      <div class="floor">${h.slots.map((f, i) => { const it = FURN.find(x => x[0] === f); return `<button class="slot ${it ? 'has' : ''}" data-a="hslot" data-i="${i}">${it ? furnIco(it[2]) : '<i>+</i>'}</button>`; }).join('')}</div>${meHtml()}${followerHtml()}</div>
+      <p class="mut small">Toque num espaço do chão para colocar ou trocar móveis. Insígnias, troféus do Torneio e conquistas aparecem na estante.</p></div>
+      <div class="card"><h3>🛒 Loja de Móveis</h3><div class="stygrid">${FURN.map(([id, n, v, pr]) => `<button class="sty ${h.owned[id] ? 'own' : ''}" data-a="fbuy" data-id="${id}">${furnIco(v)}<b>${n}</b><small>${h.owned[id] ? `Tenho ${h.owned[id]}` : fmt(pr)}</small></button>`).join('')}</div>
+      <h4>Papel de parede</h4><div class="stygrid">${WALLS.map(([id, n, c, pr]) => `<button class="sty ${h.wall === id ? 'on' : ''}" data-a="wbuy" data-id="${id}"><span class="sw" style="background:${c}"></span><b>${n}</b><small>${h.wall === id ? '✅' : h.walls[id] ? 'Usar' : fmt(pr)}</small></button>`).join('')}</div></div>`; }
+  ACT.fbuy = d => { const h = house(), it = FURN.find(x => x[0] === d.id); if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; h.owned[it[0]] = (h.owned[it[0]] || 0) + 1; SFX.coin(); toast(`${it[1]} comprado! Toque num espaço da casa para colocar.`, 'good'); save(); render(); };
+  ACT.wbuy = d => { const h = house(), it = WALLS.find(x => x[0] === d.id); if (!h.walls[it[0]]) { if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; h.walls[it[0]] = 1; SFX.coin(); } h.wall = it[0]; save(); render(); };
+  ACT.hslot = d => { const h = house(), i = +d.i, placed = id => h.slots.filter(x => x === id).length, avail = FURN.filter(f => (h.owned[f[0]] || 0) > placed(f[0]));
+    const m = modal(`<h3>Colocar móvel</h3>${avail.length ? `<div class="stygrid">${avail.map(f => `<button class="sty own" data-f="${f[0]}">${furnIco(f[2])}<b>${f[1]}</b></button>`).join('')}</div>` : '<p class="mut">Compre móveis na loja abaixo.</p>'}<div class="mbtns">${h.slots[i] ? '<button class="btn" data-f="">Guardar móvel</button>' : ''}<button class="btn" data-a="close">Fechar</button></div>`);
+    $$('[data-f]', m).forEach(b => b.onclick = () => { h.slots[i] = b.dataset.f || null; SFX.click2(); closeModal(); save(); render(); }); };
 
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
