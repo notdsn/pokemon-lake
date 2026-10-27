@@ -38,8 +38,9 @@
   const natMul = (m, i) => { const n = m.nat == null ? null : NATURES[m.nat]; if (!n || n[1] === n[2]) return 1; return n[1] === i ? 1.1 : n[2] === i ? 0.9 : 1; };
   function calcStats(m) {
     const b = (m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].s : D.mons[m.id].s), L = m.lvl, iv = m.iv, ev = m.ev || [0,0,0,0,0,0];
-    return b.map((bs, i) => i === 0 ? (m.id === 292 ? 1 : Math.floor((2 * bs + iv[i] + Math.floor(ev[i] / 4)) * L / 100) + L + 10)
-      : Math.floor((Math.floor((2 * bs + iv[i] + Math.floor(ev[i] / 4)) * L / 100) + 5) * natMul(m, i)));
+    const bm = m.bst || null;
+    return b.map((bs, i) => i === 0 ? (m.id === 292 ? 1 : Math.floor((Math.floor((2 * bs + iv[i] + Math.floor(ev[i] / 4)) * L / 100) + L + 10) * (bm ? bm[0] : 1)))
+      : Math.floor((Math.floor((2 * bs + iv[i] + Math.floor(ev[i] / 4)) * L / 100) + 5) * natMul(m, i) * (bm ? bm[i] : 1)));
   }
   // moveset "inteligente": até 3 golpes de dano fortes (tipos variados, STAB preferido) + 1 de status útil
   const BAD = new Set(['self-destruct', 'explosion', 'memento', 'final-gambit', 'healing-wish', 'lunar-dance', 'struggle', 'focus-punch', 'hyper-beam', 'giga-impact', 'solar-beam', 'sky-attack', 'skull-bash', 'razor-wind', 'dream-eater', 'snore', 'belch', 'last-resort', 'synchronoise', 'natural-gift', 'fling', 'spit-up']);

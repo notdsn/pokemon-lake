@@ -3,7 +3,7 @@ const assert = require('assert'); const store = {}; global.localStorage = { getI
 global.window = global; require('../js/save.js'); const PS = global.PS;
 const old = { v: 4, user: 'edson', trainer: 'Edson', party: [{ id: 6, lvl: 50, uid: 'a' }], box: [{ id: 25, uid: 'b' }], bag: { 'poke-ball': 2 }, gifts: { 'EDSON-LENDAS': 1 }, quests: { day: 'x' }, ach: { a: 1 }, stats: { battles: 3, wins: 2 }, settings: { sound: false, music: false }, dex: { seen: {}, caught: { 6: 1 }, shiny: {} } };
 const s = PS.migrate(JSON.parse(JSON.stringify(old)));
-assert.strictEqual(s.v, 5); assert.deepStrictEqual(s.gifts, { 'EDSON-LENDAS': 1 }); assert.strictEqual(s.party[0].id, 6); assert.strictEqual(s.box.length, 1);
+assert.strictEqual(s.v, PS.SAVE_VERSION); assert.deepStrictEqual(s.gifts, { 'EDSON-LENDAS': 1 }); assert.strictEqual(s.party[0].id, 6); assert.strictEqual(s.box.length, 1);
 assert.strictEqual(s.settings.music, false); assert.strictEqual(s.settings.follow, true); assert.deepStrictEqual(s.raids, {}); assert.deepStrictEqual(s.legq, {}); assert.deepStrictEqual(s.ach, { a: 1 });
 assert.strictEqual(s.style.hat, 'h0'); assert.strictEqual(s.house.slots.length, 8); assert.strictEqual(s.quests.day, 'x');
 assert.ok(store['pkLake.save.edson.premigrate.v4'], 'cópia pré-migração v4');

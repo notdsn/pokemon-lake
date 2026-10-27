@@ -70,9 +70,9 @@
   function makeEgg(a, b, idOverride) { const id = idOverride || baseOf(a.id === 132 ? b.id : a.id), iv = [0, 1, 2, 3, 4, 5].map(() => PE.ri({ seed: (R() * 2 ** 31) | 0 }, 0, 31));
     if (a && b) { const pick = [0, 1, 2, 3, 4, 5].sort(() => R() - 0.5).slice(0, 3); for (const k of pick) iv[k] = (R() < 0.5 ? a : b).iv[k]; }
     const hc = D.mons[id].hc || 20; S.eggs.push({ id, iv, steps: hc * 12, total: hc * 12, from: a ? 'Creche' : 'Prof. Elm', at: Date.now() }); A.newEgg = 1; }
-  function eggSteps(n) { if (!n) return; for (const e of S.eggs) e.steps = Math.max(0, e.steps - n); }
+  function eggSteps(n) { if (!n) return; n = Math.round(n * evEggMul()); for (const e of S.eggs) e.steps = Math.max(0, e.steps - n); }
   async function checkEggs() { if (B || !S.trainer) return; const i = S.eggs.findIndex(e => e.steps <= 0); if (i < 0) { if (A.newEgg) { A.newEgg = 0; toast('🥚 A Creche encontrou um Ovo! Veja em Time.', 'good'); } return; }
-    const e = S.eggs.splice(i, 1)[0]; const m = PE.makeMon(e.id, 1, { seed: (R() * 2 ** 31) | 0 }, { ot: S.trainer, caughtAt: 'Chocado de um Ovo (' + e.from + ')', iv: e.iv, shiny: R() < shinyP() });
+    const e = S.eggs.splice(i, 1)[0]; const m = PE.makeMon(e.id, 1, { seed: (R() * 2 ** 31) | 0 }, { ot: S.trainer, caughtAt: 'Chocado de um Ovo (' + e.from + ')', iv: e.iv, shiny: !!e.shiny || R() < shinyP() });
     addCaught(m); S.stats.caught++; if (m.shiny) S.stats.shinies++; S.stats.hatched = (S.stats.hatched || 0) + 1; track('hatch'); if (S.party.length < 6) S.party.push(m); else S.box.push(m); save();
     modal(`<div class="center hatch"><div class="eggbig" id="eggbig"></div><h2 id="hatchT">Hã? O ovo está se mexendo!</h2><p id="hatchP" class="mut"></p><div class="mbtns"><button class="btn primary wide hidden" id="hatchOk" data-a="close">Que fofo!</button></div></div>`);
     SFX.shake(); await sleep(900); $('#eggbig')?.classList.add('crack'); SFX.shake(); await sleep(1300);
@@ -126,7 +126,7 @@
   function render() {
     if (!S) return;
     const nav = [['home', '🏠', 'Início'], ['team', '🎒', 'Time'], ['maps', '🗺️', 'Mapas'], ['battle', '⚔️', 'Batalha'], ['more', '☰', 'Mais']];
-    const V = { safari: vSafari, raid: vRaid, legends: vLegends, arena: vArena, house: vHouse, style: vStyle, quests: vQuests, games: vGames, ach: vAch, daycare: vDaycare, home: vHome, team: vTeam, maps: vMaps, battle: vBattle, more: vMore, shop: vShop, center: vCenter, bag: vBag, dex: vDex, card: vCard, saves: vSaves, settings: vSettings, explore: vExplore };
+    const V = { ...XV, safari: vSafari, raid: vRaid, legends: vLegends, arena: vArena, house: vHouse, style: vStyle, quests: vQuests, games: vGames, ach: vAch, daycare: vDaycare, home: vHome, team: vTeam, maps: vMaps, battle: vBattle, more: vMore, shop: vShop, center: vCenter, bag: vBag, dex: vDex, card: vCard, saves: vSaves, settings: vSettings, explore: vExplore };
     ensureQuests(); const nbadge = questClaimable() + dexClaimable();
     const on = k => tab === k || (k === 'more' && MORE_TABS.includes(tab)) || (k === 'maps' && tab === 'explore');
     app.innerHTML = `<header class="top"><div class="brand" data-a="tab" data-t="home"><img src="img/items/poke-ball.png" alt=""><b>Pokémon <i>Lake</i></b></div>
@@ -232,7 +232,7 @@
     const hurt = S.party.some(m => m.hp < PE.maxhp(m) || m.status);
     return `<div class="grid">
       <div class="card span2 hero">${trainerCard()}</div>
-      ${natCard()}
+      ${homeExtra()}${natCard()}
       <button class="card goal" data-a="tab" data-t="${g.t2}"><img src="${g.img}" alt=""><div><small>PRÓXIMO OBJETIVO</small><h3>${g.t}</h3><p class="mut">${g.d}</p></div><span class="arrow">›</span></button>
       <div class="card"><div class="row between"><h3>Seu time</h3><button class="btn small" data-a="tab" data-t="team">Ver tudo</button></div>${partyMini()}
         ${hurt ? `<button class="btn wide heal" data-a="tab" data-t="center">❤️ Curar no Centro Pokémon</button>` : ''}</div>
@@ -373,9 +373,9 @@
     eggSteps(steps); setTimeout(checkEggs, 2500);
     if (mp.finds && R() < (A.findRate || 0.035)) { const f = pickFind(mp); if (f) { searching = false; $('#searchBtn').disabled = false; S.bag[f] = (S.bag[f] || 0) + 1; save(); SFX.caught();
       modal(`<div class="center badgewin"><div class="bigbadge megab"><img src="img/items/${f}.png" alt=""></div><h2>Você encontrou algo brilhando!</h2><p>Achou <b>${C.ITEM_NAME[f]}</b> escondida em ${mp.name}!</p><p class="mut small">Faça o Pokémon certo segurar para Mega Evoluir.</p><button class="btn primary wide" data-a="close">Uau!</button></div>`); return render(); } }
-    const m = PE.makeMon(e[0], lvl, st, { shinyRate: A.shinyRate || shinyP(), shiny: e[4] && e[4].shiny ? true : undefined }); m.caughtAt = mp.name;
+    const evs = eventSpawn(mp); const m = PE.makeMon(evs ? evs.id : e[0], lvl, st, { shinyRate: A.shinyRate || (evs ? evs.rate : shinyP()), shiny: !evs && e[4] && e[4].shiny ? true : undefined }); m.caughtAt = mp.name; if (evs) m.evt = 1;
     sc.classList.add('alert'); tone(1200, 0.1); await sleep(600); searching = false;
-    startBattle({ kind: 'wild', enemy: [m], map: mp, weather: battleWeather(w), legend: !!e[4]?.legend });
+    startBattle({ kind: 'wild', enemy: [m], map: mp, weather: battleWeather(w), legend: !evs && !!e[4]?.legend });
   };
   const owns = k => (S.bag[k] || 0) > 0 || [...S.party, ...S.box].some(m => m.item === k);
   function pickFind(mp) { const fs = mp.finds.filter(([k]) => !owns(k)); if (!fs.length) return null; const tot = fs.reduce((a, f) => a + f[1], 0); let r = R() * tot; for (const f of fs) { if ((r -= f[1]) <= 0) return f[0]; } return fs[0][0]; }
@@ -435,7 +435,7 @@
   function vMore() {
     const qc = questClaimable(), dc = dexClaimable(), gq = quizState();
     const it = [['quests', '📜', 'Missões', qc ? `🎁 ${qc} recompensa(s) para resgatar!` : 'Diárias e semanais'], ['games', '🎮', 'Mini-jogos', `Quem é esse Pokémon? (${QUIZ_ROUNDS - gq.n} hoje) • Pesca`], ['ach', '🏆', 'Conquistas', `${Object.keys(S.ach || {}).length}/${ACH.length} • títulos`], ['legends', '⭐', 'Lendas', 'Histórias, enigmas e lendários'], ['raid', '⬣', 'Raides Dinamax', `${raidsLeft()} raide(s) hoje • chefes gigantes`], ['arena', '🏟️', 'Torneio e Revanches', 'Torneio semanal • líderes mais fortes'], ['safari', '🦏', 'Zona Safári', 'Sem batalhas: iscas, pedras e raros'], ['house', '🏠', 'Minha Casa', 'Decore e exiba troféus'], ['style', '👕', 'Boutique', 'Cores, chapéus e auras'], ['shop', '🛒', 'Loja Pokémon', 'Bolas, poções, pedras'], ['center', '❤️', 'Centro Pokémon', 'Cura grátis do time'], ['bag', '🎒', 'Mochila', 'Seus itens'], ['dex', '📕', 'Pokédex', dc ? `🏅 ${dc} marco(s) para resgatar!` : 'Vistos, capturados e marcos'],
-      ['daycare', '🏡', 'Creche Pokémon', `Deixe 2 Pokémon, ganhe XP e ovos${S.eggs.length ? ' • ' + S.eggs.length + ' ovo(s)' : ''}`], ['card', '🪪', 'Cartão de Treinador', 'Perfil e insígnias'], ['saves', '💾', 'Salvar / Backup', 'Exportar e importar save'], ['settings', '⚙️', 'Configurações', 'Som e velocidade']];
+      ...moreExtra(), ['daycare', '🏡', 'Creche Pokémon', `Deixe 2 Pokémon, ganhe XP e ovos${S.eggs.length ? ' • ' + S.eggs.length + ' ovo(s)' : ''}`], ['card', '🪪', 'Cartão de Treinador', 'Perfil e insígnias'], ['saves', '💾', 'Salvar / Backup', 'Exportar e importar save'], ['settings', '⚙️', 'Configurações', 'Som e velocidade']];
     return `<div class="grid">${it.map(([k, i, t, dsc]) => `<button class="card morec ${(k === 'quests' && qc) || (k === 'dex' && dc) ? 'hasrw' : ''}" data-a="tab" data-t="${k}"><span class="mi">${i}</span><div><b>${t}</b><small class="mut">${dsc}</small></div></button>`).join('')}<button class="card morec" data-a="logout"><span class="mi">🚪</span><div><b>Trocar de conta</b><small class="mut">Sair de ${esc(S.trainer)}</small></div></button></div>`;
   }
   function vShop() {
@@ -585,7 +585,7 @@
   function startBattle(o) {
     const enemyParty = o.enemy; enemyParty.forEach(m => see(m.id)); S.stats.battles++; MUS.want('battle');
     if (S.party[0].hp <= 0) { const i = S.party.findIndex(m => m.hp > 0); if (i > 0) S.party.unshift(S.party.splice(i, 1)[0]); }
-    const bs = PE.createBattle({ kind: o.kind, seed: (R() * 2 ** 31) | 0, weather: o.weather, sides: [{ party: o.party || S.party, name: S.trainer, mega: (S.bag['mega-bracelet'] || 0) > 0 && !o.raid, dyna: (S.bag['dynamax-band'] || 0) > 0 || !!o.raid }, { party: enemyParty, name: o.name || '', ai: o.ai || 0, mega: enemyParty.some(m => m.item), dyna: !!o.dyna }] });
+    const bs = PE.createBattle({ kind: o.kind, seed: o.seed ?? ((R() * 2 ** 31) | 0), weather: o.weather, sides: [{ party: o.party || S.party, name: S.trainer, mega: (S.bag['mega-bracelet'] || 0) > 0 && !o.raid, dyna: (S.bag['dynamax-band'] || 0) > 0 || !!o.raid }, { party: enemyParty, name: o.name || '', ai: o.ai || 0, mega: enemyParty.some(m => m.item), dyna: !!o.dyna }] });
     B = { o, s: bs, busy: true };
     const theme = o.map ? o.map.theme : o.tower ? 'psychic' : 'gym';
     const ov = document.createElement('div'); ov.id = 'battle'; ov.className = `battle theme-${theme} ${o.weather ? 'w-' + o.weather : ''} per-${o.map ? period() : 'day'} ${o.gym != null || o.elite != null || o.jgym != null || o.jelite != null ? 'boss' : ''}`;
@@ -650,6 +650,7 @@
     bindCtl();
   }
   function showBag() {
+    if (B.o.rogue) return toast('Sem mochila no Lago Infinito — use as melhorias!', 'bad');
     const it = Object.entries(S.bag).filter(([k, v]) => v > 0 && C.ITEM_NAME[k] && (PE.BALLS[k] ? B.o.kind === 'wild' && !B.o.raid && k !== 'safari-ball' : (PE.HEAL[k] || ['revive', 'antidote', 'full-heal'].includes(k))));
     $('#bctl').innerHTML = `<div class="bitems">${it.length ? it.map(([k, v]) => `<button class="irow" data-b="item" data-id="${k}">${itemImg(k)}<b>${C.ITEM_NAME[k]}</b><small>x${v}</small></button>`).join('') : '<p class="mut">Nada útil na mochila.</p>'}</div><button class="bb back" data-b="back">← Voltar</button>`;
     if (B.o.kind !== 'wild') log('Não dá para capturar Pokémon de outro treinador!');
@@ -673,6 +674,7 @@
       if (!ok) return toast('Não teria efeito.'); S.bag[id]--; act({ type: 'item', item: id, target: +b.dataset.i }); }
     else if (k === 'sw') { if (B.forced) { B.forced = false; doForced(+b.dataset.i); } else act({ type: 'switch', i: +b.dataset.i }); } }); }
   async function act(a) {
+    if (B.o.rogue && a.type === 'run') return toast('Não dá para fugir no Lago Infinito!', 'bad');
     B.busy = true; $('#bctl').innerHTML = ''; const s = B.s;
     const ev = PE.step(s, [a, PE.aiAction(s, 1)]); await play(ev); if (B && B.o.raid && !s.over) await raidAfterTurn(); if (B) await postTurn();
   }
@@ -686,7 +688,7 @@
   async function doForced(i) { B.busy = true; await play(PE.forceSwitch(B.s, 0, i)); B.busy = false; showMain(); }
   async function award() {
     const s = B.s, def = s.sides[1].b.m; B.awarded = B.awarded || []; if (B.awarded.includes(def.uid)) return; B.awarded.push(def.uid);
-    const sd = s.sides[0], parts = sd.participants.filter(i => sd.party[i] && sd.party[i].hp > 0); const base = PE.xpGain(def, s.kind === 'trainer', 1);
+    const sd = s.sides[0], parts = sd.participants.filter(i => sd.party[i] && sd.party[i].hp > 0); const base = Math.round(PE.xpGain(def, s.kind === 'trainer', 1) * evXpMul());
     for (let i = 0; i < sd.party.length; i++) { const m = sd.party[i]; if (m.hp <= 0 || m.lvl >= 100) continue; const inP = parts.includes(i); const share = inP ? Math.ceil(base / parts.length) : Math.ceil(base * 0.3);
       for (let k = 0; k < 6; k++) if (D.mons[def.id].s[k] >= 90) m.ev[k] = Math.min(252, (m.ev[k] || 0) + 2);
       const ups = PE.addXP(m, share);
@@ -765,6 +767,7 @@
   async function endBattle() {
     const s = B.s, o = B.o; let msg = '';
     if (o.raid) return raidEnd();
+    if (o.rogue) return rogueEnd();
     if (s.ran) return closeBattle();
     if (s.caught) { const m = s.caught; m.ot = S.trainer; m.caughtAt = (o.map ? o.map.name : '') + ' • ' + new Date().toLocaleDateString('pt-BR'); const isNew = !S.dex.caught[m.id]; addCaught(m); S.stats.caught++; track('catch', 1, m); if (isNew) track('newdex');
       let where; if (S.party.length < 6) { S.party.push(m); where = 'entrou no seu time'; } else { S.box.push(m); where = 'foi enviado para o PC'; }
@@ -775,7 +778,7 @@
     }
     if (s.winner === 0) {
       await award(); S.stats.wins++; track('win'); if (o.kind === 'trainer') track('trainer'); MUS.victory();
-      if (o.kind === 'trainer') { const f = $('#foe'); if (f) { f.classList.remove('leave'); f.classList.add('back'); } const prize = o.prize; S.money += prize; SFX.win(); log(`🏆 Você venceu ${esc(o.name)}! Ganhou <b>${fmt(prize)}</b>.`); await wait(2000);
+      if (o.kind === 'trainer') { const f = $('#foe'); if (f) { f.classList.remove('leave'); f.classList.add('back'); } const prize = Math.round((o.prize || 0) * evMoneyMul()); S.money += prize; SFX.win(); log(`🏆 Você venceu ${esc(o.name)}! Ganhou <b>${fmt(prize)}</b>.`); await wait(2000);
         if (o.key) S.trainersBeaten[o.key] = (S.trainersBeaten[o.key] || 0) + 1;
         if (o.badge != null && !S.badges.includes(o.badge)) { S.badges.push(o.badge); S.badges.sort((a, b) => a - b); msg = 'badge:' + o.badge; }
         if (o.nat) { S.nat = S.nat || { wins: 0 }; S.nat.wins++; if (!S.nat.first) { S.nat.first = Date.now(); S.money += 70000; S.bag['master-ball'] = (S.bag['master-ball'] || 0) + 1; S.bag['rare-candy'] = (S.bag['rare-candy'] || 0) + 10; msg = 'nat1'; } else msg = 'nat'; }
@@ -1358,12 +1361,12 @@
   const auraOf = () => (STYLE.auras.find(x => x[0] === sty().aura) || [])[2] || '';
   function meHtml() { const h = hatOf(); return `<img class="me" src="img/tr/${S.avatar}.png" style="${meFilter()}" alt="">${h ? `<span class="mehat ${sty().hat}">${h}</span>` : ''}${auraOf() ? `<span class="meaura au-${auraOf()}"></span>` : ''}`; }
   function vStyle() { const s = sty();
-    const sec = (k, t, list, prev) => `<div class="card"><h3>${t}</h3><div class="stygrid">${list.map(([id, n, v, pr]) => { const own = s.owned[id], on = s[k] === id; return `<button class="sty ${on ? 'on' : ''} ${own ? 'own' : ''}" data-a="stybuy" data-k="${k}" data-id="${id}">${prev(v, id)}<b>${n}</b><small>${on ? '✅ Usando' : own ? 'Usar' : fmt(pr)}</small></button>`; }).join('')}</div></div>`;
+    const sec = (k, t, list, prev) => `<div class="card"><h3>${t}</h3><div class="stygrid">${list.map(([id, n, v, pr]) => { const own = s.owned[id], on = s[k] === id; return `<button class="sty ${on ? 'on' : ''} ${own ? 'own' : ''}" data-a="stybuy" data-k="${k}" data-id="${id}">${prev(v, id)}<b>${n}</b><small>${on ? '✅ Usando' : own ? 'Usar' : pr < 0 ? '🎰 Cápsula' : fmt(pr)}</small></button>`; }).join('')}</div></div>`;
     return `<div class="card stylehead"><div class="stypreview theme-grass"><div class="tcl styc">${trImg()}</div></div><div><h3>👕 Boutique do Treinador</h3><p class="mut small">Compre cores, chapéus e auras. Aparecem no mapa e no seu Cartão de Treinador.</p><span class="chip money">${fmt(S.money)}</span></div></div>
       ${sec('color', '🎨 Cores da roupa', STYLE.colors, v => `<img src="img/tr/${S.avatar}.png" style="${!v ? '' : v === -1 ? 'filter:brightness(.55) contrast(1.3)' : `filter:hue-rotate(${v}deg) saturate(1.2)`}" alt="">`)}
       ${sec('hat', '🧢 Chapéus e acessórios', STYLE.hats, v => `<span class="sem">${v || '∅'}</span>`)}${sec('aura', '✨ Auras', STYLE.auras, v => `<span class="sem aura-prev au-${v}">${v ? '' : '∅'}</span>`)}`; }
   ACT.stybuy = d => { const s = sty(), list = STYLE[d.k + 's'], it = list.find(x => x[0] === d.id); if (!it) return;
-    if (!s.owned[d.id]) { if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; s.owned[d.id] = 1; SFX.coin(); toast(`Comprou ${it[1]}!`, 'good'); }
+    if (!s.owned[d.id]) { if (it[3] < 0) return toast('Só na Máquina de Cápsulas!'); if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; s.owned[d.id] = 1; SFX.coin(); toast(`Comprou ${it[1]}!`, 'good'); }
     s[d.k] = d.id; save(); render(); };
   const trImg = () => { const h = hatOf(); return `<img src="img/tr/${S.avatar}.png" style="${meFilter()}" alt="">${h ? `<span class="tchat ${sty().hat}">${h}</span>` : ''}`; };
 
@@ -1379,14 +1382,218 @@
       <div class="room" style="--wall:${w[2]}"><div class="wall"><div class="window per-${period()}"></div><div class="shelf"><div class="trophies">${trophies || '<small class="mut">Sem insígnias ainda</small>'}</div><div class="cups">${S.champion ? '👑' : ''}${'🏆'.repeat(Math.min(5, S.trophies || 0))}${nAch ? `<span class="achn">🏅${nAch}</span>` : ''}</div></div></div>
       <div class="floor">${h.slots.map((f, i) => { const it = FURN.find(x => x[0] === f); return `<button class="slot ${it ? 'has' : ''}" data-a="hslot" data-i="${i}">${it ? furnIco(it[2]) : '<i>+</i>'}</button>`; }).join('')}</div>${meHtml()}${followerHtml()}</div>
       <p class="mut small">Toque num espaço do chão para colocar ou trocar móveis. Insígnias, troféus do Torneio e conquistas aparecem na estante.</p></div>
-      <div class="card"><h3>🛒 Loja de Móveis</h3><div class="stygrid">${FURN.map(([id, n, v, pr]) => `<button class="sty ${h.owned[id] ? 'own' : ''}" data-a="fbuy" data-id="${id}">${furnIco(v)}<b>${n}</b><small>${h.owned[id] ? `Tenho ${h.owned[id]}` : fmt(pr)}</small></button>`).join('')}</div>
+      <div class="card"><h3>🛒 Loja de Móveis</h3><div class="stygrid">${FURN.filter(f => f[3] >= 0 || h.owned[f[0]]).map(([id, n, v, pr]) => `<button class="sty ${h.owned[id] ? 'own' : ''}" data-a="fbuy" data-id="${id}">${furnIco(v)}<b>${n}</b><small>${h.owned[id] ? `Tenho ${h.owned[id]}` : fmt(pr)}</small></button>`).join('')}</div>
       <h4>Papel de parede</h4><div class="stygrid">${WALLS.map(([id, n, c, pr]) => `<button class="sty ${h.wall === id ? 'on' : ''}" data-a="wbuy" data-id="${id}"><span class="sw" style="background:${c}"></span><b>${n}</b><small>${h.wall === id ? '✅' : h.walls[id] ? 'Usar' : fmt(pr)}</small></button>`).join('')}</div></div>`; }
-  ACT.fbuy = d => { const h = house(), it = FURN.find(x => x[0] === d.id); if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; h.owned[it[0]] = (h.owned[it[0]] || 0) + 1; SFX.coin(); toast(`${it[1]} comprado! Toque num espaço da casa para colocar.`, 'good'); save(); render(); };
+  ACT.fbuy = d => { const h = house(), it = FURN.find(x => x[0] === d.id); if (it[3] < 0) return toast('Este móvel vem da Máquina de Cápsulas. Toque num espaço do chão para colocar.'); if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; h.owned[it[0]] = (h.owned[it[0]] || 0) + 1; SFX.coin(); toast(`${it[1]} comprado! Toque num espaço da casa para colocar.`, 'good'); save(); render(); };
   ACT.wbuy = d => { const h = house(), it = WALLS.find(x => x[0] === d.id); if (!h.walls[it[0]]) { if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; h.walls[it[0]] = 1; SFX.coin(); } h.wall = it[0]; save(); render(); };
   ACT.hslot = d => { const h = house(), i = +d.i, placed = id => h.slots.filter(x => x === id).length, avail = FURN.filter(f => (h.owned[f[0]] || 0) > placed(f[0]));
     const m = modal(`<h3>Colocar móvel</h3>${avail.length ? `<div class="stygrid">${avail.map(f => `<button class="sty own" data-f="${f[0]}">${furnIco(f[2])}<b>${f[1]}</b></button>`).join('')}</div>` : '<p class="mut">Compre móveis na loja abaixo.</p>'}<div class="mbtns">${h.slots[i] ? '<button class="btn" data-f="">Guardar móvel</button>' : ''}<button class="btn" data-a="close">Fechar</button></div>`);
     $$('[data-f]', m).forEach(b => b.onclick = () => { h.slots[i] = b.dataset.f || null; SFX.click2(); closeModal(); save(); render(); }); };
 
+  // =====================================================================
+  // v6 G1: Lago Infinito (rogue), Desafio Diário, Máquina de Cápsulas
+  // =====================================================================
+  const XV = {}, MORE_X = [], HOME_X = [];
+  function moreExtra() { return MORE_X.map(f => f()).filter(Boolean); }
+  function homeExtra() { return HOME_X.map(f => f()).join(''); }
+  Object.assign(C.ITEM_NAME, { 'capsule-token': 'Ficha de Cápsula', 'egg-token': 'Ficha de Ovo' });
+  Object.assign(KEY_ITEMS, { 'capsule-token': 'Use na Máquina de Cápsulas (Mais → Cápsulas).', 'egg-token': 'Troque por Ovos raros no Lago Infinito.' });
+  const HAS_SPR = new Set([...Array(251).keys()].map(i => i + 1));
+  const isFinal = id => !(D.mons[id].e || []).length;
+  const bst = id => D.mons[id].s.reduce((a, b) => a + b, 0);
+  const BIOMES = [
+    { k: 'grass', n: 'Campina Serena', t: ['normal', 'grass', 'bug', 'flying'], ico: '🌾' }, { k: 'water', n: 'Lago Profundo', t: ['water', 'ice'], ico: '🌊' },
+    { k: 'cave', n: 'Caverna Ecoante', t: ['rock', 'ground', 'steel', 'fighting'], ico: '⛰️' }, { k: 'forest', n: 'Mata Sombria', t: ['bug', 'grass', 'poison'], ico: '🌲' },
+    { k: 'volcano', n: 'Cratera Rubra', t: ['fire', 'ground', 'dragon'], ico: '🌋' }, { k: 'electric', n: 'Usina Abandonada', t: ['electric', 'steel'], ico: '⚡' },
+    { k: 'ghost', n: 'Torre Assombrada', t: ['ghost', 'dark', 'psychic'], ico: '👻' }, { k: 'ice', n: 'Pico Congelado', t: ['ice', 'water'], ico: '❄️' },
+    { k: 'sky', n: 'Céu Infinito', t: ['flying', 'dragon', 'fairy', 'psychic'], ico: '☁️' }, { k: 'psychic', n: 'Templo Mental', t: ['psychic', 'fairy'], ico: '🔮' }];
+  const RG_UPS = [
+    ['heal', '💖', 'Poção Máxima', 'Cura todo o time por completo.'], ['candy', '🍬', 'Bala Rara x2', '+2 níveis para todo o time.'], ['atk', '🥊', 'Faixa do Poder', 'Ataque e At. Esp. +10% (acumula).'],
+    ['def', '🛡️', 'Colete Robusto', 'Defesa e Def. Esp. +10% (acumula).'], ['spe', '🪶', 'Pena Veloz', 'Velocidade +10% (acumula).'], ['hp', '🍎', 'Fruta Vital', 'HP máximo +10% (acumula).'],
+    ['revive', '💎', 'Reviver em Massa', 'Revive todos os desmaiados com metade do HP.'], ['coin', '🪙', 'Bolsa de Moedas', '+300 moedas do Lago para a loja.'],
+    ['recruit', '🤝', 'Recrutar', 'O Pokémon derrotado entra no seu time (máx. 6).'], ['luck', '🍀', 'Trevo da Sorte', 'Mais Fichas no fim da corrida (acumula).'], ['evo', '🌟', 'Pedra da Evolução', 'Evolui o 1º Pokémon que puder evoluir.']];
+  const rogue = () => { S.rogue = S.rogue || { run: null, best: 0, runs: 0, daily: {}, dhist: [] }; return S.rogue; };
+  const rgRng = (run, tag) => srng(hseed(run.seed + ':' + tag));
+  function rgPool(run, w, r) { const b = BIOMES[run.biome % BIOMES.length], boss = w % 10 === 0, lim = w < 8 ? 330 : w < 18 ? 430 : w < 30 ? 500 : 560;
+    let pool = [...HAS_SPR].filter(i => D.mons[i] && !D.mons[i].L && D.mons[i].t.some(t => b.t.includes(t)) && bst(i) <= lim);
+    if (boss) pool = pool.filter(isFinal).sort((a, c) => bst(c) - bst(a)).slice(0, 8); if (!pool.length) pool = [19, 16, 41];
+    return pool[Math.floor(r() * pool.length)]; }
+  const rgLvl = w => Math.min(100, Math.round(6 + w * 1.6));
+  function rgBup(run) { const u = run.ups; return [1 + 0.1 * (u.hp || 0), 1 + 0.1 * (u.atk || 0), 1 + 0.1 * (u.def || 0), 1 + 0.1 * (u.atk || 0), 1 + 0.1 * (u.def || 0), 1 + 0.1 * (u.spe || 0)]; }
+  function rgApply(run) { const b = rgBup(run); for (const m of run.party) { const old = PE.maxhp(m); m.bst = b; const nw = PE.maxhp(m); if (m.hp > 0) m.hp = Math.min(nw, m.hp + Math.max(0, nw - old)); } }
+  const STARTER_IDS = [1, 4, 7, 25, 133, 152, 155, 158, 66, 92, 147, 246];
+  function rgNew(daily, pick) { const R0 = rogue(); const seed = daily ? 'daily:' + dayKey() : 'r' + Date.now() + ':' + Math.floor(R() * 1e9); const run = { seed, daily: !!daily, wave: 1, biome: 0, money: 200, ups: {}, party: [], log: [], t0: Date.now() };
+    const r = srng(hseed(seed + ':team')); const pool = STARTER_IDS.slice(); const ids = pick ? [pick, ...pickCount(pool.filter(x => x !== pick), 2, r)] : pickCount(pool, 3, r);
+    run.biome = Math.floor(r() * BIOMES.length);
+    run.party = ids.map((id, k) => { const m = PE.makeMon(id, 8, { seed: hseed(seed + 'm' + k) }, { shiny: false, iv: Array(6).fill(15), nat: (hseed(seed + 'n' + k) % 25) }); m.ot = S.trainer; m.rg = 1; return m; });
+    R0.run = run; R0.runs++; if (daily) R0.daily[dayKey()] = { started: 1 }; save(); return run; }
+  function vRogue() { const R0 = rogue(), run = R0.run, dk = dayKey(), dd = R0.daily[dk];
+    if (run) { const b = BIOMES[run.biome % BIOMES.length], boss = run.wave % 10 === 0;
+      return `<div class="card rg-hero theme-${b.k}"><div class="row between"><h3>${b.ico} ${b.n}</h3><span class="chip">${run.daily ? '📅 Desafio Diário' : '♾️ Lago Infinito'}</span></div>
+        <div class="rgwave"><small>ONDA</small><b>${run.wave}</b>${boss ? '<span class="bossb">👑 CHEFE</span>' : `<span class="mut small">chefe em ${10 - run.wave % 10}</span>`}</div>
+        <div class="rgparty">${run.party.map(m => `<div class="rgm ${m.hp <= 0 ? 'ko' : ''}"><img src="${spr(m)}" alt=""><small>${D.mons[m.id].n} Nv${m.lvl}</small><div class="hpb"><i style="width:${hpPct(m)}%"></i></div></div>`).join('')}</div>
+        <div class="rgups">${RG_UPS.filter(u => run.ups[u[0]] && ['atk', 'def', 'spe', 'hp', 'luck'].includes(u[0])).map(u => `<span class="chip">${u[1]}×${run.ups[u[0]]}</span>`).join('')}<span class="chip">🪙 ${run.money}</span></div>
+        <button class="btn primary big wide" data-a="rgfight">${boss ? '👑 Enfrentar o chefe' : '⚔️ Próxima onda'}</button><button class="btn small ghost wide" data-a="rgquit">Desistir (recebe as recompensas)</button></div>`; }
+    const tok = S.bag['egg-token'] || 0;
+    return `<div class="card rg-hero theme-water"><div class="rglogo">♾️</div><h2>Lago Infinito</h2><p>Ondas sem fim de batalhas. Depois de cada vitória escolha <b>1 de 3 melhorias</b>. A cada 10 ondas muda o bioma e aparece um <b>chefe</b>. Loja a cada 5 ondas.</p>
+      <p class="small">Ao perder você ganha <b>Fichas de Ovo</b>, moedas e <b>Fichas de Cápsula</b> para usar no jogo principal.</p>
+      <div class="row wrap gap"><span class="chip">🏅 Recorde: onda ${R0.best}</span><span class="chip">🎮 Corridas: ${R0.runs}</span></div>
+      <button class="btn primary big wide" data-a="rgstart">🎲 Time aleatório</button><button class="btn big wide" data-a="rgpick">🧑‍🔬 Escolher inicial</button></div>
+      <div class="card daily-ch"><div class="row between"><h3>📅 Desafio Diário</h3><span class="chip">${dk}</span></div><p class="mut small">Mesma semente para todos no dia (horário de Brasília). Uma tentativa por dia.</p>
+        ${dd && dd.wave != null ? `<p>✅ Hoje você chegou à onda <b>${dd.wave}</b>.</p>` : dd ? '<p>⏳ Corrida em andamento.</p>' : '<button class="btn primary wide" data-a="rgdaily">Jogar o desafio de hoje</button>'}
+        <h4>🏆 Ranking deste aparelho</h4>${dailyBoard(dk)}<h4>📜 Seu histórico</h4>${R0.dhist.length ? `<div class="dhist">${R0.dhist.slice(-7).reverse().map(h => `<div class="row between small"><span>${h.day}</span><b>onda ${h.wave}</b><span>${h.team.map(id => `<img src="${sprId(id)}" alt="">`).join('')}</span></div>`).join('')}</div>` : '<p class="mut small">Nenhum desafio ainda.</p>'}</div>
+      <div class="card"><h3>🥚 Troca de Fichas de Ovo</h3><p class="mut small">Você tem <b>${tok}</b> ${itemImg('egg-token')}</p><div class="stygrid">${EGG_SHOP.map(([k, n, ico, pr]) => `<button class="sty" data-a="rgegg" data-k="${k}" ${tok >= pr ? '' : 'disabled'}><span class="sem">${ico}</span><b>${n}</b><small>${pr} fichas</small></button>`).join('')}</div></div>`; }
+  const EGG_SHOP = [['common', 'Ovo Comum', '🥚', 5], ['rare', 'Ovo Raro', '🪺', 15], ['epic', 'Ovo Épico (5 IVs 31)', '💠', 35], ['shiny', 'Ovo Brilhante ✨', '🌟', 80]];
+  const EGG_POOLS = { common: [1, 4, 7, 25, 35, 39, 52, 54, 60, 63, 66, 69, 74, 79, 81, 92, 129, 133, 152, 155, 158, 172, 173, 174, 175], rare: [147, 246, 111, 123, 127, 128, 131, 137, 138, 140, 142, 143, 179, 214, 228, 238, 239, 240], epic: [147, 246, 131, 142, 143, 133, 1, 4, 7, 152, 155, 158] };
+  function giveEgg(kind, from) { const pool = EGG_POOLS[kind === 'shiny' ? 'epic' : kind] || EGG_POOLS.common, id = baseOf(pool[Math.floor(R() * pool.length)]);
+    const iv = [0, 1, 2, 3, 4, 5].map(() => Math.floor(R() * 32)); if (kind !== 'common') pickCount([0, 1, 2, 3, 4, 5], kind === 'rare' ? 3 : 5, R).forEach(k => iv[k] = 31);
+    const hc = D.mons[id].hc || 20; S.eggs.push({ id, iv, steps: hc * 8, total: hc * 8, from, at: Date.now(), shiny: kind === 'shiny' ? 1 : 0 }); return id; }
+  ACT.rgegg = d => { const it = EGG_SHOP.find(x => x[0] === d.k); if (!it || (S.bag['egg-token'] || 0) < it[3]) return; S.bag['egg-token'] -= it[3]; giveEgg(it[0], 'Lago Infinito'); SFX.caught(); toast(`${it[2]} ${it[1]} recebido! Veja em Time.`, 'good'); save(); render(); };
+  function dailyBoard(dk) { const rows = []; try { const acc = PS.accounts(); for (const u of Object.keys(acc)) { const sv = u === user ? S : PS.read(u); const h = (sv.rogue && sv.rogue.dhist || []).find(x => x.day === dk); if (h) rows.push({ n: sv.trainer || u, w: h.wave, me: u === user }); } } catch (e) {}
+    rows.sort((a, b) => b.w - a.w); return rows.length ? `<ol class="board">${rows.map((r, i) => `<li class="${r.me ? 'me' : ''}"><b>${['🥇', '🥈', '🥉'][i] || i + 1 + 'º'}</b> ${esc(r.n)} <span>onda ${r.w}</span></li>`).join('')}</ol>` : '<p class="mut small">Ninguém jogou hoje ainda.</p>'; }
+  ACT.rgstart = () => { if (rogue().run) return; rgNew(false); render(); };
+  ACT.rgdaily = () => { const R0 = rogue(); if (R0.run) return toast('Termine a corrida atual primeiro.', 'bad'); if (R0.daily[dayKey()]) return; rgNew(true); render(); };
+  ACT.rgpick = () => { if (rogue().run) return; const m = modal(`<h3>Escolha seu inicial</h3><p class="mut small">Os outros 2 do time são sorteados.</p><div class="mgrid">${STARTER_IDS.map(id => `<button class="pm" data-p="${id}"><img src="${sprId(id)}" alt=""><small>${D.mons[id].n}</small></button>`).join('')}</div>`);
+    $$('[data-p]', m).forEach(b => b.onclick = () => { closeModal(); rgNew(false, +b.dataset.p); render(); }); };
+  ACT.rgquit = async () => { if (!(await ask('Desistir?', 'Encerrar a corrida e receber as recompensas?', [{ t: 'Continuar', v: 0 }, { t: 'Encerrar', v: 1, c: 'primary' }]))) return; rgOver(); };
+  function rgTeamFor(run) { const w = run.wave, r = rgRng(run, 'w' + w), boss = w % 10 === 0, trainer = !boss && w % 5 === 0, n = boss ? 1 : trainer ? Math.min(4, 2 + Math.floor(w / 15)) : 1;
+    const team = []; for (let k = 0; k < n; k++) { let id = rgPool(run, w, r); const lv = rgLvl(w) + (boss ? 4 : 0) - (trainer ? 1 : 0); const m = PE.makeMon(id, lv, { seed: hseed(run.seed + w + 'e' + k) }, { shiny: false, iv: Array(6).fill(Math.min(31, 6 + w)), nat: bestNat(id) });
+      while (PE.levelEvo(m, 'day') && m.lvl >= 16) { PE.evolve(m, PE.levelEvo(m, 'day')); } if (boss) { m.raidHp = 1.8; m.raidStars = Math.min(5, 1 + Math.floor(w / 20)); } m.hp = PE.maxhp(m); team.push(m); }
+    return { team, boss, trainer }; }
+  ACT.rgfight = () => { const run = rogue().run; if (!run) return; if (!run.party.some(m => m.hp > 0)) return rgOver(); const { team, boss, trainer } = rgTeamFor(run), b = BIOMES[run.biome % BIOMES.length];
+    const o = { kind: trainer ? 'trainer' : 'wild', enemy: team, party: run.party, rogue: 1, map: { theme: b.k, name: b.n }, ai: run.wave > 10 ? 2 : 1, weather: null, seed: run.daily ? hseed(run.seed + 'b' + run.wave) : undefined };
+    if (trainer) Object.assign(o, { name: 'Treinador do Lago', sprite: ['acetrainer', 'acetrainerf', 'blackbelt', 'psychic', 'hiker', 'beauty'][run.wave / 5 % 6], prize: 0, intro: `Onda ${run.wave}` });
+    startBattle(o); if (boss) { const ov = $('#battle'); ov.classList.add('boss', 'rgboss'); } };
+  async function rogueEnd() { const s = B.s, run = rogue().run; if (!run) return closeBattle();
+    if (s.winner !== 0) { log('Seu time caiu nas águas do Lago...'); await wait(1600); closeBattle(); return rgOver(); }
+    await award(); for (const m of [...new Set(B.evos || [])]) { const to = PE.levelEvo(m, tod()); if (to) await evolveAnim(m, to); } B.evos = [];
+    const def = s.sides[1].party[s.sides[1].party.length - 1]; MUS.victory(); SFX.win(); run.money += 40 + run.wave * 6; log(`🏆 Onda ${run.wave} vencida! +${40 + run.wave * 6} 🪙`); await wait(1200);
+    run.party.forEach(m => { if (m.status === 'tox') m.status = 'psn'; delete m.mega; }); const wasBoss = run.wave % 10 === 0; closeBattle(); track('win');
+    if (wasBoss) { run.biome++; S.bag['capsule-token'] = (S.bag['capsule-token'] || 0) + 1; }
+    const r = rgRng(run, 'u' + run.wave); let opts = pickCount(RG_UPS.filter(u => u[0] !== 'recruit' || run.party.length < 6), 3, r); if (run.party.some(m => m.hp <= 0) && !opts.some(u => u[0] === 'revive') && r() < 0.6) opts[2] = RG_UPS.find(u => u[0] === 'revive');
+    await new Promise(res => { const mm = modal(`<div class="rgchoose center">${wasBoss ? `<div class="biomeup">🌍 Novo bioma: <b>${BIOMES[run.biome % BIOMES.length].ico} ${BIOMES[run.biome % BIOMES.length].n}</b> • +1 ${itemImg('capsule-token')}</div>` : ''}<h3>Onda ${run.wave} vencida! Escolha 1:</h3>
+      <div class="rgopts">${opts.map((u, i) => `<button class="rgopt" data-i="${i}" style="--d:${i * 0.12}s"><span class="ri">${u[1]}</span><b>${u[2]}</b><small>${u[3]}</small>${u[0] === 'recruit' ? `<img src="${spr(def)}" alt="">` : ''}</button>`).join('')}</div></div>`, 'rgmod');
+      mm.dataset.lock = 1; $$('.rgopt', mm).forEach(b => b.onclick = () => { const u = opts[+b.dataset.i]; SFX.caught(); rgUp(run, u[0], def); closeModal(); res(); }); });
+    run.wave++; rgApply(run); save(); render();
+    if ((run.wave - 1) % 5 === 0) rgShop(run); }
+  async function rgUp(run, k, def) { const P = run.party;
+    if (k === 'heal') P.forEach(m => { if (m.hp > 0) { m.hp = PE.maxhp(m); m.status = null; } });
+    if (k === 'candy') for (const m of P) { if (m.lvl < 100) { m.lvl = Math.min(100, m.lvl + 2); if (PE.xpFor) m.xp = Math.max(m.xp, PE.xpFor(D.mons[m.id].g, m.lvl)); if (m.hp > 0) m.hp = Math.min(PE.maxhp(m), m.hp + 8); } }
+    if (['atk', 'def', 'spe', 'hp', 'luck'].includes(k)) run.ups[k] = (run.ups[k] || 0) + 1;
+    if (k === 'revive') P.forEach(m => { if (m.hp <= 0) m.hp = Math.floor(PE.maxhp(m) / 2); });
+    if (k === 'coin') run.money += 300;
+    if (k === 'recruit' && P.length < 6) { const m = PE.makeMon(def.id, def.lvl, { seed: (R() * 2 ** 31) | 0 }, { shiny: false, iv: def.iv.slice(), nat: def.nat }); m.ot = S.trainer; m.rg = 1; P.push(m); }
+    if (k === 'evo') { for (const m of P) { const to = PE.levelEvo(m, tod()) || (D.mons[m.id].e || [])[0]?.to; if (to && D.mons[to]) { PE.evolve(m, to); m.hp = Math.min(PE.maxhp(m), m.hp + 20); toast(`🌟 Evoluiu para ${D.mons[to].n}!`, 'good'); break; } } } }
+  function rgShop(run) { const IT = [['heal1', '💖', 'Curar 1º desmaiado/ferido', 120], ['healall', '🏥', 'Curar todos', 300], ['candy1', '🍬', '+1 nível para todos', 220], ['atk', '🥊', 'Faixa do Poder', 450]];
+    const draw = () => `<h3>🛒 Loja do Lago <span class="chip">🪙 ${run.money}</span></h3><div class="stygrid">${IT.map(([k, ic, n, p]) => `<button class="sty" data-k="${k}" ${run.money >= p ? '' : 'disabled'}><span class="sem">${ic}</span><b>${n}</b><small>${p} 🪙</small></button>`).join('')}</div><div class="mbtns"><button class="btn primary wide" data-a="close">Seguir para a onda ${run.wave}</button></div>`;
+    const mm = modal(draw()); const bind = () => $$('[data-k]', mm).forEach(b => b.onclick = () => { const it = IT.find(x => x[0] === b.dataset.k); if (run.money < it[3]) return; run.money -= it[3]; SFX.coin();
+      if (it[0] === 'heal1') { const m = run.party.find(x => x.hp <= 0) || run.party.slice().sort((a, c) => hpPct(a) - hpPct(c))[0]; m.hp = PE.maxhp(m); m.status = null; }
+      if (it[0] === 'healall') run.party.forEach(m => { m.hp = PE.maxhp(m); m.status = null; }); if (it[0] === 'candy1') run.party.forEach(m => { m.lvl = Math.min(100, m.lvl + 1); }); if (it[0] === 'atk') { run.ups.atk = (run.ups.atk || 0) + 1; rgApply(run); }
+      save(); $('.modal', document) ; mm.innerHTML = draw(); bind(); render(); }); bind(); }
+  function rgOver() { const R0 = rogue(), run = R0.run; if (!run) return; R0.run = null; const w = run.wave - 1, luck = 1 + 0.25 * (run.ups.luck || 0);
+    const rw = { 'egg-token': Math.max(1, Math.floor(w / 2 * luck)), money: Math.floor(w * 250 * luck), 'capsule-token': Math.floor((w / 5 + 1) * luck) };
+    giveReward(rw); const rec = w > R0.best; R0.best = Math.max(R0.best, w); S.stats.rogueWaves = (S.stats.rogueWaves || 0) + w; try { seasonXP && seasonXP(w * 15, 'Lago Infinito'); } catch (e) {}
+    if (run.daily) { const dk = run.seed.slice(6); R0.daily[dk] = { started: 1, wave: w }; R0.dhist.push({ day: dk, wave: w, team: run.party.map(m => m.id), user, trainer: S.trainer, ver: 1, at: Date.now() }); R0.dhist = R0.dhist.slice(-60); }
+    save(); render(); SFX.caught();
+    modal(`<div class="center rgover"><div class="burstbg"></div><h2>${rec ? '🏅 Novo recorde!' : 'Fim da corrida'}</h2><p>Você chegou à onda <b>${w}</b>${run.daily ? ' no Desafio Diário' : ''}.</p><div class="rgparty">${run.party.map(m => `<img src="${spr(m)}" alt="">`).join('')}</div>
+      <p><b>${rewardText(rw)}</b></p><p class="mut small">Fichas de Ovo viram ovos raros • Fichas de Cápsula giram a Máquina de Cápsulas.</p><button class="btn primary wide" data-a="close">OK</button></div>`); }
+  MORE_X.push(() => ['rogue', '♾️', 'Lago Infinito', rogue().run ? `Corrida em andamento • onda ${rogue().run.wave}` : `Recorde: onda ${rogue().best} • Desafio Diário`]);
+  XV.rogue = vRogue; MORE_TABS.push('rogue', 'caps');
+
+  // ---------- Máquina de Cápsulas ----------
+  Object.assign(STYLE, {}); STYLE.colors.push(['cg1', 'Galáxia', 230, -1], ['cg2', 'Neon', 150, -1]); STYLE.hats.push(['hg1', 'Chapéu de Mago', '🧙', -1], ['hg2', 'Fones Gamer', '🎧', -1], ['hg3', 'Auréola', '😇', -1]); STYLE.auras.push(['ag1', 'Cósmica', 'cosmic', -1], ['ag2', 'Elétrica', 'volt', -1]);
+  FURN.push(['gcap', 'Máquina de Cápsulas Mini', '🎰', -1], ['gstar', 'Luminária Estelar', '🌟', -1], ['gcake', 'Bolo Pokémon', '🎂', -1], ['g151', 'Estátua Mew', 'img:151', -1], ['g249', 'Estátua Lugia', 'img:249', -1], ['g250', 'Estátua Ho-Oh', 'img:250', -1]);
+  const CAP_R = [['c', 'Comum', '#94a3b8', 60], ['r', 'Rara', '#3b82f6', 28], ['e', 'Épica', '#a855f7', 10], ['l', 'Lendária', '#f59e0b', 2]];
+  const CAP_PRIZES = {
+    c: [['item', 'poke-ball', 10], ['item', 'great-ball', 5], ['item', 'super-potion', 4], ['item', 'rare-candy', 1], ['money', 3000], ['egg', 'common']],
+    r: [['egg', 'rare'], ['item', 'ultra-ball', 5], ['item', 'rare-candy', 3], ['furn', 'gcake'], ['furn', 'gstar'], ['style', 'colors', 'cg2'], ['style', 'hats', 'hg2']],
+    e: [['egg', 'epic'], ['item', 'wishing-piece', 2], ['style', 'colors', 'cg1'], ['style', 'hats', 'hg1'], ['style', 'auras', 'ag2'], ['furn', 'gcap'], ['form', 'spiky'], ['furn', 'g151']],
+    l: [['egg', 'shiny'], ['item', 'master-ball', 1], ['style', 'auras', 'ag1'], ['style', 'hats', 'hg3'], ['form', 'shinystarter'], ['furn', 'g249'], ['furn', 'g250']] };
+  const caps = () => { S.caps = S.caps || { pity: 0, pulls: 0, log: [], forms: {} }; return S.caps; };
+  const owned = p => p[0] === 'furn' ? (house().owned[p[1]] || 0) > 0 : p[0] === 'style' ? !!sty().owned[p[2]] : p[0] === 'form' ? !!caps().forms[p[1]] : false;
+  function capRoll() { const c = caps(); c.pulls++; c.pity++; let tier; if (c.pity >= 30) tier = 'l'; else { let r = R() * 100; tier = CAP_R.find(t => (r -= t[3]) < 0)[0]; }
+    if (tier === 'l') c.pity = 0; let list = CAP_PRIZES[tier].filter(p => !owned(p)); let dup = false; if (!list.length) { list = [['refund', 3]]; dup = true; }
+    return { tier, p: list[Math.floor(R() * list.length)], dup }; }
+  function capGive(p) { const k = p[0];
+    if (k === 'item') { giveReward({ [p[1]]: p[2] }); return { ico: itemImg(p[1]), t: `${p[2]}x ${C.ITEM_NAME[p[1]]}` }; }
+    if (k === 'money') { S.money += p[1]; return { ico: '💰', t: fmt(p[1]) }; }
+    if (k === 'egg') { const id = giveEgg(p[1], 'Máquina de Cápsulas'); return { ico: p[1] === 'shiny' ? '🌟' : '🥚', t: { common: 'Ovo Comum', rare: 'Ovo Raro', epic: 'Ovo Épico', shiny: 'Ovo Brilhante (shiny garantido!)' }[p[1]] }; }
+    if (k === 'furn') { const h = house(), f = FURN.find(x => x[0] === p[1]); h.owned[p[1]] = 1; return { ico: furnIco(f[2]), t: `Móvel: ${f[1]}` }; }
+    if (k === 'style') { const it = STYLE[p[1]].find(x => x[0] === p[2]); sty().owned[p[2]] = 1; return { ico: p[1] === 'hats' ? it[2] : p[1] === 'auras' ? '✨' : '🎨', t: `Visual: ${it[1]}` }; }
+    if (k === 'form') { caps().forms[p[1]] = 1; let m;
+      if (p[1] === 'spiky') { m = PE.makeMon(172, 10, { seed: (R() * 2 ** 31) | 0 }, { shiny: true, ot: S.trainer, caughtAt: 'Máquina de Cápsulas • Pichu Orelha-Espetada' }); m.nick = 'Espetada'; }
+      else { const id = [1, 4, 7, 152, 155, 158][Math.floor(R() * 6)]; m = PE.makeMon(id, 5, { seed: (R() * 2 ** 31) | 0 }, { shiny: true, iv: Array(6).fill(31), nat: bestNat(id), ot: S.trainer, caughtAt: 'Máquina de Cápsulas • Inicial Estrela' }); }
+      addCaught(m); if (S.party.length < 6) S.party.push(m); else S.box.push(m); return { ico: `<img src="${spr(m)}" alt="">`, t: `Forma especial: ${D.mons[m.id].n} ✨` }; }
+    if (k === 'refund') { giveReward({ 'capsule-token': p[1] }); return { ico: itemImg('capsule-token'), t: `Repetido! +${p[1]} Fichas de volta` }; } }
+  function vCaps() { const c = caps(), t = S.bag['capsule-token'] || 0;
+    return `<div class="card capm"><h3>🎰 Máquina de Cápsulas</h3><p class="mut small">Só fichas do jogo — nada de dinheiro real. Ganhe fichas no Lago Infinito, nas missões, no calendário e nas raides.</p>
+      <div class="machine" id="machine"><div class="globe">${['#94a3b8', '#3b82f6', '#a855f7', '#f59e0b', '#94a3b8', '#3b82f6', '#22c55e', '#ef4444'].map((x, i) => `<i style="--c:${x};--i:${i};--y:${70 + (i * 37) % 60}px"></i>`).join('')}</div><div class="mbody"><div class="crank" id="crank"></div><div class="chute"></div></div></div>
+      <div class="row between"><span class="chip">${itemImg('capsule-token')} ${t} ficha(s)</span><span class="chip">⭐ Lendária garantida em ${30 - c.pity}</span></div>
+      <div class="pity"><i style="width:${c.pity / 30 * 100}%"></i></div>
+      <div class="row gap"><button class="btn primary big grow" data-a="cappull" data-n="1" ${t >= 1 ? '' : 'disabled'}>Girar ×1</button><button class="btn big grow" data-a="cappull" data-n="10" ${t >= 10 ? '' : 'disabled'}>Girar ×10</button></div>
+      <p class="mut small">Chances: Comum 60% • Rara 28% • Épica 10% • Lendária 2%. Itens únicos nunca repetem (repetido vira ficha de volta).</p></div>
+      <div class="card"><h3>📦 Últimos prêmios</h3>${c.log.length ? `<div class="caplog">${c.log.slice(-12).reverse().map(x => `<div class="cl r-${x.r}"><span>${x.ico}</span><small>${x.t}</small></div>`).join('')}</div>` : '<p class="mut small">Nada ainda.</p>'}</div>
+      <div class="card"><h3>🔁 Prêmios do catálogo</h3><p class="mut small">O catálogo é fixo e volta sempre — nada some.</p><div class="capcat">${CAP_R.map(([k, n, col]) => `<div><b style="color:${col}">${n}</b><small>${CAP_PRIZES[k].map(p => capLabel(p) + (owned(p) ? ' ✅' : '')).join(' • ')}</small></div>`).join('')}</div></div>`; }
+  const capLabel = p => p[0] === 'item' ? C.ITEM_NAME[p[1]] : p[0] === 'money' ? 'Moedas' : p[0] === 'egg' ? { common: 'Ovo Comum', rare: 'Ovo Raro', epic: 'Ovo Épico', shiny: 'Ovo Brilhante' }[p[1]] : p[0] === 'furn' ? FURN.find(x => x[0] === p[1])[1] : p[0] === 'style' ? STYLE[p[1]].find(x => x[0] === p[2])[1] : p[1] === 'spiky' ? 'Pichu Orelha-Espetada' : 'Inicial Estrela ✨';
+  let capBusy = false;
+  ACT.cappull = async d => { const n = +d.n; if (capBusy || (S.bag['capsule-token'] || 0) < n) return; capBusy = true; S.bag['capsule-token'] -= n; const res = []; for (let i = 0; i < n; i++) { const r = capRoll(); const g = capGive(r.p); res.push({ ...g, r: r.tier }); caps().log.push({ ...g, r: r.tier }); } caps().log = caps().log.slice(-40); save();
+    const tier = ['c', 'r', 'e', 'l'].reduce((a, k) => res.some(x => x.r === k) ? k : a, 'c'), col = CAP_R.find(t => t[0] === tier)[2];
+    const cr = $('#crank'); if (cr) cr.classList.add('spin'); SFX.click2(); for (let i = 0; i < 4; i++) { tone(300 + i * 80, 0.06, 'square', 0.04); await sleep(160); }
+    const mm = modal(`<div class="capopen center" style="--rc:${col}"><div class="caprays"></div><div class="capsule" id="capsule"><i class="ctop"></i><i class="cbot"></i></div><div id="capres" class="capres hidden">${res.map((x, i) => `<div class="cl r-${x.r}" style="--d:${i * 0.08}s"><span>${x.ico}</span><small>${x.t}</small></div>`).join('')}</div><p id="captier" class="captier"></p><button class="btn primary wide hidden" id="capok">Pegar!</button></div>`, 'capmod');
+    mm.dataset.lock = 1; const cap = $('#capsule', mm); await sleep(500); cap.classList.add('shake'); for (let i = 0; i < 3; i++) { SFX.shake(); await sleep(380); }
+    cap.classList.add('open'); if (tier === 'l') SFX.shiny(); else SFX.caught(); $('#captier', mm).innerHTML = `<b style="color:${col}">${CAP_R.find(t => t[0] === tier)[1]}!</b>`; mm.querySelector('.capopen').classList.add('t-' + tier);
+    await sleep(500); $('#capres', mm).classList.remove('hidden'); $('#capok', mm).classList.remove('hidden'); $('#capok', mm).onclick = () => { closeModal(); render(); }; capBusy = false; };
+  MORE_X.push(() => ['caps', '🎰', 'Máquina de Cápsulas', `${S.bag['capsule-token'] || 0} ficha(s) • lendária em ${30 - caps().pity}`]);
+  XV.caps = vCaps;
+  // fichas extras: bônus diário das missões e raides
+  { const qb = ACT.qbonus; ACT.qbonus = () => { const q = ensureQuests(), had = q.bonus; qb(); if (!had && q.bonus) { S.bag['capsule-token'] = (S.bag['capsule-token'] || 0) + 2; toast('+2 Fichas de Cápsula!', 'good'); save(); } }; }
+  A.rogue = { new: rgNew, team: rgTeamFor, over: rgOver, end: () => rogueEnd(), caps: capRoll, give: capGive };
+
+  // =====================================================================
+  // v6 G2: Dia da Comunidade + Hora do Holofote (horário de Brasília)
+  // =====================================================================
+  const nowT = () => Date.now() + (A.evShift || 0);
+  const BRT = t => new Date(t - 3 * 3600e3); // campos getUTC* = horário de Brasília
+  const brtTime = (y, mo, d, h) => Date.UTC(y, mo, d, h + 3);
+  const CD_LIST = [[1, 'leaf-storm'], [4, 'flare-blitz'], [7, 'hydro-pump'], [147, 'extreme-speed'], [133, 'last-resort'], [152, 'wood-hammer'], [155, 'heat-wave'], [158, 'aqua-tail'], [246, 'stone-edge'], [66, 'close-combat'], [179, 'dragon-pulse'], [35, 'moonblast']];
+  const SP_LIST = [25, 39, 54, 77, 83, 104, 108, 113, 123, 127, 128, 131, 137, 175, 190, 194, 203, 206, 209, 214, 215, 216, 220, 225, 227, 231, 234, 241];
+  const SP_BONUS = [['xp', '⭐ XP em dobro'], ['money', '💰 Moedas em dobro'], ['egg', '🥚 Ovos chocam 2x mais rápido'], ['shiny', '✨ Chance shiny 2x no destaque']];
+  function cdOf(y, mo) { let d = 1; while (new Date(Date.UTC(y, mo, d)).getUTCDay() !== 6) d++; d += 7; const st0 = brtTime(y, mo, d, 14); const idx = ((y * 12 + mo) % CD_LIST.length + CD_LIST.length) % CD_LIST.length; return { start: st0, end: st0 + 3 * 3600e3, id: CD_LIST[idx][0], move: CD_LIST[idx][1], kind: 'cd' }; }
+  function nextCDs(n) { const b = BRT(nowT()); let y = b.getUTCFullYear(), mo = b.getUTCMonth(); const out = []; for (let k = -1; out.length < n && k < 24; k++) { const yy = y + Math.floor((mo + k) / 12), mm = ((mo + k) % 12 + 12) % 12; const c = cdOf(yy, mm); if (c.end > nowT()) out.push(c); } return out; }
+  function spOf(t) { const b = BRT(t); const dow = b.getUTCDay(); const base = Date.UTC(b.getUTCFullYear(), b.getUTCMonth(), b.getUTCDate()) + 3 * 3600e3; // meia-noite BRT
+    let start = base + ((2 - dow + 7) % 7) * 864e5 + 18 * 3600e3; if (start + 3600e3 <= t) start += 7 * 864e5; const wk = Math.floor((start - Date.UTC(2026, 0, 6, 21)) / (7 * 864e5)); const i = ((wk % SP_LIST.length) + SP_LIST.length) % SP_LIST.length;
+    return { start, end: start + 3600e3, id: SP_LIST[i], bonus: SP_BONUS[((wk % 4) + 4) % 4], kind: 'sp' }; }
+  const liveEv = () => { const t = nowT(), c = nextCDs(1)[0], s = spOf(t); return [c, s].filter(e => e && e.start <= t && t < e.end); };
+  const cdLive = () => liveEv().find(e => e.kind === 'cd'), spLive = () => liveEv().find(e => e.kind === 'sp');
+  const evXpMul = () => (cdLive() ? 1.5 : 1) * (spLive()?.bonus[0] === 'xp' ? 2 : 1);
+  const evEggMul = () => (cdLive() ? 2 : 1) * (spLive()?.bonus[0] === 'egg' ? 2 : 1);
+  const evMoneyMul = () => spLive()?.bonus[0] === 'money' ? 2 : 1;
+  function eventSpawn(mp) { const c = cdLive(), s = spLive(); if (c && R() < 0.6) return { id: c.id, rate: shinyP() * 8 }; if (s && R() < 0.5) return { id: s.id, rate: shinyP() * (s.bonus[0] === 'shiny' ? 2 : 1) }; return null; }
+  const cdn = ms => { ms = Math.max(0, ms); const d = Math.floor(ms / 864e5), h = Math.floor(ms / 3600e3) % 24, m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1e3) % 60; return d ? `${d}d ${h}h ${m}min` : `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; };
+  const fmtBR = t => { const b = BRT(t); return `${['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'][b.getUTCDay()]} ${String(b.getUTCDate()).padStart(2, '0')}/${String(b.getUTCMonth() + 1).padStart(2, '0')} • ${String(b.getUTCHours()).padStart(2, '0')}h`; };
+  const evCount = e => { const t = nowT(); return t < e.start ? `começa em <b class="cdn" data-t="${e.start}">${cdn(e.start - t)}</b>` : `termina em <b class="cdn" data-t="${e.end}">${cdn(e.end - t)}</b>`; };
+  setInterval(() => { const els = document.querySelectorAll('.cdn[data-t]'); if (!els.length) return; const t = nowT(); let flip = false; els.forEach(x => { const left = +x.dataset.t - t; if (left <= 0) flip = true; x.textContent = cdn(left); }); if (flip && !B && !document.querySelector('.modal')) render(); }, 1000);
+  function evCard(e, big) { const live = nowT() >= e.start, d = D.mons[e.id], fam = e.kind === 'cd' ? cdFinal(e.id) : e.id;
+    return `<div class="card evc ${e.kind} ${live ? 'live' : ''} ${big ? 'big' : ''}"><div class="evbg"></div><div class="evimgs"><img src="${sprId(e.id)}" alt=""><img class="sh" src="${sprId(e.id, true)}" alt=""></div>
+      <div class="grow"><small>${e.kind === 'cd' ? '🎉 DIA DA COMUNIDADE' : '🔦 HORA DO HOLOFOTE'}${live ? ' • <span class="livep">AO VIVO</span>' : ''}</small><h3>${d.n}</h3><p class="small">${fmtBR(e.start)}–${String(BRT(e.end).getUTCHours()).padStart(2, '0')}h (Brasília) • ${evCount(e)}</p>
+      <p class="mut small">${e.kind === 'cd' ? `Aparece muito em todos os mapas • shiny 8x • XP 1,5x • ovos 2x • evoluir para ${D.mons[fam].n} durante o evento ensina <b>${moveName(e.move)}</b>` : `Aparece muito em todos os mapas • ${e.bonus[1]}`}</p></div></div>`; }
+  const moveName = n => (D.moves[n] && (D.moves[n].pt || D.moves[n].n)) || n;
+  const cdFinal = id => finalEvo(id);
+  function vEvents() { const t = nowT(), cds = nextCDs(3), sp = spOf(t), sp2 = spOf(sp.end + 1000);
+    const cal = (() => { const b = BRT(t), y = b.getUTCFullYear(), mo = b.getUTCMonth(), first = new Date(Date.UTC(y, mo, 1)).getUTCDay(), days = new Date(Date.UTC(y, mo + 1, 0)).getUTCDate(), cd = cdOf(y, mo), cdd = BRT(cd.start).getUTCDate();
+      return `<div class="evcal"><b>${['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'][mo]} ${y}</b><div class="ecg">${['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map(x => `<small>${x}</small>`).join('')}${'<i></i>'.repeat(first)}${Array.from({ length: days }, (_, i) => { const dd = i + 1, dow = (first + i) % 7; return `<span class="${dd === cdd ? 'ecd' : dow === 2 ? 'esp' : ''} ${dd === b.getUTCDate() ? 'today' : ''}">${dd}</span>`; }).join('')}</div><p class="mut small"><span class="ecd dot"></span> Dia da Comunidade (2º sábado, 14h–17h) • <span class="esp dot"></span> Hora do Holofote (toda terça, 18h–19h)</p></div>`; })();
+    return `<div class="card"><h3>📅 Eventos</h3><p class="mut small">Eventos se repetem sempre: os Pokémon em destaque voltam em rodízio, nada é perdido para sempre.</p>${cal}</div>
+      ${liveEv().map(e => evCard(e, 1)).join('')}<h4 class="sech">🔦 Hora do Holofote</h4>${[sp, sp2].filter(e => !(e.start <= t && t < e.end)).map(e => evCard(e)).join('')}
+      <h4 class="sech">🎉 Próximos Dias da Comunidade</h4>${cds.filter(e => !(e.start <= t && t < e.end)).map(e => evCard(e)).join('')}
+      <div class="card"><h3>🔁 Rodízio</h3><div class="evrot">${CD_LIST.map(([id, mv]) => `<div><img src="${sprId(id)}" alt=""><small>${D.mons[id].n}</small></div>`).join('')}</div></div>`; }
+  XV.events = vEvents; MORE_TABS.push('events');
+  MORE_X.unshift(() => { const l = liveEv(); return ['events', '📅', 'Eventos', l.length ? `🔴 AO VIVO: ${l.map(e => D.mons[e.id].n).join(' + ')}` : `Próximo: ${D.mons[spOf(nowT()).id].n} na terça 18h`]; });
+  HOME_X.push(() => { const l = liveEv(); if (l.length) return `<button class="card span2 evbanner live" data-a="tab" data-t="events"><img src="${sprId(l[0].id)}" alt=""><div><small>${l[0].kind === 'cd' ? '🎉 DIA DA COMUNIDADE AO VIVO' : '🔦 HORA DO HOLOFOTE AO VIVO'}</small><b>${D.mons[l[0].id].n} por todo lado!</b><span class="small">${evCount(l[0])}</span></div><span class="arrow">›</span></button>`;
+    const t = nowT(), nx = [nextCDs(1)[0], spOf(t)].sort((a, b) => a.start - b.start)[0]; if (nx.start - t < 864e5) return `<button class="card span2 evbanner" data-a="tab" data-t="events"><img src="${sprId(nx.id)}" alt=""><div><small>${nx.kind === 'cd' ? '🎉 DIA DA COMUNIDADE' : '🔦 HORA DO HOLOFOTE'} EM BREVE</small><b>${D.mons[nx.id].n}</b><span class="small">${evCount(nx)}</span></div><span class="arrow">›</span></button>`; return ''; });
+  { const ea = evolveAnim; evolveAnim = async (m, to, f) => { const r = await ea(m, to, f); const c = cdLive(); if (r !== false && c && baseOf(to) === baseOf(c.id) && D.moves[c.move] && !m.moves.some(x => x.n === c.move)) { toast(`🎉 Golpe exclusivo do Dia da Comunidade!`, 'good'); await learnMove(m, c.move); S.stats.cdMoves = (S.stats.cdMoves || 0) + 1; save(); } return r; }; }
+  A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
+
+  A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   if (localStorage.getItem(UNLOCK_KEY) !== PASS_HASH) gate();

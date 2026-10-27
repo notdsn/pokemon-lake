@@ -1,12 +1,14 @@
 // Saves versionados. NUNCA apagar saves: para mudar o formato, incremente SAVE_VERSION e adicione uma migração.
 (function (G) {
   const ls = G.localStorage;
-  const SAVE_VERSION = 5, P = 'pkLake.';
+  const SAVE_VERSION = 6, P = 'pkLake.';
   const MIGRATIONS = {
     // v1 -> v2: Johto, Creche/Ovos, Mega Evolução, Pontos de Batalha. Só ADICIONA campos (S.gifts e tudo mais é mantido).
     // v2 -> v3: Dinamax/Gigantamax. Só remove estado temporário de batalha (dmax) se tiver sobrado.
     // v3 -> v4: Missões, marcos da Pokédex, conquistas, pesca, mini-jogos, música. Só ADICIONA campos.
     // v4 -> v5: Safári, Raides, Lendas, Torneio, Estilo/Casa, Naturezas (aplicadas no jogo com natFix). Só ADICIONA.
+    // v5 -> v6: Lago Infinito, Desafio Diário, Cápsulas, Eventos, Passe, Expedições, Fusão, Concursos, Horta, Laços, Fotos, Fendas — tudo com init preguiçoso. Só ADICIONA.
+    5: s => { s.rogue = s.rogue || null; s.caps = s.caps || null; return s; },
     4: s => s,
     3: s => s,
     2: s => { [...(s.party || []), ...(s.box || [])].forEach(m => { if (m && m.dmax) delete m.dmax; }); return s; },
