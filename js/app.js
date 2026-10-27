@@ -550,6 +550,7 @@
     return out; } },
     '96fb1f08d72fdb10d1c524db3b9981ae48a271ef7831d240f0390208882108b9': { name: 'Sylveon do Edson', build: () => [PE.makeMon(700, 50, st, { ot: S.trainer, caughtAt: 'Presente • Código de presente', shiny: false, iv: [31, 31, 31, 31, 31, 31], moves: ['moonblast', 'hyper-voice', 'calm-mind', 'shadow-ball'] })] },
     '01aea158d891de1fd0c6ec8b42ba842caf7aa770452629662a4b036852608d56': { name: 'Eeveelutions + Mew do Edson', build: () => [134, 135, 136, 196, 197, 470, 471, 700, 151].map(id => PE.makeMon(id, 50, st, { ...GO(), iv: IV31, moves: giftMoves(id) })) },
+    'afd38b2d7aa0ae0bf5e961abe8f6be300e58b8e023a0c8479a718132f1dd49e5': { name: 'Greninja do Edson', tip: '💧 Greninja tem a habilidade <b>Protean</b>: todos os golpes de dano ganham bônus de mesmo tipo!', build: () => [PE.makeMon(658, 50, st, { ...GO(), nat: 10, iv: [31, 28, 31, 31, 31, 31], moves: ['water-shuriken', 'hydro-pump', 'dark-pulse', 'ice-beam'] })] },
     'c8715b3a2989f1ee29a31fa5b86846f118984c807eecea6a7f13e7a16481bc40': { name: 'Mega Kit do Edson', items: { 'mega-bracelet': 1, 'charizardite-x': 1, 'charizardite-y': 1 }, build: () => [] },
     '5d5be4c11ef135e648c907406f429f2e4bbe42279223673880eba4fa1fc89a2b': { name: 'Gigantamax do Edson', items: { 'dynamax-band': 1 }, tip: '⬣ Uma vez por batalha, toque em <b>Gigantamax</b> no menu de golpes do Charizard: ele fica gigante por 3 turnos e usa <b>Fogaréu G-Max</b>!', build: () => [] } };
   async function redeemGift(code) {

@@ -1,13 +1,14 @@
 # raw.json + data/pt -> js/data-gen.js
 import json
 d=json.load(open('data/raw.json')); pt=json.load(open('data/pt/moves.json')); ab=json.load(open('data/pt/abils.json'))
-FIX={'avalanche':'Avalanche','embargo':'Embargo','inferno':'Inferno','magnitude':'Magnitude','octazooka':'Octazuca','surf':'Surfar'}
+FIX={'avalanche':'Avalanche','embargo':'Embargo','inferno':'Inferno','magnitude':'Magnitude','octazooka':'Octazuca','surf':'Surfar','water-shuriken':'Shuriken de Água'}
 STONE={'venusaur-mega':'venusaurite','charizard-mega-x':'charizardite-x','charizard-mega-y':'charizardite-y','blastoise-mega':'blastoisinite','beedrill-mega':'beedrillite','pidgeot-mega':'pidgeotite','alakazam-mega':'alakazite','slowbro-mega':'slowbronite','gengar-mega':'gengarite','kangaskhan-mega':'kangaskhanite','pinsir-mega':'pinsirite','gyarados-mega':'gyaradosite','aerodactyl-mega':'aerodactylite','mewtwo-mega-x':'mewtwonite-x','mewtwo-mega-y':'mewtwonite-y','ampharos-mega':'ampharosite','steelix-mega':'steelixite','scizor-mega':'scizorite','heracross-mega':'heracronite','houndoom-mega':'houndoominite','tyranitar-mega':'tyranitarite','sceptile-mega':'sceptilite','blaziken-mega':'blazikenite','swampert-mega':'swampertite','latias-mega':'latiasite','latios-mega':'latiosite','rayquaza-mega':None}
 CAT={'physical':'p','special':'s','status':'t'}
 mons={}
 for m in d['mons']:
     mons[m['id']]=dict(n=m['name'],t=m['types'],s=m['stats'],c=m['capture'],x=m['xp'],g=m['growth'],L=1 if m['legend'] else 0,e=m['evo'],l=m['learn'],eg=m['eggs'],gr=m['gender'],hc=m['hatch'],ab=m['abil'])
 mons[700]['ab']='pixilate'
+mons[658]['ab']='protean'
 megas={}
 for b,fs in d['megas'].items():
     b=int(b); mons[b]['mg']=[f['form'] for f in fs]

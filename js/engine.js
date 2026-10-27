@@ -181,7 +181,7 @@
     if (s.weather === 'sun') d *= mv.t === 'fire' ? 1.5 : mv.t === 'water' ? 0.5 : 1;
     if (crit) d *= 1.5; if (useRng) d *= (85 + Math.floor(rnd(s) * 16)) / 100;
     const aa = abilityOf(a.m), ta = abilityOf(t.m);
-    const at = monTypes(a.m); if (at.includes(mv.t)) d *= aa === 'adaptability' ? 2 : 1.5;
+    const at = monTypes(a.m); if (at.includes(mv.t) || (aa === 'protean' && mv.p > 0)) d *= aa === 'adaptability' ? 2 : 1.5;
     let e = mv.t === '???' ? 1 : eff(mv.t, monTypes(t.m)); if (ta === 'levitate' && mv.t === 'ground') e = 0; d *= e;
     if (aa === 'tough-claws' && phys) d *= 1.3; if (aa === 'technician' && mv.p <= 60) d *= 1.5; if (aa === 'parental-bond') d *= 1.25;
     if ((aa === 'huge-power' || aa === 'pure-power') && phys) d *= 2; if (aa === 'mega-launcher' && /Pulse|Aura/.test(mv.en || '')) d *= 1.5;
