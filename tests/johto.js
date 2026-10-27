@@ -1,5 +1,5 @@
 // E2E: migração de save antigo, Prof. Elm, Creche + ovo + eclosão, mapa e ginásio de Johto (nomes de golpes em pt-BR)
-const { chromium } = require('/var/tmp/sand-playwright-runtime/164c91ebeb1a9d84bdfd8b8aa7480625/node_modules/playwright-core');
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
 const fs = require('fs'); const HASH = fs.readFileSync(__dirname + '/../js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
 const URL = process.argv[2] || 'http://127.0.0.1:18473/', OUT = __dirname + '/../prints/v2/';
 const W = ms => new Promise(r => setTimeout(r, ms));

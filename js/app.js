@@ -219,7 +219,7 @@
     if (!S.jchampion) return { t: 'Liga de Johto', d: 'Will, Koga, Bruno, Karen e o Campeão Lance!', img: 'img/tr/lance.png', t2: 'battle', reg: 'johto' };
     return { t: 'Campeão de Kanto e Johto!', d: 'Suba o Monte Prata, complete a Pokédex e junte Mega Pedras.', img: 'img/tr/red.png', t2: 'maps', reg: 'johto' };
   }
-  const dexCount = () => [Object.keys(S.dex.seen).length, Object.keys(S.dex.caught).length];
+  const dexCount = () => [Object.keys(S.dex.seen).filter(i => D.mons[i] && !D.mons[i].fm).length, Object.keys(S.dex.caught).filter(i => D.mons[i] && !D.mons[i].fm).length];
   function trainerCard(big) {
     const [se, ca] = dexCount(); const h = Math.floor(S.stats.playMs / 36e5), mi = Math.floor(S.stats.playMs / 6e4) % 60;
     return `<div class="tcard ${big ? 'big' : ''}"><div class="tcl ${auraOf() ? 'au-' + auraOf() : ''} ${poseCls()}">${trImg()}</div><div class="tcr"><small>CARTÃO DE TREINADOR</small>${titleOf() ? `<span class="ttitle">🏆 ${titleOf()}</span>` : S.nat && S.nat.wins ? '<span class="ttitle">🌈 Mestre Eevee</span>' : ''}<h2>${esc(S.trainer)}${S.champion ? ' 👑' : ''}</h2>
@@ -336,7 +336,7 @@
       ${rg === 'johto' && isJohtoOpen() && !S.elmGift ? `<button class="card goal elm" data-a="elm"><img src="img/tr/elm.png" alt=""><div><small>LABORATÓRIO DE NEW BARK</small><h3>Visite o Prof. Elm</h3><p class="mut">Ele tem um Pokémon inicial de Johto e um Ovo misterioso para você!</p></div><span class="arrow">›</span></button>` : ''}
       <div class="grid maps">${C.MAPS.filter(mp => mp.region === rg).map(mp => { const ok = unlocked(mp), w = weatherOf(mp);
       const seen = mp.enc.filter(e => !e[4]?.legend).map(e => e[0]); return `<button class="card mapc theme-${mp.theme} per-${period()} ${ok ? '' : 'locked'}" data-a="enter" data-id="${mp.id}">
-      <div class="mapimg"><span class="memo">${mp.emoji}</span><span class="mw">${WEATHER[w][1]}</span><div class="mmons">${seen.slice(0, 4).map(id => `<img src="${sprId(id)}" class="${S.dex.seen[id] ? '' : 'sil'}" loading="lazy" alt="">`).join('')}</div></div>
+      <div class="mapimg"><span class="memo">${mp.emoji}</span><span class="mw">${WEATHER[w][1]}</span>${ok && riftOn(mp) ? '<span class="mrift">🌀 Fenda</span>' : ''}<div class="mmons">${seen.slice(0, 4).map(id => `<img src="${sprId(id)}" class="${S.dex.seen[id] ? '' : 'sil'}" loading="lazy" alt="">`).join('')}</div></div>
       <div class="mapinfo"><div class="row between"><b>${mp.name}</b><small class="lv">Nv ${mp.lv[0]}–${mp.lv[1]}</small></div><small class="mut">${ok ? mp.desc : lockText(mp)}</small></div></button>`; }).join('')}</div>`;
   }
   ACT.enter = d => { const mp = C.MAPS.find(m => m.id === d.id); if (!unlocked(mp)) return toast('🔒 Área bloqueada ainda.'); S.lastMap = mp.id; go('explore', mp.id); };
@@ -355,7 +355,7 @@
     return `<div class="grid"><div class="card span2 explore theme-${mp.theme} w-${w} per-${period()}" id="scene"><div class="sky"><i class="sun"></i></div><div class="wx"></div><div class="ground"></div>
       <div class="grass-row">${'<i></i>'.repeat(12)}</div>${meHtml()}${followerHtml()}<div class="alertmark">!</div>
       <div class="ex-top"><button class="btn small ghost" data-a="tab" data-t="maps">← Mapas</button><span class="chip">${WEATHER[w][1]} ${WEATHER[w][0]}</span><span class="chip">${PERIOD_PT[period()]}</span></div>
-      <div class="ex-bot"><h2>${mp.emoji} ${mp.name}</h2><p>${mp.desc}</p><div class="exbtns"><button class="btn primary big" data-a="search" id="searchBtn">🔍 Procurar Pokémon</button>${isWater(mp) ? '<button class="btn big fishbtn" data-a="fish" id="fishBtn0">🎣 Pescar</button>' : ''}<button class="btn big phbtn" data-a="photo">📷 Foto</button>${mp.id === 'safari' ? '<button class="btn big sfbtn" data-a="tab" data-t="safari">🦏 Jogo do Safári</button>' : ''}${legendHunts(mp).map(([q, sp]) => `<button class="btn big legbtn" data-a="leghunt" data-q="${q.id}">${sp.btn}</button>`).join('')}</div></div></div>
+      <div class="ex-bot"><h2>${mp.emoji} ${mp.name}</h2><p>${mp.desc}</p><div class="exbtns"><button class="btn primary big" data-a="search" id="searchBtn">🔍 Procurar Pokémon</button>${isWater(mp) ? '<button class="btn big fishbtn" data-a="fish" id="fishBtn0">🎣 Pescar</button>' : ''}${riftBtn(mp)}<button class="btn big phbtn" data-a="photo">📷 Foto</button>${mp.id === 'safari' ? '<button class="btn big sfbtn" data-a="tab" data-t="safari">🦏 Jogo do Safári</button>' : ''}${legendHunts(mp).map(([q, sp]) => `<button class="btn big legbtn" data-a="leghunt" data-q="${q.id}">${sp.btn}</button>`).join('')}</div></div></div>
       <div class="card"><h3>Pokémon desta área</h3><div class="enc">${mp.enc.map((e, i) => { const sn = S.dex.seen[e[0]], leg = e[4]?.legend; if (leg && !sn) return ''; const pc = ws[i] / tot * 100;
         return `<div class="encm ${sn ? '' : 'unk'}"><img src="${sprId(e[0])}" class="${sn ? '' : 'sil'}" alt="" loading="lazy"><small>${sn ? D.mons[e[0]].n : '???'}</small><small class="mut">${pc < 1 ? 'raro' : Math.round(pc) + '%'}${S.dex.caught[e[0]] ? ' ●' : ''}</small></div>`; }).join('')}${mp.enc.some(e => e[4]?.legend && !S.dex.seen[e[0]]) ? '<div class="encm unk"><span class="q">⭐</span><small>Lendário?</small></div>' : ''}</div>
         <p class="mut small">${w !== 'clear' ? `${WEATHER[w][1]} O clima de agora favorece alguns tipos.` : 'Clima estável.'} ● = já capturado</p></div>
@@ -461,7 +461,7 @@
     $$('.mcard', mm).forEach(b => b.onclick = e => { e.stopPropagation(); useBagItem(d.id, S.party[+b.dataset.i]); }); };
   let dexFilter = 'all';
   function vDex() {
-    const ids = Object.keys(D.mons).map(Number).sort((a, b) => a - b); const [se, ca] = dexCount();
+    const ids = Object.keys(D.mons).map(Number).filter(i => !D.mons[i].fm).sort((a, b) => a - b); const [se, ca] = dexCount();
     return `<div class="card"><div class="row between"><h3>📕 Pokédex</h3><b>${ca}/${ids.length}</b></div><div class="progress"><i style="width:${ca / ids.length * 100}%"></i></div><p class="mut small">${se} vistos • ${ca} capturados • ${Object.keys(S.dex.shiny).length} shiny</p>
       <div class="seg">${[['all', 'Todos'], ['caught', 'Capturados'], ['missing', 'Faltando']].filter(x => moreOk(x[0])).map(([k, l]) => `<button class="${dexFilter === k ? 'on' : ''}" data-a="dexf" data-k="${k}">${l}</button>`).join('')}</div></div>${dexRewardsCard()}
       <div class="dex">${ids.filter(id => dexFilter === 'all' || (dexFilter === 'caught' ? S.dex.caught[id] : !S.dex.caught[id])).map(id => { const sn = S.dex.seen[id], c = S.dex.caught[id];
@@ -886,7 +886,7 @@
   ACT.qbonus = () => { const q = ensureQuests(); if (q.bonus || !q.d.every(x => x.c)) return; q.bonus = 1; addItems(DAY_BONUS); SFX.win(); toast(`🎁 Bônus diário: ${rewardText(DAY_BONUS)}`, 'good'); save(); render(); };
 
   // ---------- Pokédex com recompensas ----------
-  const dexTotal = () => Object.keys(D.mons).length;
+  const dexTotal = () => Object.keys(D.mons).filter(i => !D.mons[i].fm).length;
   const DEXM = [[10, { 'great-ball': 10 }], [25, { 'ultra-ball': 5, 'rare-candy': 3 }], [50, { 'shiny-charm': 1, 'rare-candy': 5 }], [75, { 'super-rod': 1, money: 20000 }], [100, { 'master-ball': 1, 'rare-candy': 5 }],
     [150, { 'master-ball': 1, 'fire-stone': 1, 'water-stone': 1, 'thunder-stone': 1, 'leaf-stone': 1 }], [200, { 'master-ball': 2, 'rare-candy': 10 }], [251, { 'master-ball': 3, money: 100000 }], ['all', { special: 1 }]];
   const dmN = x => x === 'all' ? dexTotal() : x;
@@ -1854,6 +1854,52 @@
   XV.album = vAlbum; MORE_TABS.push('album');
   MORE_X.push(() => ['album', '📔', 'Álbum de Fotos', `${Object.values(album()).reduce((a, l) => a + l.length, 0)} fotos • Modo Foto nos mapas`]);
   A.g5 = { garden, gTick, hearts, addAff, phScore, starOf, contest, poff, CT: () => CT, ctAppeal };
+  // ===================== v6 G6: FENDAS MISTERIOSAS =====================
+  // A cada 2 h uma fenda se abre por 30 min em um mapa liberado (determinístico). Sempre volta — sem FOMO.
+  const RIFT_EVERY = 2 * 36e5, RIFT_LEN = 30 * 6e4;
+  const RIFT_TYPES = { grass: ['grass', 'bug', 'normal', 'flying'], forest: ['grass', 'bug', 'poison', 'fairy'], cave: ['rock', 'ground', 'steel', 'dark'], water: ['water', 'ice'], ghost: ['ghost', 'dark', 'psychic'],
+    safari: ['normal', 'ground', 'grass', 'fighting'], electric: ['electric', 'steel'], ice: ['ice', 'water'], volcano: ['fire', 'rock', 'dragon'], psychic: ['psychic', 'fairy'], sky: ['flying', 'dragon', 'fairy'], gym: ['normal', 'fighting'] };
+  const RIFT_BOSS = [10169, 10170, 10171, 793, 794, 795, 796, 797, 798, 799, 805, 806, 10104, 10165, 10114, 10177, 10115];
+  const rift = () => (S.rift = S.rift || { n: {}, boss: {}, seen: 0, bosses: 0, caught: 0 });
+  let RPRE = null; const prevoOf = () => { if (RPRE) return RPRE; RPRE = {}; for (const [id, m] of Object.entries(D.mons)) for (const e of m.e || []) RPRE[e.to] = +id; return RPRE; };
+  function riftAt(t) { if (A.riftForce) return A.riftForce; const w = Math.floor(t / RIFT_EVERY), st0 = w * RIFT_EVERY; if (t - st0 >= RIFT_LEN) return null;
+    const ms = C.MAPS.filter(m => unlocked(m)); if (!ms.length) return null; const mp = ms[hseed('rift' + w) % ms.length]; return { map: mp.id, key: 'r' + w, end: st0 + RIFT_LEN, w }; }
+  const riftNow = () => riftAt(nowT()); const riftOn = mp => { const r = riftNow(); return r && r.map === mp.id ? r : null; };
+  const riftNext = () => { const t = nowT(), w = Math.floor(t / RIFT_EVERY) + 1; return w * RIFT_EVERY; };
+  function riftPool(mp) { const ty = RIFT_TYPES[mp.theme] || ['normal'], pre = prevoOf(), out = [];
+    for (const [k, m] of Object.entries(D.mons)) { const id = +k; if (m.L || (id <= 251 && !m.fm)) continue; if (!m.t.some(t => ty.includes(t))) continue;
+      const stage = pre[id] ? (pre[pre[id]] ? 2 : 1) : 0; const w = (stage === 0 ? 10 : stage === 1 ? 4 : 1.2) * (m.fm ? 2.5 : 1); out.push([id, w]); }
+    return out; }
+  const pickW = (arr, r) => { const tot = arr.reduce((a, x) => a + x[1], 0); let v = r * tot; for (const x of arr) if ((v -= x[1]) <= 0) return x[0]; return arr[0][0]; };
+  const riftLv = mp => [Math.min(100, mp.lv[0] + 3), Math.min(100, mp.lv[1] + 6)];
+  const riftBoss = r => RIFT_BOSS[hseed('boss' + r.key) % RIFT_BOSS.length];
+  function riftBtn(mp) { const r = riftOn(mp); if (!r) return ''; const n = rift().n[r.key] || 0, bossOk = n >= 5 && !rift().boss[r.key];
+    return `<button class="btn big riftbtn" data-a="rift">🌀 Fenda (${n}/5)</button>${bossOk ? '<button class="btn big riftboss" data-a="riftboss">👹 Chefe da Fenda</button>' : ''}`; }
+  ACT.rift = async () => { const mp = C.MAPS.find(m => m.id === sub), r = riftOn(mp); if (!r) { toast('A fenda se fechou... outra abre em breve!'); return render(); }
+    if (!S.party.some(m => m.hp > 0)) return toast('Seus Pokémon estão sem energia! Vá ao Centro Pokémon.', 'bad');
+    const rr = srng(hseed(r.key + ':' + (rift().n[r.key] || 0) + ':' + Date.now())), id = pickW(riftPool(mp), rr()), [a, b] = riftLv(mp);
+    const m = PE.makeMon(id, a + Math.floor(rr() * (b - a + 1)), st, { shinyRate: A.shinyRate || shinyP() * 3 }); m.caughtAt = 'Fenda Misteriosa'; m.rift = 1;
+    rift().n[r.key] = (rift().n[r.key] || 0) + 1; rift().seen++; save(); riftFx();
+    await sleep(900); startBattle({ kind: 'wild', enemy: [m], map: mp, weather: battleWeather(weatherOf(mp)), intro: '🌀 Algo saiu da fenda!' }); };
+  ACT.riftboss = async () => { const mp = C.MAPS.find(m => m.id === sub), r = riftOn(mp); if (!r || (rift().n[r.key] || 0) < 5 || rift().boss[r.key]) return render();
+    const id = riftBoss(r), lv = Math.min(100, mp.lv[1] + 10), m = PE.makeMon(id, lv, st, { shinyRate: shinyP() * 3, iv: Array(6).fill(31) }); m.raidHp = 2.2; m.hp = PE.maxhp(m); m.caughtAt = 'Chefe da Fenda'; m.rift = 2;
+    rift().boss[r.key] = 1; rift().bosses++; save(); riftFx(1); await sleep(1300);
+    startBattle({ kind: 'wild', enemy: [m], map: mp, legend: true, riftBoss: 1, weather: battleWeather(weatherOf(mp)), intro: '👹 O Chefe da Fenda apareceu!' }); };
+  function riftFx(big) { const d = document.createElement('div'); d.className = 'riftfx' + (big ? ' big' : ''); document.body.appendChild(d); SFX.evo && SFX.evo(); setTimeout(() => d.remove(), 1600); }
+  // depois de vencer o chefe: prêmio garantido (mesmo se não capturar)
+  const _awR = award; award = async function () { const r = await _awR.apply(this, arguments); try { if (B && B.o && B.o.riftBoss && !B.riftPaid) { B.riftPaid = 1; S.money += 15000; S.bag['rare-candy'] = (S.bag['rare-candy'] || 0) + 3; S.bag['ultra-ball'] = (S.bag['ultra-ball'] || 0) + 5; toast('🌀 Chefe da Fenda: +15.000, 3 Balas Raras e 5 Ultra Balls!', 'good'); } } catch (e) {} return r; };
+  const fmtCd = ms => { const m = Math.max(0, Math.ceil(ms / 6e4)); return m >= 60 ? `${Math.floor(m / 60)}h${String(m % 60).padStart(2, '0')}` : `${m} min`; };
+  HOME_X.push(() => { const r = riftNow(); if (r) { const mp = C.MAPS.find(m => m.id === r.map); return `<button class="card goal riftc" data-a="riftgo"><div class="rportal"></div><div class="grow"><small>FENDA MISTERIOSA ABERTA</small><h3>🌀 ${esc(mp.name)}</h3><p class="mut">Pokémon de outras regiões e formas de Alola/Galar! Fecha em ${fmtCd(r.end - nowT())}.</p></div><span class="arrow">›</span></button>`; }
+    return `<div class="card riftc off"><div class="rportal"></div><div class="grow"><small>FENDAS MISTERIOSAS</small><p class="mut small">Próxima fenda abre em ${fmtCd(riftNext() - nowT())} (a cada 2 h, dura 30 min).</p></div></div>`; });
+  ACT.riftgo = () => { const r = riftNow(); if (!r) return render(); const mp = C.MAPS.find(m => m.id === r.map); S.region = mp.region; S.lastMap = mp.id; go('explore', mp.id); };
+  MORE_X.push(() => ['riftdex', '🌀', 'Fendas Misteriosas', `${rift().seen} encontros • ${rift().bosses} chefes`]);
+  XV.riftdex = () => { const forms = Object.keys(D.mons).map(Number).filter(i => D.mons[i].fm), r = riftNow();
+    return `<div class="card"><button class="btn ghost small" data-a="tab" data-t="more">← Mais</button><h3>🌀 Fendas Misteriosas</h3><p class="mut small">A cada 2 horas uma fenda se abre por 30 minutos em um dos seus mapas. Lá saem Pokémon de outras regiões e formas regionais. Explore 5 vezes para chamar o Chefe da Fenda (prêmio garantido + chance de captura). Sempre volta, então não precisa correr!</p>
+      <p>${r ? `🟣 Aberta agora em <b>${esc(C.MAPS.find(m => m.id === r.map).name)}</b> — fecha em ${fmtCd(r.end - nowT())} <button class="btn small primary" data-a="riftgo">Ir</button>` : `Próxima em ${fmtCd(riftNext() - nowT())}`}</p>
+      <p class="small">Encontros: <b>${rift().seen}</b> • Chefes: <b>${rift().bosses}</b></p></div>
+      <div class="card"><h3>Formas Regionais (${forms.filter(i => S.dex.caught[i]).length}/${forms.length})</h3><div class="dex">${forms.map(id => { const sn = S.dex.seen[id], c = S.dex.caught[id]; return `<button class="dx ${c ? 'c' : ''}" ${sn ? `data-a="dexinfo" data-id="${id}"` : ''}><small>${D.mons[id].rg === 'alola' ? '🌺' : '🏰'}</small><img src="${sprId(id, !!S.dex.shiny[id])}" class="${sn ? '' : 'sil'}" loading="lazy" alt=""><b>${sn ? D.mons[id].n : '???'}</b>${c ? '<i>●</i>' : ''}</button>`; }).join('')}</div></div>
+      <div class="card"><h3>👹 Chefes possíveis</h3><div class="gteam">${RIFT_BOSS.map(id => `<img src="${sprId(id)}" class="${S.dex.seen[id] ? '' : 'sil'}" loading="lazy" alt="" title="${S.dex.seen[id] ? D.mons[id].n : '???'}">`).join('')}</div></div>`; };
+  A.g6 = { riftAt, riftNow, riftPool, riftBoss, RIFT_BOSS, force: id => { A.riftForce = id ? { map: id, key: 'test' + id, end: nowT() + RIFT_LEN, w: -1 } : null; } };
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------

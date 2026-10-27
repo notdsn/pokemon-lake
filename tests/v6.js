@@ -1,5 +1,5 @@
 // Teste do lote v6 (G1..G6). Uso: node tests/v6.js [URL] [grupos ex: 1,2]
-const { chromium } = require('/var/tmp/sand-playwright-runtime/164c91ebeb1a9d84bdfd8b8aa7480625/node_modules/playwright-core');
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
 const fs = require('fs'); const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
 const URL = process.argv[2] || 'http://127.0.0.1:18473/', GR = (process.argv[3] || '1,2,3,4,5,6').split(',').map(Number), TAGN = URL.includes('github.io') ? 'v6live' : 'v6', OUT = '/workspace/pokemon-lake/prints/v2/';
 let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
@@ -111,5 +111,24 @@ let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m
     await ev(() => document.querySelector('#phshot').click()); await p.waitForTimeout(900); await shot('photo-score', 100); ok(await ev(() => Object.keys(PokeApp.debug.S.album).length === 1 && !!document.querySelector('#phc')), `${tag} foto salva no álbum + nota do Professor`);
     const sc = await ev(() => [PokeApp.g5.phScore({ x: 0.5, y: 0.55, zoom: 2.4, pose: 1 }), PokeApp.g5.phScore({ x: 0.1, y: 0.8, zoom: 1, pose: 0 })]); ok(sc[0] >= 85 && sc[1] < 40, `${tag} estrelas bronze→diamante (${sc})`);
     await clr(); await ev(() => PokeApp.debug.go('album')); await shot('album', 300); await click('[data-a="phopen"]'); await p.waitForTimeout(400); await click('[data-a="phframe"]'); await p.waitForTimeout(500); await shot('album-photo', 200); ok(await ev(() => PokeApp.debug.S.album[Object.keys(PokeApp.debug.S.album)[0]][0].frame === 'pol'), `${tag} moldura`); await clr();
+  }
+  if (GR.includes(6)) { await clr();
+    const sch = await ev(() => { const g = PokeApp.g6, t0 = Date.UTC(2026, 9, 27, 12, 0); const a = g.riftAt(t0 + 6e4), b = g.riftAt(t0 + 40 * 6e4), c = g.riftAt(t0 + 2 * 36e5 + 6e4); return [!!a, !!b, !!c, a && a.map]; });
+    ok(sch[0] && !sch[1] && sch[2], `${tag} fenda abre 30 min a cada 2 h ${JSON.stringify(sch)}`);
+    await ev(() => { PokeApp.g6.force(null); PokeApp.debug.go('home'); }); await shot('rift-home-off', 300);
+    await ev(() => { PokeApp.g6.force('rota1'); PokeApp.debug.render(); }); await shot('rift-home', 300); ok(await ev(() => !!document.querySelector('.riftc [data-a],.riftc[data-a="riftgo"]') || !!document.querySelector('[data-a="riftgo"]')), `${tag} card da fenda na Home`);
+    await ev(() => PokeApp.debug.go('maps')); await shot('rift-maps', 300); ok(await ev(() => !!document.querySelector('.mrift')), `${tag} selo 🌀 no mapa`);
+    await click('[data-a="riftgo"]') || await ev(() => PokeApp.debug.go('explore', 'rota1')); await ev(() => { if (!document.querySelector('[data-a="rift"]')) PokeApp.debug.go('explore', 'rota1'); }); await p.waitForTimeout(400); await shot('rift-map', 200);
+    ok(await ev(() => !!document.querySelector('[data-a="rift"]')), `${tag} botão Fenda no mapa`);
+    const pool = await ev(() => { const mp = PC.MAPS.find(m => m.id === 'rota1'); const p = PokeApp.g6.riftPool(mp); return [p.length, p.every(([id]) => id > 251 || PDATA.mons[id].fm), p.some(([id]) => PDATA.mons[id].fm)]; });
+    ok(pool[0] > 30 && pool[1] && pool[2], `${tag} pool: outras regiões + formas ${JSON.stringify(pool)}`);
+    for (let k = 0; k < 5; k++) { await ev(() => PokeApp.debug.healAll()); await click('[data-a="rift"]'); await p.waitForTimeout(2400); if (k === 0) await shot('rift-battle', 600);
+      ok(await ev(() => { const m = PokeApp.debug.B && PokeApp.debug.B.s.sides[1].party[0]; return !!m && (m.id > 251) && m.caughtAt === 'Fenda Misteriosa'; }), `${tag} encontro ${k + 1} da fenda`); await winBattle(); for (let w = 0; w < 40 && await ev(() => !!PokeApp.debug.B); w++) { await p.waitForTimeout(300); await ev(() => [...document.querySelectorAll('#modal-root button')].forEach(b => !/Parar/.test(b.textContent) && b.click())); } await clr(); await ev(() => PokeApp.debug.go('explore', 'rota1')); }
+    await shot('rift-bossbtn', 300); ok(await ev(() => !!document.querySelector('[data-a="riftboss"]')), `${tag} Chefe da Fenda liberado após 5`);
+    const c0 = await ev(() => PokeApp.debug.S.bag['rare-candy'] || 0); await ev(() => PokeApp.debug.healAll()); await click('[data-a="riftboss"]'); await p.waitForTimeout(3200); await shot('rift-boss', 800);
+    ok(await ev(() => { const m = PokeApp.debug.B.s.sides[1].party[0]; return PokeApp.g6.RIFT_BOSS.includes(m.id) && m.raidHp > 1; }), `${tag} chefe com HP extra`);
+    await winBattle(); await p.waitForTimeout(3500); ok(await ev(c0 => (PokeApp.debug.S.bag['rare-candy'] || 0) >= c0 + 3, c0), `${tag} prêmio do chefe`); await clr();
+    await ev(() => PokeApp.debug.go('riftdex')); await shot('riftdex', 400); ok(await ev(() => document.querySelectorAll('.dx').length >= 30), `${tag} página Fendas + formas regionais`);
+    await ev(() => PokeApp.debug.go('dex')); await shot('dex-1025', 400); ok(await ev(() => /\/1025/.test(document.body.textContent)), `${tag} Pokédex 1025`); await ev(() => PokeApp.g6.force(null));
   }
   ok(!errs.length, `${tag} sem erros JS ${JSON.stringify(errs)}`); await b.close(); console.log(fail ? 'FALHAS: ' + fail : 'TUDO OK'); process.exit(fail ? 1 : 0); })();

@@ -1,4 +1,4 @@
-const { chromium } = require('/var/tmp/sand-playwright-runtime/164c91ebeb1a9d84bdfd8b8aa7480625/node_modules/playwright-core');
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
 const fs = require('fs'); const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
 const URL = process.argv[2] || 'http://127.0.0.1:18473/', OUT = '/workspace/pokemon-lake/prints/v2/';
 (async () => { const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });

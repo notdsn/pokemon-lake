@@ -1,4 +1,4 @@
-const { chromium } = require('/var/tmp/sand-playwright-runtime/164c91ebeb1a9d84bdfd8b8aa7480625/node_modules/playwright-core');
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
 const fs = require('fs');
 // desbloqueia o portão gravando o hash (já público em app.js) no localStorage — a senha nunca é lida
 const HASH = fs.readFileSync(__dirname + '/../js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];

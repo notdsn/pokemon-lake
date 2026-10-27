@@ -614,3 +614,13 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .phflash{position:fixed;inset:0;background:#fff;pointer-events:none;animation:phfl .5s forwards;z-index:9}@keyframes phfl{to{opacity:0}}
 .albrow{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:5px}.aph{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;background:#1a2133;border:2px solid #334155;color:inherit;font:inherit}
 .aph img{width:70%;image-rendering:pixelated}.aph small{font-size:10px}.aph.empty{opacity:.35;font-size:20px}.aph.s1{border-color:#cbd5e1}.aph.s2{border-color:#facc15}.aph.s3{border-color:#67e8f9;box-shadow:0 0 8px #67e8f9}.aph.s0{border-color:#cd7f32}
+/* ===== v6 G6 fendas ===== */
+.riftbtn{background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;box-shadow:0 0 14px #a855f799;animation:riftp 2s infinite}.riftboss{background:linear-gradient(135deg,#450a0a,#7c3aed);color:#fff;border:1px solid #f472b6}
+@keyframes riftp{50%{box-shadow:0 0 24px #e879f9}}
+.mrift{position:absolute;left:6px;top:6px;background:#7c3aedcc;color:#fff;font-size:11px;font-weight:800;border-radius:8px;padding:2px 6px;box-shadow:0 0 10px #e879f9;animation:riftp 2s infinite}
+.mapimg{position:relative}
+.riftc{display:flex;align-items:center;gap:12px;background:radial-gradient(circle at 15% 50%,#7c3aed55,transparent 60%),var(--card,#151b2b);border:1px solid #7c3aed88}.riftc.off{opacity:.75;border-style:dashed}
+.rportal{flex:none;width:52px;height:52px;border-radius:50%;background:conic-gradient(from 0deg,#7c3aed,#ec4899,#22d3ee,#7c3aed);mask:radial-gradient(circle,transparent 30%,#000 32%);-webkit-mask:radial-gradient(circle,transparent 30%,#000 32%);animation:rspin 3s linear infinite;filter:drop-shadow(0 0 8px #e879f9)}
+@keyframes rspin{to{transform:rotate(360deg)}}
+.riftfx{position:fixed;inset:0;z-index:50;pointer-events:none;background:radial-gradient(circle,#0000 0,#7c3aedaa 40%,#000d 75%);animation:riftfx 1.6s forwards}.riftfx.big{background:radial-gradient(circle,#0000 0,#db2777cc 35%,#000 75%)}
+@keyframes riftfx{0%{opacity:0;transform:scale(2)}40%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.6) rotate(40deg)}}

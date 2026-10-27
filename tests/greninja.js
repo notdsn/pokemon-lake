@@ -1,5 +1,5 @@
 // Código EDSON-GRENINJA: Greninja Nv50 + resumo, Pokédex e batalha. Uso: node tests/greninja.js [URL]
-const { chromium } = require('/var/tmp/sand-playwright-runtime/164c91ebeb1a9d84bdfd8b8aa7480625/node_modules/playwright-core');
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
 const fs = require('fs'); const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
 const URL = process.argv[2] || 'http://127.0.0.1:18473/', T = URL.includes('github.io') ? 'v6live' : 'v6', OUT = '/workspace/pokemon-lake/prints/v2/375x667-' + T + '-';
 let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
