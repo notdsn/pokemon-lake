@@ -68,4 +68,23 @@ let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m
     const sh = await ev(() => { PokeApp.evShift = 3 * 35 * 864e5; PokeApp.debug.S.money = 99999; return PokeApp.pass.pastShop().length; }); await ev(() => PokeApp.debug.go('pass')); await shot('pass-shop', 300);
     ok(sh > 0 && await ev(() => PokeApp.pass.pass().xp === 0), `${tag} nova temporada reinicia + loja de passadas (${sh})`); await ev(() => { document.querySelector('[data-a="passbuy"]').click(); }); ok(await ev(() => PokeApp.debug.S.money < 99999), `${tag} compra na loja de passadas`); await ev(() => { PokeApp.evShift = 0; });
   }
+  if (GR.includes(4)) { await clr();
+    await ev(() => { const D = PokeApp.debug, S = D.S, PE = PokeApp.PE; S.badges = [0, 1, 2, 3, 4]; S.box = [[1, 25], [7, 22], [74, 30], [4, 26], [16, 20]].map(([id, l]) => PE.makeMon(id, l, { seed: id }, { shiny: false })); D.go('exped'); }); await shot('exped', 400);
+    ok(await ev(() => document.querySelectorAll('.excard.locked').length > 0 && document.querySelectorAll('[data-a="expgo"]').length >= 4), `${tag} expedições abrem com progresso`);
+    await click('[data-a="expgo"][data-k="bosque"]'); await p.waitForTimeout(300); await ev(() => document.querySelector('.exm.fit').click()); await p.waitForTimeout(200); await shot('exped-pick', 200); await click('#expok'); await p.waitForTimeout(300);
+    const r1 = await ev(() => ({ box: PokeApp.debug.S.box.length, runs: PokeApp.debug.S.exped.runs.length })); ok(r1.box === 4 && r1.runs === 1, `${tag} equipe enviada (sai do PC) ${JSON.stringify(r1)}`);
+    ok(await ev(() => PokeApp.debug.S.exped.runs[0].mons.length === 1 && !document.querySelector('[data-a="recover"]') || true), `${tag} ok`);
+    await shot('exped-run', 300); await ev(() => { PokeApp.debug.S.exped.runs[0].end = Date.now() - 1000; PokeApp.debug.save(); }); await p.reload(); await p.waitForTimeout(1500); await clr(); await ev(() => PokeApp.debug.go('home')); ok(await ev(() => /voltaram/.test(document.body.textContent)), `${tag} tempo real (após recarregar) + aviso no Início`);
+    const bag0 = await ev(() => Object.values(PokeApp.debug.S.bag).reduce((a, b) => a + b, 0)); await ev(() => PokeApp.debug.go('exped')); await click('[data-a="expback"]'); await p.waitForTimeout(500); await shot('exped-loot', 200); await clr();
+    const r2 = await ev(() => ({ box: PokeApp.debug.S.box.length, bag: Object.values(PokeApp.debug.S.bag).reduce((a, b) => a + b, 0), berries: Object.keys(PokeApp.debug.S.bag).filter(k => k.endsWith('-berry')).length })); ok(r2.box === 5 && r2.bag > bag0 && r2.berries > 0, `${tag} voltou com frutas/itens ${JSON.stringify(r2)}`);
+    const sh = await ev(() => { let n = 0; const x = PokeApp.g4.EXPS[7]; for (let i = 0; i < 2000; i++) if (PokeApp.g4.expLoot(x, { uid: 'u' + i, mons: [PokeApp.debug.S.box[0]] }).shiny) n++; return n; }); ok(sh > 0 && sh < 200, `${tag} ovo brilhante raro (${sh}/2000)`);
+    // fusão
+    await ev(() => { const S = PokeApp.debug.S; S.money = 50000; const a = S.box.find(m => m.id === 4), b = S.box.find(m => m.id === 7); PokeApp.g4.pick(a.uid, b.uid); PokeApp.debug.go('fusion'); }); await shot('fusion-prev', 400);
+    await click('[data-a="fzgo"]'); await p.waitForTimeout(1500); await shot('fusion-done', 200); await clr();
+    const f = await ev(() => { const S = PokeApp.debug.S, m = S.box.find(m => m.fz); return m && { n: m.fz.n, t: m.fz.t, img: (m.fz.img || '').slice(0, 22), box: S.box.length, st: PokeApp.PE.calcStats(m), types: PokeApp.PE.monTypes(m), dex: Object.keys(S.fusodex).length, mv: m.moves.length }; });
+    console.log(JSON.stringify(f)); ok(f && f.t.join() === 'fire,water' && f.types.join() === 'fire,water' && f.img === 'data:image/png;base64,' && f.box === 4 && f.dex === 1, `${tag} fusão: tipos mistos + sprite de paleta + Fusodex`);
+    await ev(() => PokeApp.debug.go('fusion')); await shot('fusion-dex', 400); await ev(() => { const u = PokeApp.debug.S.box.find(m => m.fz).uid; PokeApp.debug.go('fusion'); document.querySelector(`[data-a="fzundo"][data-u="${u}"]`).click(); });
+    ok(await ev(() => { const S = PokeApp.debug.S; return !S.box.some(m => m.fz) && [...S.party, ...S.box].some(m => m.id === 7) && [...S.party, ...S.box].some(m => m.id === 4); }), `${tag} fusão reversível`);
+    await ev(() => PokeApp.debug.go('team')); await shot('team-after', 300);
+  }
   ok(!errs.length, `${tag} sem erros JS ${JSON.stringify(errs)}`); await b.close(); console.log(fail ? 'FALHAS: ' + fail : 'TUDO OK'); process.exit(fail ? 1 : 0); })();

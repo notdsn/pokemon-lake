@@ -29,7 +29,7 @@
       case 'slow-then-very-fast': return Math.floor(n ** 3 * 0.9); case 'fast-then-very-slow': return Math.floor(n ** 3 * 1.1);
       default: return n ** 3; }
   }
-  const monTypes = m => (m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].t : D.mons[m.id].t);
+  const monTypes = m => (m.fz && !m.mega ? m.fz.t : m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].t : D.mons[m.id].t);
   const SN = ['hp','atk','def','spa','spd','spe'];
   // 25 naturezas: [nome, stat+ , stat-] (1=Atk 2=Def 3=AtE 4=DfE 5=Vel); iguais = neutra
   const NATURES = [['Firme',1,1],['Solitária',1,2],['Corajosa',1,5],['Inflexível',1,3],['Travessa',1,4],['Ousada',2,1],['Dócil',2,2],['Relaxada',2,5],['Marota',2,3],['Frouxa',2,4],
@@ -37,7 +37,7 @@
     ['Calma',4,1],['Gentil',4,2],['Atrevida',4,5],['Cuidadosa',4,3],['Peculiar',4,4]];
   const natMul = (m, i) => { const n = m.nat == null ? null : NATURES[m.nat]; if (!n || n[1] === n[2]) return 1; return n[1] === i ? 1.1 : n[2] === i ? 0.9 : 1; };
   function calcStats(m) {
-    const b = (m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].s : D.mons[m.id].s), L = m.lvl, iv = m.iv, ev = m.ev || [0,0,0,0,0,0];
+    const b = (m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].s : m.fz ? m.fz.s : D.mons[m.id].s), L = m.lvl, iv = m.iv, ev = m.ev || [0,0,0,0,0,0];
     const bm = m.bst || null;
     return b.map((bs, i) => i === 0 ? (m.id === 292 ? 1 : Math.floor((Math.floor((2 * bs + iv[i] + Math.floor(ev[i] / 4)) * L / 100) + L + 10) * (bm ? bm[0] : 1)))
       : Math.floor((Math.floor((2 * bs + iv[i] + Math.floor(ev[i] / 4)) * L / 100) + 5) * natMul(m, i) * (bm ? bm[i] : 1)));
@@ -263,7 +263,7 @@
     for (const f of fs) { const g = D.megas[f]; if (g.st ? (ignoreItem || m.item === g.st) : m.moves.some(x => x.n === 'dragon-ascent')) return f; }
     return null;
   }
-  function canMega(s, i) { const sd = s.sides[i]; return !!(sd.megaOk && !sd.megaUsed && !sd.dynaUsed && sd.b.m.hp > 0 && megaFormFor(sd.b.m)); }
+  function canMega(s, i) { const sd = s.sides[i]; return !!(sd.megaOk && !sd.megaUsed && !sd.dynaUsed && sd.b.m.hp > 0 && !sd.b.m.fz && megaFormFor(sd.b.m)); }
   // ---------- Dynamax / Gigantamax (uma vez por batalha, não combina com Mega, 3 turnos) ----------
   const GMAX = {
     6: { k: 'charizard', n: 'Charizard Gigantamax', ty: 'fire', mv: 'Fogaréu G-Max', fx: 'res', rn: 'o Fogaréu G-Max' },
@@ -370,10 +370,10 @@
       out.push({ lvl: m.lvl, learn: [...new Set(learn)] }); }
     return out;
   }
-  function levelEvo(m, tod) { const st = calcStats(m);
+  function levelEvo(m, tod) { if (m.fz) return null; const st = calcStats(m);
     const e = (D.mons[m.id].e || []).find(x => x.lvl && m.lvl >= x.lvl && (!x.tod || !tod || x.tod === tod || (x.tod === 'day' && tod !== 'night')) && (x.rps == null || x.rps === Math.sign(st[1] - st[2])));
     return e ? e.to : null; }
-  function stoneEvo(m, item) { const e = (D.mons[m.id].e || []).find(x => x.item === item); return e ? e.to : null; }
+  function stoneEvo(m, item) { if (m.fz) return null; const e = (D.mons[m.id].e || []).find(x => x.item === item); return e ? e.to : null; }
   function evolve(m, to) { const oldMax = maxhp(m); m.id = to; m.hp = Math.max(1, m.hp + maxhp(m) - oldMax); return m; }
 
   const API = { NATURES, natMul, movePower, TYPES, eff, rnd, ri, xpFor, calcStats, maxhp, makeMon, movesAt, createBattle, step, needSwitch, forceSwitch, aiAction, aiSwitchIdx,

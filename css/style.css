@@ -561,3 +561,25 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .pose-wave img:first-child{animation:pwave 1.4s ease-in-out infinite;transform-origin:50% 90%}@keyframes pwave{25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
 .pose-hero img:first-child{transform:scale(1.12);filter:drop-shadow(0 0 8px #ffcc33)!important}
 .pose-dance img:first-child{animation:pdance .8s steps(2) infinite}@keyframes pdance{50%{transform:scaleX(-1)}}
+/* ===== v6 G4 expedições + fusão ===== */
+.exgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.excard{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;color:inherit;font:inherit;padding:10px 6px}
+.excard .exe{font-size:30px}.excard.locked{opacity:.45;filter:grayscale(.7)}.excard.busy{opacity:.6}
+.excard .type,.exrun .type,.fzprev .type,.fzd .type,.fzdone .type{font-size:10px;padding:1px 6px;border-radius:6px;color:#fff;margin:1px}
+.exrun{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid #ffffff12}.exrun:first-of-type{border-top:0}
+.exrun .exe{font-size:28px}.exrun.done{background:linear-gradient(90deg,#14532d55,transparent);border-radius:10px}
+.exmons img,.expback img{width:40px;height:40px;image-rendering:pixelated}.exrun .bar{height:6px;border-radius:4px;background:#0006;overflow:hidden;margin:3px 0}.exrun .bar i{display:block;height:100%;background:#4ade80}
+.expick{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-height:50vh;overflow:auto}
+.exm{display:flex;flex-direction:column;align-items:center;background:#1a2133;border:2px solid transparent;border-radius:10px;padding:4px;color:inherit;font:inherit}
+.exm img{width:52px;height:52px;image-rendering:pixelated}.exm small{font-size:10px}.exm.fit{border-color:#4ade8055}.exm.on{border-color:#ffcc33;background:#3a3112}
+.btn.sm{padding:6px 10px;font-size:12px}
+.fzlab{background:radial-gradient(circle at 50% 0,#1f3b4a,#141a2b 70%)}
+.fzrow{display:flex;align-items:center;gap:6px;justify-content:center;margin:10px 0}.fzplus{font-size:26px;color:#5ec8ff}
+.fzslot{flex:1;display:flex;flex-direction:column;align-items:center;background:#0005;border:2px dashed #5ec8ff66;border-radius:14px;padding:8px;color:inherit;font:inherit;min-height:120px;justify-content:center}
+.fzslot img{width:72px;height:72px;image-rendering:pixelated}
+.fzprev{text-align:center;border-top:1px solid #ffffff14;padding-top:8px}.fzst{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;font-size:12px;margin:6px 0}
+.fzst span{background:#0004;border-radius:6px;padding:3px}
+.fzflash img{width:120px;height:120px;image-rendering:pixelated;animation:fzin 1.2s ease-out}@keyframes fzin{0%{filter:brightness(6) blur(4px);transform:scale(.3) rotate(-30deg)}70%{filter:brightness(2)}100%{filter:none;transform:none}}
+.fzi{width:52px;height:52px;image-rendering:pixelated}
+.fzdex{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.fzd{background:#1a2133;border-radius:10px;padding:5px;text-align:center;font-size:11px}
+.fzpair{display:flex;justify-content:center}.fzpair img{width:32px;height:32px;image-rendering:pixelated}.fzpair img+img{margin-left:-8px}

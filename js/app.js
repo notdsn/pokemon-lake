@@ -38,12 +38,12 @@
   function cry(id) { if (!audioOn()) return; try { const a = new Audio('cries/' + id + '.ogg'); a.volume = 0.35; a.play().catch(() => {}); } catch (e) {} }
 
   // ---------- util de Pokémon ----------
-  const pn = m => m.nick || D.mons[m.id].n;
+  const pn = m => m.nick || (m.fz && m.fz.n) || D.mons[m.id].n;
   // sprites do Showdown têm tamanho natural proporcional ao Pokémon: escala fixa e nítida na batalha
   document.addEventListener('load', e => { const t = e.target; if (t.tagName === 'IMG' && t.closest && t.closest('.bmon')) fitSpr(t); }, true);
   function fitSpr(img) { if (!img.naturalWidth) return; const back = !!img.closest('.pmon'), k = innerWidth < 600 ? (back ? 1.15 : 1.7) : (back ? 1.5 : 2.4), box = img.closest('.bmon');
     let w = img.naturalWidth * k, h = img.naturalHeight * k; const mh = box ? box.clientHeight : 1e9, mw = box ? box.clientWidth : 1e9; const f = Math.min(1, mh / h, mw / w); w *= f; h *= f; img.style.width = w + 'px'; img.style.height = h + 'px'; }
-  const spr = (m, back) => { const d = back ? (m.shiny ? 'backshiny' : 'back') : (m.shiny ? 'shiny' : 'front'); if (m.dmax && m.dmax.g && PE.GMAX[m.id]) return `img/gmax/${d}/${PE.GMAX[m.id].k}.gif`; return m.mega ? `img/mega/${d}/${m.mega}.gif` : `img/${d}/${m.id}.gif`; };
+  const spr = (m, back) => { const d = back ? (m.shiny ? 'backshiny' : 'back') : (m.shiny ? 'shiny' : 'front'); if (m.dmax && m.dmax.g && PE.GMAX[m.id]) return `img/gmax/${d}/${PE.GMAX[m.id].k}.gif`; return m.fz && m.fz.img && !m.mega ? m.fz.img : m.mega ? `img/mega/${d}/${m.mega}.gif` : `img/${d}/${m.id}.gif`; };
   const bname = m => m.dmax && m.dmax.g && PE.GMAX[m.id] && !m.nick ? PE.GMAX[m.id].n : m.mega && !m.nick && D.megas[m.mega] ? D.megas[m.mega].n : pn(m);
   const mtypes = m => PE.monTypes(m);
   const tod = () => period() === 'night' ? 'night' : 'day';
@@ -242,7 +242,7 @@
     </div>`;
   }
   function monCard(m, i, where) {
-    const p = hpPct(m), d = D.mons[m.id];
+    const p = hpPct(m), d = fzD(m);
     return `<button class="mcard ${m.hp <= 0 ? 'fainted' : ''}" data-a="mon" data-i="${i}" data-w="${where}" style="--tc:${C.TYPE_COLOR[d.t[0]]}">
       <div class="msp">${m.shiny ? '<span class="shinytag">★</span>' : ''}${m.item ? `<span class="helditem" title="${C.ITEM_NAME[m.item] || ''}">${itemImg(m.item)}</span>` : ''}<img src="${spr(m)}" alt="" loading="lazy"></div>
       <div class="minfo"><div class="row between"><b>${esc(pn(m))}</b><small>Nv ${m.lvl}</small></div><div class="types">${d.t.map(typeChip).join('')}${stChip(m.status)}</div>
@@ -255,7 +255,7 @@
   }
   ACT.mon = d => { if (d.w === 'x') return; monDetail(d.w === 'b' ? 'b' : 'p', +d.i); };
   function monDetail(w, i) {
-    const list = w === 'b' ? S.box : S.party, m = list[i]; if (!m) return; const d = D.mons[m.id], s = PE.calcStats(m);
+    const list = w === 'b' ? S.box : S.party, m = list[i]; if (!m) return; const d = fzD(m), s = PE.calcStats(m);
     const g = d.g, x0 = PE.xpFor(g, m.lvl), x1 = PE.xpFor(g, m.lvl + 1), xp = m.lvl >= 100 ? 100 : (m.xp - x0) / (x1 - x0) * 100;
     const evo = (d.e || []).map(e => `${D.mons[e.to].n} (${e.lvl ? 'Nv ' + e.lvl : C.ITEM_NAME[e.item] || e.item})`).join(', ');
     const SN = ['HP', 'Ataque', 'Defesa', 'At. Esp.', 'Def. Esp.', 'Veloc.'];
@@ -495,12 +495,12 @@
   }
   // ---------- recuperação de Pokémon (lê backups; só ADICIONA ao PC) ----------
   const monKey = m => m.uid || ['x', m.id, m.ot, m.caughtAt, (m.iv || []).join('.')].join('|');
-  function allMine() { return [...S.party, ...S.box, ...((S.daycare && S.daycare.slots) || [])].filter(Boolean); }
+  function allMine() { const L = [...S.party, ...S.box, ...((S.daycare && S.daycare.slots) || []), ...expMons(S)].filter(Boolean); return [...L, ...L.filter(m => m.fz && m.fz.b).map(m => m.fz.b)]; }
   function findLost() {
     const have = new Set(allMine().map(monKey)), pre = 'pkLake.save.' + user, best = {};
     for (let k = 0; k < localStorage.length; k++) { const key = localStorage.key(k); if (!key || (key !== pre && !key.startsWith(pre + '.'))) continue;
       let o; try { o = JSON.parse(localStorage.getItem(key)); } catch (e) { continue; } if (!o || typeof o !== 'object') continue;
-      for (const m of [...(o.party || []), ...(o.box || []), ...((o.daycare && o.daycare.slots) || [])]) { if (!m || !D.mons[m.id] || !Array.isArray(m.moves)) continue; const id = monKey(m);
+      for (const m of [...(o.party || []), ...(o.box || []), ...((o.daycare && o.daycare.slots) || []), ...expMons(o), ...[...(o.party || []), ...(o.box || [])].filter(x => x && x.fz && x.fz.b).map(x => x.fz.b)]) { if (!m || !D.mons[m.id] || !Array.isArray(m.moves)) continue; const id = monKey(m);
         if (have.has(id)) continue; if (!best[id] || m.lvl > best[id].m.lvl) best[id] = { m, src: key.slice(pre.length + 1) || 'atual' }; } }
     return Object.values(best);
   }
@@ -1648,6 +1648,86 @@
   { const qc = ACT.qclaim; ACT.qclaim = d => { const n = S.stats.questsDone || 0; qc(d); if ((S.stats.questsDone || 0) > n) { seasonXP(60); save(); } }; }
   { const qb = ACT.qbonus; ACT.qbonus = () => { const q = ensureQuests(), had = q.bonus; qb(); if (!had && q.bonus) { seasonXP(150); save(); } }; }
   A.pass = { pass, seasonAt, seasonXP, passReward, pastShop };
+  // ---------- v6 G4: Expedições + Laboratório de Fusão ----------
+  const BERRIES = [['oran', 'Fruta Oran', 'Recupera 10 HP. Ingrediente de Poffin.'], ['pecha', 'Fruta Pecha', 'Doce. Ingrediente de Poffin.'], ['cheri', 'Fruta Cheri', 'Apimentada. Ingrediente de Poffin.'], ['rawst', 'Fruta Rawst', 'Amarga. Ingrediente de Poffin.'], ['aspear', 'Fruta Aspear', 'Azeda. Ingrediente de Poffin.'], ['chesto', 'Fruta Chesto', 'Seca. Ingrediente de Poffin.'], ['persim', 'Fruta Persim', 'Ingrediente de Poffin.'], ['razz', 'Fruta Razz', 'Ingrediente de Poffin.'], ['bluk', 'Fruta Bluk', 'Ingrediente de Poffin.'], ['nanab', 'Fruta Nanab', 'Ingrediente de Poffin.'], ['wepear', 'Fruta Wepear', 'Ingrediente de Poffin.'], ['pinap', 'Fruta Pinap', 'Ingrediente de Poffin.'], ['leppa', 'Fruta Leppa', 'Rara. Ingrediente de Poffin.'], ['sitrus', 'Fruta Sitrus', 'Rara. Ingrediente de Poffin.'], ['lum', 'Fruta Lum', 'Muito rara! Ingrediente de Poffin.']];
+  BERRIES.forEach(([k, n, d]) => { C.ITEM_NAME[k + '-berry'] = n; KEY_ITEMS[k + '-berry'] = d; });
+  const EXPS = [ // [id, nome, emoji, minutos, tipos (1 do time precisa ter), progresso mínimo, tier]
+    ['bosque', 'Bosque Verdejante', '🌳', 30, ['grass', 'bug'], 0, 0], ['praia', 'Praia das Conchas', '🏖️', 60, ['water'], 1, 0], ['caverna', 'Caverna de Cristal', '💎', 120, ['rock', 'ground', 'steel'], 2, 1],
+    ['fazenda', 'Fazenda Miltank', '🐄', 180, ['normal', 'fairy'], 3, 1], ['vulcao', 'Vulcão Rubro', '🌋', 240, ['fire'], 4, 2], ['neve', 'Pico Nevado', '❄️', 300, ['ice'], 6, 2],
+    ['ceu', 'Ilhas do Céu', '☁️', 360, ['flying', 'dragon'], 8, 3], ['ruinas', 'Ruínas Antigas', '🏛️', 480, ['psychic', 'ghost', 'dark'], 10, 3]];
+  const progOf = () => (S.badges || []).length + (S.jbadges || []).length + (S.champion ? 2 : 0);
+  function expMons(o) { return ((o && o.exped && o.exped.runs) || []).flatMap(r => r.mons || []); }
+  const exped = () => { S.exped = S.exped || { runs: [], done: 0, log: [] }; return S.exped; };
+  const fzD = m => m.fz ? { ...D.mons[m.id], n: m.fz.n, t: m.fz.t, s: m.fz.s, e: [] } : D.mons[m.id];
+  const mTypes = m => PE.monTypes(m);
+  function expLoot(x, r) { const rnd = srng(hseed(r.uid)), tier = x[6], fit = r.mons.filter(m => mTypes(m).some(t => x[4].includes(t))).length, mul = 1 + 0.25 * (fit - 1) + r.mons.length * 0.15 + Math.min(0.5, r.mons.reduce((a, m) => a + m.lvl, 0) / 600), out = {}, add = (k, n) => out[k] = (out[k] || 0) + n;
+    const bpool = BERRIES.slice(0, 6 + tier * 3); for (let i = 0; i < Math.round((2 + x[3] / 60) * mul); i++) add(bpool[Math.floor(rnd() * bpool.length)][0] + '-berry', 1);
+    const it = [['potion', 'poke-ball', 'super-potion'], ['great-ball', 'super-potion', 'revive', 'moon-stone'], ['ultra-ball', 'hyper-potion', 'fire-stone', 'water-stone', 'thunder-stone', 'leaf-stone'], ['ultra-ball', 'full-restore', 'rare-candy', 'sun-stone', 'dragon-scale']][tier];
+    for (let i = 0; i < 1 + Math.floor(x[3] / 90 * mul); i++) add(it[Math.floor(rnd() * it.length)], 1);
+    out.money = Math.round(x[3] * 18 * mul); if (x[3] >= 120 && rnd() < 0.25) add('rare-candy', 1);
+    const egg = rnd() < 0.08 + x[3] / 1200 ? (tier >= 2 ? 'epic' : tier ? 'rare' : 'common') : null, shiny = rnd() < 0.005 + x[3] / 48000; return { out, egg, shiny }; }
+  ACT.expgo = d => { const x = EXPS.find(e => e[0] === d.k); if (!x) return; const E = exped(); if (E.runs.some(r => r.k === x[0])) return toast('Já tem uma equipe lá!');
+    const box = S.box.map((m, i) => [m, i]).filter(([m]) => m.hp > 0 || true); if (!box.length) return toast('Expedições usam Pokémon do PC (caixa). Seu PC está vazio!', 'bad');
+    const pick = new Set(); const draw = () => { const ok = [...pick].some(i => mTypes(S.box[i]).some(t => x[4].includes(t)));
+      const mm = modal(`<h3>${x[2]} ${x[1]}</h3><p class="mut small">Escolha até 3 Pokémon do PC. Precisa de pelo menos 1 do tipo ${x[4].map(t => `<span class="type" style="background:${C.TYPE_COLOR[t]}">${C.TYPE_PT[t]}</span>`).join(' ')}. Duração: <b>${fmtDur(x[3])}</b> (conta mesmo com o jogo fechado).</p>
+        <div class="expick">${box.map(([m, i]) => `<button class="exm ${pick.has(i) ? 'on' : ''} ${mTypes(m).some(t => x[4].includes(t)) ? 'fit' : ''}" data-i="${i}"><img src="${spr(m)}" alt=""><small>${esc(pn(m))} Nv${m.lvl}</small></button>`).join('')}</div>
+        <div class="mbtns"><button class="btn ghost" data-a="close">Cancelar</button><button class="btn primary" id="expok" ${ok ? '' : 'disabled'}>🚀 Enviar (${pick.size}/3)</button></div>`);
+      mm.querySelectorAll('.exm').forEach(b => b.onclick = () => { const i = +b.dataset.i; if (pick.has(i)) pick.delete(i); else if (pick.size < 3) pick.add(i); draw(); });
+      mm.querySelector('#expok').onclick = () => { const idx = [...pick].sort((a, b) => b - a), mons = idx.map(i => S.box.splice(i, 1)[0]); const now = Date.now();
+        E.runs.push({ k: x[0], mons, start: now, end: now + x[3] * 6e4, uid: x[0] + ':' + now + ':' + mons.map(m => m.uid).join(',') }); save(); closeModal(); SFX.throw && SFX.throw(); toast(`${x[2]} Equipe partiu para ${x[1]}!`, 'good'); render(); }; };
+    draw(); };
+  const fmtDur = mn => mn < 60 ? `${mn} min` : `${Math.floor(mn / 60)}h${mn % 60 ? ' ' + (mn % 60) + 'min' : ''}`;
+  ACT.expback = d => { const E = exped(), j = E.runs.findIndex(r => r.uid === d.u); if (j < 0) return; const r = E.runs[j], x = EXPS.find(e => e[0] === r.k), done = Date.now() >= r.end;
+    if (!done && d.f !== '1') return ask('Chamar de volta?', 'Se voltarem antes da hora, não trazem nada.', [{ t: 'Esperar' }, { t: 'Chamar', cls: 'primary' }]).then(i => { if (i === 1) ACT.expback({ u: d.u, f: '1' }); });
+    E.runs.splice(j, 1); r.mons.forEach(m => S.box.push(m)); if (!done) { save(); render(); return toast('A equipe voltou sem nada.'); }
+    const L = expLoot(x, r); giveReward(L.out); const extra = []; if (L.egg) { giveEgg(L.egg, 'Expedição: ' + x[1]); extra.push('🥚 um Ovo!'); } if (L.shiny) { giveEgg('shiny', 'Expedição: ' + x[1]); extra.push('🌟 um Ovo BRILHANTE!'); }
+    E.done++; S.stats.expeds = (S.stats.expeds || 0) + 1; E.log.unshift({ k: r.k, at: Date.now(), t: rewardText(L.out) + (extra.length ? ' + ' + extra.join(' ') : '') }); E.log = E.log.slice(0, 15); try { seasonXP(Math.round(x[3] / 4)); } catch (e) {}
+    SFX.win(); save(); modal(`<div class="center"><h3>${x[2]} Equipe voltou de ${x[1]}!</h3><div class="expback">${r.mons.map(m => `<img src="${spr(m)}" alt="">`).join('')}</div><p>${rewardText(L.out)}</p>${extra.map(e => `<p class="big">${e}</p>`).join('')}<div class="mbtns"><button class="btn primary" data-a="close">Oba!</button></div></div>`); render(); };
+  function vExped() { const E = exped(), pg = progOf(), t = Date.now();
+    return `<div class="card"><h3>🧭 Expedições</h3><p class="mut small">Mande Pokémon parados no PC explorar. O tempo é real: eles continuam explorando com o jogo fechado. Trazem frutas, itens, moedas, às vezes ovos — e raramente um ovo brilhante! Novas expedições abrem com seu progresso (insígnias).</p></div>
+      ${E.runs.length ? `<div class="card"><h3>Em andamento</h3>${E.runs.map(r => { const x = EXPS.find(e => e[0] === r.k), done = t >= r.end, pc = Math.min(100, (t - r.start) / (r.end - r.start) * 100); return `<div class="exrun ${done ? 'done' : ''}"><span class="exe">${x[2]}</span><div class="grow"><b>${x[1]}</b><div class="exmons">${r.mons.map(m => `<img src="${spr(m)}" alt="">`).join('')}</div><div class="bar"><i style="width:${pc}%"></i></div><small>${done ? '✅ Voltaram! Toque para ver o que trouxeram' : `volta em <b class="cdn" data-t="${r.end}">${cdn(r.end - t)}</b>`}</small></div><button class="btn ${done ? 'primary' : 'ghost'} sm" data-a="expback" data-u="${r.uid}">${done ? 'Receber' : 'Chamar'}</button></div>`; }).join('')}</div>` : ''}
+      <div class="exgrid">${EXPS.map(x => { const lock = pg < x[5], busy = E.runs.some(r => r.k === x[0]); return `<button class="card excard ${lock ? 'locked' : ''} ${busy ? 'busy' : ''}" ${lock || busy ? '' : `data-a="expgo" data-k="${x[0]}"`}><span class="exe">${lock ? '🔒' : x[2]}</span><b>${x[1]}</b><small>⏱️ ${fmtDur(x[3])}</small><div>${x[4].map(t => `<span class="type" style="background:${C.TYPE_COLOR[t]}">${C.TYPE_PT[t]}</span>`).join('')}</div><small class="mut">${lock ? `Precisa de ${x[5]} insígnias` : busy ? 'Equipe lá agora' : '★'.repeat(x[6] + 1) + ' Enviar'}</small></button>`; }).join('')}</div>
+      ${E.log.length ? `<div class="card"><h3>📜 Diário</h3>${E.log.map(l => { const x = EXPS.find(e => e[0] === l.k); return `<p class="small">${x[2]} <b>${x[1]}</b>: ${l.t}</p>`; }).join('')}</div>` : ''}`; }
+  XV.exped = vExped; MORE_TABS.push('exped');
+  MORE_X.push(() => { const E = exped(), done = E.runs.filter(r => Date.now() >= r.end).length; return ['exped', '🧭', 'Expedições', done ? `✅ ${done} equipe(s) voltaram!` : E.runs.length ? `${E.runs.length} equipe(s) explorando` : 'Mande Pokémon do PC explorar']; });
+  HOME_X.push(() => { const E = exped(), done = E.runs.filter(r => Date.now() >= r.end).length; return done ? `<button class="card span2 evbanner live" data-a="tab" data-t="exped"><span class="pse">🧭</span><div><small>EXPEDIÇÕES</small><b>${done} equipe(s) voltaram com prêmios!</b></div><span class="arrow">›</span></button>` : ''; });
+  // ----- Fusão: paleta de B aplicada no desenho de A (canvas), tipos/estatísticas/golpes misturados, reversível -----
+  const loadImg = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+  async function blendSprite(aId, bId, shiny) { const [ia, ib] = await Promise.all([loadImg(`img/${shiny ? 'shiny' : 'front'}/${aId}.gif`), loadImg(`img/front/${bId}.gif`)]);
+    const px = im => { const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext('2d'); x.drawImage(im, 0, 0); return [c, x, x.getImageData(0, 0, c.width, c.height)]; };
+    const lum = (r, g, b) => 0.3 * r + 0.59 * g + 0.11 * b, [ca, xa, da] = px(ia), [, , db] = px(ib);
+    const pal = d => { const m = new Map(); for (let i = 0; i < d.data.length; i += 4) { if (d.data[i + 3] < 128) continue; const r = d.data[i], g = d.data[i + 1], b = d.data[i + 2], L = lum(r, g, b); if (L < 35 || L > 245) continue; const k = (r >> 4) << 8 | (g >> 4) << 4 | (b >> 4); const e = m.get(k) || [0, 0, 0, 0]; e[0] += r; e[1] += g; e[2] += b; e[3]++; m.set(k, e); } return [...m.values()].sort((a, b) => b[3] - a[3]).slice(0, 10).map(e => [e[0] / e[3], e[1] / e[3], e[2] / e[3]]).sort((a, b) => lum(...a) - lum(...b)); };
+    const pb = pal(db); if (!pb.length) return ca.toDataURL(); const d = da.data, Ls = []; for (let i = 0; i < d.length; i += 4) if (d[i + 3] >= 128) Ls.push(lum(d[i], d[i + 1], d[i + 2])); Ls.sort((a, b) => a - b);
+    const rank = L => { let lo = 0, hi = Ls.length; while (lo < hi) { const m = (lo + hi) >> 1; if (Ls[m] < L) lo = m + 1; else hi = m; } return lo / Math.max(1, Ls.length - 1); };
+    for (let i = 0; i < d.length; i += 4) { if (d[i + 3] < 128) continue; const L = lum(d[i], d[i + 1], d[i + 2]); if (L < 35) continue; const t = pb[Math.min(pb.length - 1, Math.floor(rank(L) * pb.length))], k = 0.72; d[i] = d[i] * (1 - k) + t[0] * k; d[i + 1] = d[i + 1] * (1 - k) + t[1] * k; d[i + 2] = d[i + 2] * (1 - k) + t[2] * k; }
+    xa.putImageData(da, 0, 0); return ca.toDataURL('image/png'); }
+  const fzName = (a, b) => { const A = D.mons[a].n, B = D.mons[b].n; return A.slice(0, Math.ceil(A.length / 2)) + B.slice(Math.floor(B.length / 2)).toLowerCase(); };
+  const fzTypes = (a, b) => { const A = D.mons[a].t, B = D.mons[b].t, t1 = A[0], t2 = B[B.length - 1] !== t1 ? B[B.length - 1] : B[0] !== t1 ? B[0] : null; return t2 ? [t1, t2] : [t1]; };
+  const fzStats = (a, b) => D.mons[a].s.map((v, i) => Math.round((v + D.mons[b].s[i]) / 2));
+  const fusodex = () => { S.fusodex = S.fusodex || {}; return S.fusodex; };
+  let fzPick = [null, null];
+  const fzCands = () => [...S.party.map((m, i) => ['p', i, m]), ...S.box.map((m, i) => ['b', i, m])].filter(([, , m]) => !m.fz && !m.mega && m.lvl >= 20 && !(m.dmax));
+  ACT.fzsel = d => { const slot = +d.s, c = fzCands(); const mm = modal(`<h3>Escolha o Pokémon ${slot ? 'B (cores e 2º tipo)' : 'A (corpo e 1º tipo)'}</h3><p class="mut small">Nível 20+, sem Mega/Fusão.</p><div class="expick">${c.map(([w, i, m]) => `<button class="exm" data-w="${w}" data-i="${i}"><img src="${spr(m)}" alt=""><small>${esc(pn(m))} Nv${m.lvl}</small></button>`).join('') || '<p>Nenhum Pokémon nível 20+.</p>'}</div><div class="mbtns"><button class="btn ghost" data-a="close">Voltar</button></div>`);
+    mm.querySelectorAll('.exm').forEach(b => b.onclick = () => { const m = (b.dataset.w === 'p' ? S.party : S.box)[+b.dataset.i]; fzPick[slot] = m.uid; if (fzPick[1 - slot] === m.uid) fzPick[1 - slot] = null; closeModal(); render(); }); };
+  const byUid = u => S.party.find(m => m.uid === u) || S.box.find(m => m.uid === u);
+  const FZ_COST = 5000;
+  ACT.fzgo = async () => { const a = byUid(fzPick[0]), b = byUid(fzPick[1]); if (!a || !b) return; if (S.money < FZ_COST) return toast('Precisa de ' + fmt(FZ_COST), 'bad'); if (S.party.length === 1 && S.party[0] === b) return toast('Não dá pra fundir seu único Pokémon do time como B.', 'bad');
+    let img = null; try { img = await blendSprite(a.id, b.id, a.shiny); } catch (e) { img = null; }
+    S.money -= FZ_COST; const bl = S.party.includes(b) ? S.party : S.box; bl.splice(bl.indexOf(b), 1);
+    a.fz = { b: JSON.parse(JSON.stringify(b)), a0: { moves: a.moves, hp: a.hp }, bid: b.id, n: fzName(a.id, b.id), t: fzTypes(a.id, b.id), s: fzStats(a.id, b.id), img };
+    const mv = [...a.moves.slice(0, 2), ...b.moves.filter(x => !a.moves.slice(0, 2).some(y => y.n === x.n)).slice(0, 2)]; a.moves = mv.map(x => ({ n: x.n, pp: D.moves[x.n].pp })); a.hp = PE.maxhp(a);
+    const k = a.id + '-' + b.id, fd = fusodex(); const fresh = !fd[k]; fd[k] = { a: a.id, b: b.id, n: a.fz.n, t: a.fz.t, at: Date.now() }; S.stats.fusions = (S.stats.fusions || 0) + 1; fzPick = [null, null]; save();
+    SFX.evo && SFX.evo(); modal(`<div class="center fzdone"><h3>🧬 Fusão completa!</h3><div class="fzflash"><img src="${spr(a)}" alt=""></div><h2>${esc(a.fz.n)}</h2><p>${a.fz.t.map(t => `<span class="type" style="background:${C.TYPE_COLOR[t]}">${C.TYPE_PT[t]}</span>`).join(' ')}</p>${fresh ? '<p class="good">📗 Nova entrada na Fusodex!</p>' : ''}<p class="mut small">Pode desfazer quando quiser no Laboratório.</p><div class="mbtns"><button class="btn primary" data-a="close">Incrível!</button></div></div>`); render(); };
+  ACT.fzundo = d => { const a = byUid(d.u); if (!a || !a.fz) return; const b = a.fz.b; a.moves = a.fz.a0.moves; delete a.fz; a.hp = Math.min(PE.maxhp(a), a.hp); b.hp = Math.min(PE.maxhp(b), b.hp); if (S.party.length < 6) S.party.push(b); else S.box.push(b); addCaught(b); save(); SFX.coin(); toast(`Fusão desfeita: ${pn(a)} e ${pn(b)} estão de volta!`, 'good'); render(); };
+  function vFusion() { const a = byUid(fzPick[0]), b = byUid(fzPick[1]), fused = [...S.party, ...S.box].filter(m => m.fz), fd = fusodex(), ks = Object.keys(fd);
+    const slot = (m, s) => `<button class="fzslot" data-a="fzsel" data-s="${s}">${m ? `<img src="${spr(m)}" alt=""><b>${esc(pn(m))}</b><small>Nv ${m.lvl}</small>` : `<span class="sem">➕</span><b>Pokémon ${s ? 'B' : 'A'}</b><small>${s ? 'cores + 2º tipo' : 'corpo + 1º tipo'}</small>`}</button>`;
+    const prev = a && b ? (() => { const t = fzTypes(a.id, b.id), s = fzStats(a.id, b.id); return `<div class="fzprev"><h3>${esc(fzName(a.id, b.id))}</h3><p>${t.map(x => `<span class="type" style="background:${C.TYPE_COLOR[x]}">${C.TYPE_PT[x]}</span>`).join(' ')}</p><div class="fzst">${['HP', 'Atq', 'Def', 'AtE', 'DfE', 'Vel'].map((n, i) => `<span>${n} <b>${s[i]}</b></span>`).join('')}</div><p class="mut small">Estatísticas = média das duas espécies (equilibrado). Golpes: 2 de cada. Não evolui nem Mega Evolui enquanto fundido.</p><button class="btn primary wide" data-a="fzgo">🧬 Fundir (${fmt(FZ_COST)})</button></div>`; })() : '';
+    return `<div class="card fzlab"><h3>🧬 Laboratório de Fusão</h3><p class="mut small">Junte dois Pokémon em um só: corpo do A, cores do B, tipos e estatísticas misturados. Totalmente reversível — o B fica guardado dentro da fusão.</p><div class="fzrow">${slot(a, 0)}<span class="fzplus">+</span>${slot(b, 1)}</div>${prev}</div>
+      ${fused.length ? `<div class="card"><h3>Suas fusões</h3>${fused.map(m => `<div class="exrun"><img class="fzi" src="${spr(m)}" alt=""><div class="grow"><b>${esc(pn(m))}</b> <small>Nv ${m.lvl}</small><div>${m.fz.t.map(x => `<span class="type" style="background:${C.TYPE_COLOR[x]}">${C.TYPE_PT[x]}</span>`).join('')}</div></div><button class="btn ghost sm" data-a="fzundo" data-u="${m.uid}">Desfazer</button></div>`).join('')}</div>` : ''}
+      <div class="card"><h3>📗 Fusodex <small class="mut">${ks.length} descobertas</small></h3>${ks.length ? `<div class="fzdex">${ks.map(k => { const f = fd[k]; return `<div class="fzd"><div class="fzpair"><img src="${sprId(f.a)}" alt=""><img src="${sprId(f.b)}" alt=""></div><b>${esc(f.n)}</b><div>${f.t.map(x => `<span class="type" style="background:${C.TYPE_COLOR[x]}">${C.TYPE_PT[x]}</span>`).join('')}</div></div>`; }).join('')}</div>` : '<p class="mut">Faça sua primeira fusão!</p>'}</div>`; }
+  XV.fusion = vFusion; MORE_TABS.push('fusion');
+  MORE_X.push(() => ['fusion', '🧬', 'Laboratório de Fusão', `${Object.keys(fusodex()).length} na Fusodex`]);
+  A.g4 = { EXPS, expLoot, blendSprite, fzName, fzTypes, fzStats, exped, pick: (a, b) => { fzPick = [a, b]; } };
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------
