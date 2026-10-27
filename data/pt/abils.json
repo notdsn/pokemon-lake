@@ -1,1 +1,1122 @@
-{"adaptability": {"pt": "Adaptabilidade", "d": "Este Pokémon causa o dobro de dano com movimentos cujos tipos coincidem com o seu, em vez do bônus habitual de 1,5× para ataques do mesmo tipo."}, "aerilate": {"pt": "Aerilato", "d": "Transforma os ataques do tipo Normal do Pokémon portador em ataques do tipo Voador. Os ataques alterados por essa habilidade têm 1,3 vezes mais poder."}, "air-lock": {"pt": "Câmara de Ar", "d": "Enquanto este Pokémon estiver em batalha, as condições climáticas ainda podem estar ativas, mas não terão nenhum de seus efeitos. Esta habilidade funciona exatamente como Aluvião."}, "blaze": {"pt": "Chama", "d": "Quando este Pokémon tem 1/3 ou menos de seus HP restantes, seus ataques do tipo Fogo causam 1,5 vezes mais dano normal."}, "chlorophyll": {"pt": "Clorofila", "d": "A Speed deste Pokémon é duplicada sob luz solar intensa. Este bônus não conta como um modificador de atributo."}, "clear-body": {"pt": "Corpo Limpo", "d": "Este Pokémon não pode ter seus atributos reduzidos por outros Pokémon. Esta habilidade não evita perdas de atributos que não sejam modificadores de atributos, como a redução de Speed causada pela paralisia. Este Pokémon ainda pode receber modificadores de atributos negativos por meio de Guard Swap, Heart Swap ou Power Swap. Esta habilidade funciona de forma idêntica a White Smoke em batalha."}, "compound-eyes": {"pt": "Olhos Compostos", "d": "Os movimentos deste Pokémon têm 1,3× de sua precisão. Esta habilidade não tem efeito sobre os movimentos de nocaute em um único golpe (Fissure, Guillotine, Horn Drill e Sheer Cold). Mundo Externo: Se o primeiro Pokémon na equipe tiver esta habilidade, a chance de um Pokémon selvagem estar segurando um item específico aumenta de 50%, 5% ou 1% para 60%, 20% ou 5%, respectivamente."}, "cursed-body": {"pt": "Corpo Amaldiçoado", "d": "Os golpes que acertam este Pokémon têm 30% de chance de ficarem desativados depois disso."}, "cute-charm": {"pt": "Charme Fofo", "d": "Sempre que um ataque atingir este Pokémon, o usuário do ataque tem 30% de chance de ficar apaixonado. Mundo Aberto: Se o primeiro Pokémon do grupo tiver essa habilidade, qualquer Pokémon selvagem cuja espécie possa ser de qualquer gênero tem 2/3 de chance de ter seu gênero definido como o oposto e 1/3 de chance de ter um gênero aleatório, como de costume."}, "damp": {"pt": "Umidade", "d": "Enquanto este Pokémon estiver em batalha, Autodestruição e Explosão falharão e Rescaldo não terá efeito."}, "delta-stream": {"pt": "Corrente Delta", "d": "Quando este Pokémon entra na batalha ou adquire essa habilidade, o clima se transforma em uma corrente de ar misteriosa. Uma corrente de ar misteriosa faz com que os golpes não sejam supereficazes contra o tipo Voador; em vez disso, causam dano neutro. Os golpes “Antecipação” e “Rocha Furtiva” não são afetados. A corrente de ar misteriosa termina quando este Pokémon sai da batalha ou perde essa habilidade, ou quando essa habilidade é anulada. O clima não pode ser alterado de outra forma, exceto pelos efeitos de “Terra Desolada” e “Mar Primordial”. “Bloqueio Aéreo” e “Nuvem Nove” impedem o efeito da corrente de ar misteriosa, mas não permitem que o clima seja alterado."}, "drizzle": {"pt": "Garoa", "d": "O clima muda para chuva quando este Pokémon entra em batalha e não termina a menos que seja substituído por outra condição climática. Se vários Pokémon com esta habilidade, Drought, Sand Stream ou Snow Warning forem enviados a campo ao mesmo tempo, as habilidades serão ativadas em ordem de Velocidade, respeitando a Sala de Truques. O clima de cada habilidade cancelará o clima anterior, e apenas o clima invocado pelo Pokémon mais lento permanecerá."}, "drought": {"pt": "Seca", "d": "O clima muda para sol forte quando este Pokémon entra na batalha e não termina a menos que seja cancelado por outra condição climática. Se vários Pokémon com essa habilidade, Garoa, Tempestade de Areia ou Nevasca forem enviados ao mesmo tempo, as habilidades serão ativadas na ordem de Velocidade, respeitando a Sala Dimensional. O clima de cada habilidade cancelará o clima anterior, e apenas o clima invocado pelo Pokémon mais lento permanecerá."}, "early-bird": {"pt": "Madrugador", "d": "A contagem de turnos de sono restantes deste Pokémon diminui em 2 em vez de 1. Se o contador de sono deste Pokémon estiver em 1, ele cairá para 0 e então o Pokémon acordará."}, "effect-spore": {"pt": "Esporo de Efeito", "d": "Sempre que um movimento faz contato com este Pokémon, o usuário do movimento tem 30% de chance de ficar paralisado, envenenado ou adormecido, escolhido aleatoriamente. Nenhuma compensação é feita se o usuário do movimento for imune a uma dessas condições; há simplesmente uma chance menor de que o usuário do movimento seja afetado."}, "flame-body": {"pt": "Corpo de Chamas", "d": "Sempre que um movimento fizer contato com este Pokémon, o usuário do movimento tem 30% de chance de sofrer queimadura. Mundo Aberto: Se algum Pokémon na equipe tiver esta habilidade, cada ovo na equipe terá seu contador de eclosão diminuído em 2 (em vez de 1) a cada ciclo de passos, fazendo com que os ovos eclodam aproximadamente duas vezes mais rápido. Este efeito não se acumula se vários Pokémon tiverem esta habilidade ou Armadura de Magma."}, "flash-fire": {"pt": "Absorção de Fogo", "d": "Este Pokémon é imune a movimentos do tipo Fogo. Assim que este Pokémon for atingido por um movimento do tipo Fogo, seus próprios movimentos do tipo Fogo causarão 1,5× de dano até que ele deixe a batalha. Esta habilidade não tem efeito enquanto o Pokémon estiver congelado. O bônus de dano de Fogo é mantido mesmo que o Pokémon seja congelado e descongelado ou que a habilidade seja perdida ou desativada. Movimentos do tipo Fogo ignorarão o Substituto deste Pokémon. Esta habilidade entra em vigor mesmo em movimentos que não causam dano, ou seja, Fogo Fátuo."}, "guts": {"pt": "Audácia", "d": "Sempre que este Pokémon estiver dormindo, com queimadura, paralisado ou envenenado, ele tem 1,5× seu Ataque. Este Pokémon não é afetado pela redução habitual no Ataque causada por uma queimadura. Esse bônus não conta como um modificador de estatística."}, "hustle": {"pt": "Vigor", "d": "Os ataques físicos deste Pokémon causam 1,5× mais dano normal, mas têm 0,8× da precisão habitual. Os ataques especiais não são afetados. Movimentos que causam dano fixo, como Arremesso Sísmico, têm sua precisão afetada, mas não o dano. Mundo Aberto: Se o Pokémon inicial tiver essa habilidade, a taxa de encontro com Pokémon de níveis mais altos aumenta."}, "hyper-cutter": {"pt": "Hipertesoura", "d": "O Ataque deste Pokémon não pode ser reduzido por outros Pokémon. Essa habilidade não impede perdas de Ataque que não sejam decorrentes de modificadores de estatísticas, como a redução no Ataque causada por uma queimadura. Este Pokémon ainda pode receber modificadores negativos de Ataque por meio de Troca de Coração ou Troca de Força."}, "illuminate": {"pt": "Iluminar", "d": "Mundo Aberto: Se o Pokémon líder tiver esta habilidade, a taxa de encontros selvagens é duplicada. Esta habilidade não tem efeito em batalha."}, "immunity": {"pt": "Imunidade", "d": "Este Pokémon não pode ser envenenado. Isso inclui o envenenamento grave. Se um Pokémon estiver envenenado e adquirir esta habilidade, seu envenenamento é curado; isso inclui ao recuperar uma habilidade perdida ao sair da batalha."}, "inner-focus": {"pt": "Foco Interno", "d": "Este Pokémon não pode recuar."}, "insomnia": {"pt": "Insônia", "d": "Este Pokémon não pode adormecer. Isso faz com que Rest falhe completamente. Se um Pokémon estiver dormindo e adquirir esta habilidade, ele acordará imediatamente; isso inclui ao recuperar uma habilidade perdida ao sair da batalha. Esta habilidade funciona de forma idêntica a Vital Spirit em batalha."}, "intimidate": {"pt": "Intimidação", "d": "Quando este Pokémon entra na batalha, o Ataque do adversário é reduzido em um estágio. Em uma batalha dupla, ambos os adversários são afetados. Essa habilidade também entra em vigor quando adquirida durante uma batalha, mas não terá efeito novamente se for perdida e recuperada sem deixar a batalha. Essa habilidade não tem efeito sobre um adversário que possua um Substituto. Mundo Externo: Se o primeiro Pokémon do grupo tiver essa habilidade, qualquer encontro aleatório com um Pokémon cinco ou mais níveis abaixo dele tem 50% de chance de ser ignorado."}, "keen-eye": {"pt": "Olho Perspicaz", "d": "A precisão deste Pokémon não pode ser reduzida. Essa habilidade não impede perdas de precisão que não sejam decorrentes de modificadores de estatísticas, como a redução de precisão causada pela neblina; tampouco impede que a evasão de outros Pokémon torne os ataques deste Pokémon menos precisos. Este Pokémon ainda pode receber modificadores negativos de precisão por meio do Heart Swap. Mundo Aberto: Se o primeiro Pokémon do grupo tiver essa habilidade, qualquer encontro aleatório com um Pokémon cinco ou mais níveis abaixo dele tem 50% de chance de ser ignorado."}, "levitate": {"pt": "Levitar", "d": "Este Pokémon é imune a movimentos do tipo Ground, Spikes, Toxic Spikes e Arena Trap. Esta habilidade é desativada durante Gravity ou Ingrain, ou enquanto estiver segurando uma Iron Ball. Esta habilidade não é desativada durante Roost."}, "lightning-rod": {"pt": "Para-raios", "d": "Os movimentos do tipo Electric de alvo único de todos os outros Pokémon são redirecionados para este Pokémon, se ele for um alvo elegível. Os movimentos Electric de outros Pokémon aumentam o Special Attack deste Pokémon em um estágio, anulando qualquer outro efeito sobre ele, e não podem errar. Se o alvo pretendido do movimento também tiver esta habilidade, o movimento não será redirecionado. Quando múltiplos Pokémon com esta habilidade forem alvos possíveis para redirecionamento, o movimento será redirecionado para aquele com o maior Speed, ou, em caso de empate, para um Pokémon empatado aleatório. Follow Me tem precedência sobre esta habilidade. Se o Pokémon for do tipo Ground e, portanto, imune a movimentos Electric, sua imunidade impede o aumento do Special Attack."}, "limber": {"pt": "Ágil", "d": "Este Pokémon não pode ser paralisado. Se um Pokémon estiver paralisado e adquirir esta habilidade, sua paralisia será curada; isso inclui quando recuperar uma habilidade perdida ao sair da batalha."}, "magma-armor": {"pt": "Armadura de Magma", "d": "Este Pokémon não pode ser congelado. Se um Pokémon estiver congelado e adquirir esta habilidade, ele descongelará imediatamente; isso inclui quando recuperar uma habilidade perdida ao deixar a batalha. Mundo Aberto: Se algum Pokémon do grupo tiver esta habilidade, o contador de eclosão de cada ovo no grupo tem seu valor diminuído em 2 (em vez de 1) a cada ciclo de passos, fazendo com que os ovos eclodam cerca de duas vezes mais rápido. Este efeito não se acumula se múltiplos Pokémon tiverem esta habilidade ou Flame Body."}, "magnet-pull": {"pt": "Atração Magnética", "d": "Enquanto este Pokémon estiver em batalha, os Pokémon do tipo Steel oponentes não podem fugir nem ser substituídos. Pokémon com Run Away ainda podem fugir. Os Pokémon ainda podem ser substituídos com o uso de um movimento ou item. Mundo Aberto: Se o Pokémon líder tiver essa habilidade, os Pokémon do tipo Steel terão uma taxa de encontro maior."}, "mega-launcher": {"pt": "Mega Lançador", "d": "Fortalece a aura e aumenta o poder dos golpes de pulso em 1,5×."}, "mold-breaker": {"pt": "Quebra-moldes", "d": "Os golpes deste Pokémon ignoram completamente as habilidades que possam atrapalhar ou impedir o efeito delas no alvo. Por exemplo, os golpes deste Pokémon ignoram habilidades que as anulariam totalmente, como Water Absorb; habilidades que impediriam qualquer um de seus efeitos, como Clear Body, Shell Armor ou Sticky Hold; e habilidades que concedem qualquer benefício protetor geral, como Simple, Snow Cloak ou Thick Fat. Se uma habilidade puder atrapalhar ou ajudar os golpes deste Pokémon, por exemplo, Dry Skin ou Unaware, a habilidade é ignorada de qualquer maneira. Habilidades que não se enquadram nesta descrição, mesmo que possam atrapalhar golpes de alguma outra forma, não são afetadas. Por exemplo, Cursed Body afeta apenas usos futuros potenciais do golpe, enquanto Liquid Ooze e Shadow Tag só podem atrapalhar o efeito de um golpe no usuário. Esta habilidade não pode ignorar mudanças de tipo ou forma concedidas por habilidades, por exemplo, Color Change ou Forecast; nem efeitos causados por habilidades que não estão mais vinculados a uma habilidade, como a chuva de Drizzle. Esta habilidade não pode ignorar Multitype de forma alguma. Uma habilidade ignorada por esta habilidade só é anulada enquanto o golpe está sendo usado. Por exemplo, os golpes deste Pokémon podem paralisar um Pokémon com Limber, mas Limber será ativado e curará a paralisia imediatamente depois, e os Spikes deste Pokémon não são afetados por esta habilidade depois de terem sido colocados. Quando este Pokémon entra na batalha, todos os treinadores participantes são notificados de que ele possui esta habilidade. Esta habilidade funciona de forma idêntica a Teravolt e Turboblaze."}, "natural-cure": {"pt": "Cura Natural", "d": "Este Pokémon é curado de qualquer condição de status grave quando é substituído por outro Pokémon. Se esta habilidade for adquirida durante a batalha, o Pokémon é curado ao deixar a batalha antes de perder a habilidade temporária."}, "no-guard": {"pt": "Sem Guarda", "d": "Movimentos usados por ou contra este Pokémon nunca erram. Movimentos de KO em um único golpe não são afetados. Movimentos afetados por esta habilidade podem atingir Pokémon durante o turno de preparação de movimentos como Escavar (Dig) ou Voo (Fly). No Mundo Superior: Se o Pokémon na liderança da equipe tiver esta habilidade, a taxa de encontro com Pokémon selvagens é dobrada."}, "oblivious": {"pt": "Alheio", "d": "Este Pokémon não pode ficar infatuado e é imune a Cativar. Se um Pokémon estiver infatuado e adquirir esta habilidade, sua infatuação será removida."}, "overgrow": {"pt": "Supercrescimento", "d": "Quando esse Pokémon tem 1/3 ou menos de seus HP restantes, seus ataques do tipo Planta causam 1,5 vezes mais dano normal."}, "own-tempo": {"pt": "Ritmo Próprio", "d": "Este Pokémon não pode ficar confuso. Se um Pokémon estiver confuso e adquirir esta habilidade, sua confusão será curada imediatamente."}, "parental-bond": {"pt": "Vínculo Materno", "d": "Permite que quem a possuir acerte duas vezes com golpes que causam dano. O segundo golpe tem metade da potência."}, "pickup": {"pt": "recolher", "d": "No final de cada turno, se outro Pokémon tiver consumido ou lançado um item que estava em sua posse naquele turno, este Pokémon pega o item, caso ainda não esteja segurando nenhum. Após cada batalha, este Pokémon tem 10% de chance de pegar um item, caso ainda não esteja segurando nenhum. O Balão de Ar e o Botão de Ejetar não podem ser pegos. Os itens que podem ser encontrados variam de acordo com o jogo e, a partir de Pokémon Emerald, de acordo com o nível do Pokémon. Essa habilidade é verificada após o término da batalha, momento em que quaisquer alterações temporárias na habilidade já terão cessado."}, "poison-point": {"pt": "Ponto Venenoso", "d": "Sempre que um movimento fizer contato com este Pokémon, o usuário do movimento terá 30% de chance de ser envenenado."}, "pressure": {"pt": "Pressão", "d": "Movimentos direcionados a este Pokémon usam um PP extra. Esta habilidade se acumula se múltiplos alvos a tiverem. Esta habilidade ainda afeta movimentos que falham ou erram. Esta habilidade não afeta movimentos de aliados que tenham como alvo todo o campo ou apenas o seu lado, nem os movimentos de autoalvo deste Pokémon; no entanto, ela afeta movimentos de aliados de alvo único direcionados a este Pokémon, movimentos de aliados que tenham como alvo todos os outros Pokémon e movimentos de oponentes que tenham como alvo todo o campo. Se esta habilidade elevar o custo de PP de um movimento acima do seu PP restante, ele usará todo o PP restante. Quando este Pokémon entra em batalha, todos os treinadores participantes são notificados de que ele possui esta habilidade. Mundo Aberto: Se o Pokémon líder tiver esta habilidade, Pokémon de nível mais alto têm sua taxa de encontro aumentada."}, "rock-head": {"pt": "Cabeça de Pedra", "d": "Este Pokémon não sofre dano de recuo causado por seus golpes com efeito de recuo. O recuo do golpe Conflito não é afetado. Essa habilidade não impede que o dano de colisão ocorra quando os golpes Chute de Salto ou Chute de Salto Alto erram o alvo."}, "run-away": {"pt": "Fuga", "d": "Este Pokémon sempre consegue fugir com sucesso de batalhas selvagens, mesmo que esteja preso por um movimento ou habilidade."}, "sand-force": {"pt": "Força Arenosa", "d": "Durante uma tempestade de areia, os ataques dos tipos Rocha, Terra e Aço deste Pokémon têm 1,3 vezes a potência básica. Este Pokémon não sofre danos causados pela tempestade de areia, independentemente do tipo."}, "sand-stream": {"pt": "Tempestade de Areia", "d": "O clima muda para uma tempestade de areia quando este Pokémon entra em batalha e não termina, a menos que seja cancelado por outra condição climática. Se vários Pokémon com esta habilidade, Drizzle, Drought ou Snow Warning forem enviados ao mesmo tempo, as habilidades serão ativadas em ordem de Speed, respeitando o Trick Room. O clima de cada habilidade cancelará o clima anterior, e apenas o clima evocado pelo Pokémon mais lento permanecerá. Mundo Aberto: Se o Pokémon líder tiver esta habilidade, a taxa de encontro selvagem é reduzida pela metade em uma tempestade de areia."}, "sand-veil": {"pt": "Véu de Areia", "d": "Durante uma tempestade de areia, este Pokémon tem sua evasão multiplicada por 1,25 e não sofre dano de tempestade de areia, independentemente do tipo. O bônus de evasão não conta como um modificador de estatística. Mundo Externo: Se o Pokémon líder tiver esta habilidade, a taxa de encontros selvagens é reduzida pela metade em uma tempestade de areia."}, "serene-grace": {"pt": "Graça Serena", "d": "Os movimentos deste Pokémon têm o dobro de sua chance de efeito habitual. A chance de efeito é a chance de um movimento infligir uma condição de status, causar alteração de atributo ou fazer o alvo recuar, além do efeito principal do movimento. Por exemplo, a chance de Flamethrower queimar o alvo é duplicada, mas a chance de sucesso de Protect e a taxa aumentada de acerto crítico de Air Cutter não são afetadas. Secret Power não é afetado."}, "shadow-tag": {"pt": "Sombra Presa", "d": "Enquanto este Pokémon estiver em batalha, os Pokémon adversários não podem fugir nem ser substituídos. Outros Pokémon com esta habilidade não são afetados. Pokémon com Fugir ainda podem fugir. Os Pokémon ainda podem ser substituídos com o uso de um movimento ou item."}, "shed-skin": {"pt": "Troca de Pele", "d": "Após cada turno, esse Pokémon tem 33% de chance de se livrar de qualquer condição grave."}, "shell-armor": {"pt": "Armadura de Concha", "d": "Os movimentos não podem desferir acertos críticos contra este Pokémon. Esta habilidade funciona exatamente como Armadura de Batalha."}, "shield-dust": {"pt": "Poeira Protetora", "d": "Este Pokémon é imune aos efeitos adicionais dos movimentos usados contra ele. Um efeito adicional é a chance de um movimento, listada como \"chance de efeito\", de infligir uma condição de status, causar alteração de estatística ou fazer o alvo recuar, além do efeito principal do movimento. Por exemplo, a paralisia de Thunder Shock é um efeito adicional, mas a de Thunder Wave não é, assim como a remoção de item de Knock Off e o aumento da taxa de acerto crítico de Air Cutter."}, "skill-link": {"pt": "Encadeamento", "d": "Este Pokémon sempre acerta cinco vezes com movimentos de duas a cinco ocorrências, como Estalactite. Ele também ignora a checagem de precisão no segundo e terceiro acertos de Chute Triplo."}, "solar-power": {"pt": "Energia Solar", "d": "Sob forte luz solar, este Pokémon tem seu Ataque Especial multiplicado por 1,5, mas sofre danos equivalentes a 1/8 de seu HP máximo a cada turno."}, "soundproof": {"pt": "À Prova de Som", "d": "Este Pokémon é imune a movimentos classificados como baseados em som. Heal Bell não é afetado. Uproar ainda impede que este Pokémon adormeça. Este Pokémon ainda pode receber um contador de Perish Song por meio de Baton Pass, e reterá um contador de Perish Song se adquirir esta habilidade após Perish Song ser usado. Howl, Roar of Time, Sonic Boom e Yawn não são classificados como baseados em som."}, "speed-boost": {"pt": "Impulso de Velocidade", "d": "A Velocidade deste Pokémon aumenta em um estágio após cada turno."}, "static": {"pt": "Estático", "d": "Sempre que um movimento fizer contato com este Pokémon, o usuário do movimento tem 30% de chance de ficar paralisado. Pokémon que são imunes a movimentos do tipo Elétrico ainda podem ser paralisados por esta habilidade. Mundo Externo: Se o Pokémon líder tiver esta habilidade, há 50% de chance de que os encontros sejam com um Pokémon do tipo Elétrico, se aplicável."}, "steadfast": {"pt": "Inabalável", "d": "Sempre que esse Pokémon recuar, sua Velocidade aumenta um nível."}, "stench": {"pt": "Fedor", "d": "Os movimentos de dano deste Pokémon têm 10% de chance de fazer o alvo recuar a cada acerto, caso já não causem recuo como efeito secundário. Essa habilidade não se acumula com um item equipado. Mundo Externo: A taxa de encontros selvagens é reduzida pela metade enquanto este Pokémon estiver na liderança da equipe."}, "sturdy": {"pt": "Resistente", "d": "Quando este Pokémon está com o HP máximo, qualquer golpe que o nocautearia o deixará com 1 de HP em vez disso. Independentemente de seu HP atual, ele também é imune aos movimentos de nocaute em um único golpe: Fissure, Guillotine, Horn Drill e Sheer Cold. Se este Pokémon estiver segurando uma Faixa de Foco, esta habilidade tem prioridade e o item não será consumido."}, "suction-cups": {"pt": "Ventosas", "d": "Este Pokémon não pode ser forçado a sair da batalha por movimentos como Redemoinho. Cauda de Dragão e Arremesso Circular ainda causam dano a este Pokémon. Mundo Externo: Se o Pokémon líder tiver essa habilidade, a taxa de sucesso ao pescar aumenta."}, "swarm": {"pt": "Enxame", "d": "Quando este Pokémon tem 1/3 ou menos de seus HP restantes, seus ataques do tipo Inseto causam 1,5 vezes mais dano normal. Mundo Aberto: Se o Pokémon inicial tiver essa habilidade, a taxa de encontro com Pokémon selvagens aumenta."}, "swift-swim": {"pt": "Natação Rápida", "d": "A Speed deste Pokémon é duplicada durante a chuva. Este bônus não conta como um modificador de atributo."}, "synchronize": {"pt": "Sincronizar", "d": "Sempre que este Pokémon sofre queimadura, paralisia ou envenenamento, o Pokémon que causou essa condição a ele também a recebe. Esta habilidade transfere envenenamento grave quando este Pokémon está gravemente envenenado. Esta habilidade não pode passar uma condição de status que o Pokémon não tenha recebido diretamente de outro Pokémon, como o veneno de Toxic Spikes ou a queimadura de um Flame Orb. Mundo Aberto: Se o Pokémon líder tiver esta habilidade, os Pokémon selvagens têm 50% de chance de ter a natureza do Pokémon líder e 50% de chance de receber uma natureza aleatória como de costume, incluindo a natureza do Pokémon líder. Isso não funciona em Pokémon recebidos fora de batalha ou lendários errantes."}, "technician": {"pt": "Técnico", "d": "Os golpes deste Pokémon têm 1,5× do seu poder se o poder base for 60 ou menos. Isso inclui golpes de poder variável, como Hidden Power e Magnitude, quando o poder deles é 60 ou menos. O aumento de potência do Helping Hand é levado em conta para qualquer movimento, assim como o aumento de potência do Defense Curl para o Rollout."}, "thick-fat": {"pt": "Gordura Espessa", "d": "Este Pokémon recebe metade do dano de movimentos dos tipos Fire e Ice."}, "torrent": {"pt": "Torrente", "d": "Quando esse Pokémon tem 1/3 ou menos de seus HP restantes, seus ataques do tipo Água causam 1,5 vezes mais dano normal."}, "tough-claws": {"pt": "Garras Ríspidas", "d": "Aumenta o poder dos golpes que acertam o alvo para 1,33 vezes o seu valor original."}, "trace": {"pt": "Rastrear", "d": "Quando este Pokémon entra em batalha, ele copia a habilidade de um oponente aleatório. Esta habilidade não pode copiar Flower Gift, Forecast, Illusion, Imposter, Multitype, Trace, Wonder Guard ou Zen Mode."}, "vital-spirit": {"pt": "Espírito Vital", "d": "Este Pokémon não pode estar dormindo. Isso faz com que o comando “Descanso” falhe completamente. Se um Pokémon estiver dormindo e adquirir essa habilidade, ele acordará imediatamente; isso inclui quando recuperar uma habilidade perdida ao sair da batalha. Essa habilidade funciona exatamente como a Insônia durante a batalha. Mundo Aberto: Se o Pokémon inicial tiver essa habilidade, a taxa de encontro com Pokémon de nível mais alto aumenta."}, "volt-absorb": {"pt": "Absorção de Volts", "d": "Sempre que um movimento do tipo Elétrico atinge este Pokémon, ele se cura em 1/4 do seu HP máximo, anulando qualquer outro efeito nele. Esta habilidade não terá efeito se este Pokémon for do tipo Terra e, portanto, imune a movimentos do tipo Elétrico. Movimentos do tipo Elétrico ignorarão o Substituto deste Pokémon. Este efeito inclui movimentos que não causam dano, ou seja, Onda de Choque."}, "water-absorb": {"pt": "Absorção de Água", "d": "Sempre que um movimento do tipo Água atinge este Pokémon, ele se cura em 1/4 do seu HP máximo, anulando qualquer outro efeito nele. Movimentos do tipo Água ignorarão o Substituto deste Pokémon."}, "leaf-guard": {"pt": "Guarda de Folhas", "d": "Este Pokémon não pode sofrer uma condição de status grave sob luz solar intensa. Essa habilidade não cura condições de status pré-existentes. O movimento Rest falhará completamente enquanto essa habilidade estiver em vigor. O movimento Yawn falhará imediatamente se for usado neste Pokémon sob luz solar intensa, e um Yawn já utilizado falhará se o clima mudar para luz solar intensa nesse meio tempo."}, "snow-cloak": {"pt": "Manto de Neve", "d": "Durante uma tempestade de granizo, este Pokémon tem sua evasão multiplicada por 1,25 e não sofre dano causado pelo granizo, independentemente do tipo. O bônus de evasão não conta como um modificador de estatística. Mundo aberto: se o Pokémon inicial tiver essa habilidade, a taxa de encontro com Pokémon selvagens é reduzida pela metade na neve."}, "protean": {"pt": "Mudança de Cor Total (Protean)", "d": "Muda o tipo do Pokémon para o do golpe que vai usar: todos os golpes de dano recebem bônus de mesmo tipo (STAB)."}}
+{
+"adaptability": {
+"pt": "Adaptabilidade",
+"d": "Este Pokémon causa o dobro de dano com movimentos cujos tipos coincidem com o seu, em vez do bônus habitual de 1,5× para ataques do mesmo tipo."
+},
+"aerilate": {
+"pt": "Aerilato",
+"d": "Transforma os ataques do tipo Normal do Pokémon portador em ataques do tipo Voador. Os ataques alterados por essa habilidade têm 1,3 vezes mais poder."
+},
+"air-lock": {
+"pt": "Câmara de Ar",
+"d": "Enquanto este Pokémon estiver em batalha, as condições climáticas ainda podem estar ativas, mas não terão nenhum de seus efeitos. Esta habilidade funciona exatamente como Aluvião."
+},
+"blaze": {
+"pt": "Chama",
+"d": "Quando este Pokémon tem 1/3 ou menos de seus HP restantes, seus ataques do tipo Fogo causam 1,5 vezes mais dano normal."
+},
+"chlorophyll": {
+"pt": "Clorofila",
+"d": "A Speed deste Pokémon é duplicada sob luz solar intensa. Este bônus não conta como um modificador de atributo."
+},
+"clear-body": {
+"pt": "Corpo Limpo",
+"d": "Este Pokémon não pode ter seus atributos reduzidos por outros Pokémon. Esta habilidade não evita perdas de atributos que não sejam modificadores de atributos, como a redução de Speed causada pela paralisia. Este Pokémon ainda pode receber modificadores de atributos negativos por meio de Guard Swap, Heart Swap ou Power Swap. Esta habilidade funciona de forma idêntica a White Smoke em batalha."
+},
+"compound-eyes": {
+"pt": "Olhos Compostos",
+"d": "Os movimentos deste Pokémon têm 1,3× de sua precisão. Esta habilidade não tem efeito sobre os movimentos de nocaute em um único golpe (Fissure, Guillotine, Horn Drill e Sheer Cold). Mundo Externo: Se o primeiro Pokémon na equipe tiver esta habilidade, a chance de um Pokémon selvagem estar segurando um item específico aumenta de 50%, 5% ou 1% para 60%, 20% ou 5%, respectivamente."
+},
+"cursed-body": {
+"pt": "Corpo Amaldiçoado",
+"d": "Os golpes que acertam este Pokémon têm 30% de chance de ficarem desativados depois disso."
+},
+"cute-charm": {
+"pt": "Charme Fofo",
+"d": "Sempre que um ataque atingir este Pokémon, o usuário do ataque tem 30% de chance de ficar apaixonado. Mundo Aberto: Se o primeiro Pokémon do grupo tiver essa habilidade, qualquer Pokémon selvagem cuja espécie possa ser de qualquer gênero tem 2/3 de chance de ter seu gênero definido como o oposto e 1/3 de chance de ter um gênero aleatório, como de costume."
+},
+"damp": {
+"pt": "Umidade",
+"d": "Enquanto este Pokémon estiver em batalha, Autodestruição e Explosão falharão e Rescaldo não terá efeito."
+},
+"delta-stream": {
+"pt": "Corrente Delta",
+"d": "Quando este Pokémon entra na batalha ou adquire essa habilidade, o clima se transforma em uma corrente de ar misteriosa. Uma corrente de ar misteriosa faz com que os golpes não sejam supereficazes contra o tipo Voador; em vez disso, causam dano neutro. Os golpes “Antecipação” e “Rocha Furtiva” não são afetados. A corrente de ar misteriosa termina quando este Pokémon sai da batalha ou perde essa habilidade, ou quando essa habilidade é anulada. O clima não pode ser alterado de outra forma, exceto pelos efeitos de “Terra Desolada” e “Mar Primordial”. “Bloqueio Aéreo” e “Nuvem Nove” impedem o efeito da corrente de ar misteriosa, mas não permitem que o clima seja alterado."
+},
+"drizzle": {
+"pt": "Garoa",
+"d": "O clima muda para chuva quando este Pokémon entra em batalha e não termina a menos que seja substituído por outra condição climática. Se vários Pokémon com esta habilidade, Drought, Sand Stream ou Snow Warning forem enviados a campo ao mesmo tempo, as habilidades serão ativadas em ordem de Velocidade, respeitando a Sala de Truques. O clima de cada habilidade cancelará o clima anterior, e apenas o clima invocado pelo Pokémon mais lento permanecerá."
+},
+"drought": {
+"pt": "Seca",
+"d": "O clima muda para sol forte quando este Pokémon entra na batalha e não termina a menos que seja cancelado por outra condição climática. Se vários Pokémon com essa habilidade, Garoa, Tempestade de Areia ou Nevasca forem enviados ao mesmo tempo, as habilidades serão ativadas na ordem de Velocidade, respeitando a Sala Dimensional. O clima de cada habilidade cancelará o clima anterior, e apenas o clima invocado pelo Pokémon mais lento permanecerá."
+},
+"early-bird": {
+"pt": "Madrugador",
+"d": "A contagem de turnos de sono restantes deste Pokémon diminui em 2 em vez de 1. Se o contador de sono deste Pokémon estiver em 1, ele cairá para 0 e então o Pokémon acordará."
+},
+"effect-spore": {
+"pt": "Esporo de Efeito",
+"d": "Sempre que um movimento faz contato com este Pokémon, o usuário do movimento tem 30% de chance de ficar paralisado, envenenado ou adormecido, escolhido aleatoriamente. Nenhuma compensação é feita se o usuário do movimento for imune a uma dessas condições; há simplesmente uma chance menor de que o usuário do movimento seja afetado."
+},
+"flame-body": {
+"pt": "Corpo de Chamas",
+"d": "Sempre que um movimento fizer contato com este Pokémon, o usuário do movimento tem 30% de chance de sofrer queimadura. Mundo Aberto: Se algum Pokémon na equipe tiver esta habilidade, cada ovo na equipe terá seu contador de eclosão diminuído em 2 (em vez de 1) a cada ciclo de passos, fazendo com que os ovos eclodam aproximadamente duas vezes mais rápido. Este efeito não se acumula se vários Pokémon tiverem esta habilidade ou Armadura de Magma."
+},
+"flash-fire": {
+"pt": "Absorção de Fogo",
+"d": "Este Pokémon é imune a movimentos do tipo Fogo. Assim que este Pokémon for atingido por um movimento do tipo Fogo, seus próprios movimentos do tipo Fogo causarão 1,5× de dano até que ele deixe a batalha. Esta habilidade não tem efeito enquanto o Pokémon estiver congelado. O bônus de dano de Fogo é mantido mesmo que o Pokémon seja congelado e descongelado ou que a habilidade seja perdida ou desativada. Movimentos do tipo Fogo ignorarão o Substituto deste Pokémon. Esta habilidade entra em vigor mesmo em movimentos que não causam dano, ou seja, Fogo Fátuo."
+},
+"guts": {
+"pt": "Audácia",
+"d": "Sempre que este Pokémon estiver dormindo, com queimadura, paralisado ou envenenado, ele tem 1,5× seu Ataque. Este Pokémon não é afetado pela redução habitual no Ataque causada por uma queimadura. Esse bônus não conta como um modificador de estatística."
+},
+"hustle": {
+"pt": "Vigor",
+"d": "Os ataques físicos deste Pokémon causam 1,5× mais dano normal, mas têm 0,8× da precisão habitual. Os ataques especiais não são afetados. Movimentos que causam dano fixo, como Arremesso Sísmico, têm sua precisão afetada, mas não o dano. Mundo Aberto: Se o Pokémon inicial tiver essa habilidade, a taxa de encontro com Pokémon de níveis mais altos aumenta."
+},
+"hyper-cutter": {
+"pt": "Hipertesoura",
+"d": "O Ataque deste Pokémon não pode ser reduzido por outros Pokémon. Essa habilidade não impede perdas de Ataque que não sejam decorrentes de modificadores de estatísticas, como a redução no Ataque causada por uma queimadura. Este Pokémon ainda pode receber modificadores negativos de Ataque por meio de Troca de Coração ou Troca de Força."
+},
+"illuminate": {
+"pt": "Iluminar",
+"d": "Mundo Aberto: Se o Pokémon líder tiver esta habilidade, a taxa de encontros selvagens é duplicada. Esta habilidade não tem efeito em batalha."
+},
+"immunity": {
+"pt": "Imunidade",
+"d": "Este Pokémon não pode ser envenenado. Isso inclui o envenenamento grave. Se um Pokémon estiver envenenado e adquirir esta habilidade, seu envenenamento é curado; isso inclui ao recuperar uma habilidade perdida ao sair da batalha."
+},
+"inner-focus": {
+"pt": "Foco Interno",
+"d": "Este Pokémon não pode recuar."
+},
+"insomnia": {
+"pt": "Insônia",
+"d": "Este Pokémon não pode adormecer. Isso faz com que Rest falhe completamente. Se um Pokémon estiver dormindo e adquirir esta habilidade, ele acordará imediatamente; isso inclui ao recuperar uma habilidade perdida ao sair da batalha. Esta habilidade funciona de forma idêntica a Vital Spirit em batalha."
+},
+"intimidate": {
+"pt": "Intimidação",
+"d": "Quando este Pokémon entra na batalha, o Ataque do adversário é reduzido em um estágio. Em uma batalha dupla, ambos os adversários são afetados. Essa habilidade também entra em vigor quando adquirida durante uma batalha, mas não terá efeito novamente se for perdida e recuperada sem deixar a batalha. Essa habilidade não tem efeito sobre um adversário que possua um Substituto. Mundo Externo: Se o primeiro Pokémon do grupo tiver essa habilidade, qualquer encontro aleatório com um Pokémon cinco ou mais níveis abaixo dele tem 50% de chance de ser ignorado."
+},
+"keen-eye": {
+"pt": "Olho Perspicaz",
+"d": "A precisão deste Pokémon não pode ser reduzida. Essa habilidade não impede perdas de precisão que não sejam decorrentes de modificadores de estatísticas, como a redução de precisão causada pela neblina; tampouco impede que a evasão de outros Pokémon torne os ataques deste Pokémon menos precisos. Este Pokémon ainda pode receber modificadores negativos de precisão por meio do Heart Swap. Mundo Aberto: Se o primeiro Pokémon do grupo tiver essa habilidade, qualquer encontro aleatório com um Pokémon cinco ou mais níveis abaixo dele tem 50% de chance de ser ignorado."
+},
+"levitate": {
+"pt": "Levitar",
+"d": "Este Pokémon é imune a movimentos do tipo Ground, Spikes, Toxic Spikes e Arena Trap. Esta habilidade é desativada durante Gravity ou Ingrain, ou enquanto estiver segurando uma Iron Ball. Esta habilidade não é desativada durante Roost."
+},
+"lightning-rod": {
+"pt": "Para-raios",
+"d": "Os movimentos do tipo Electric de alvo único de todos os outros Pokémon são redirecionados para este Pokémon, se ele for um alvo elegível. Os movimentos Electric de outros Pokémon aumentam o Special Attack deste Pokémon em um estágio, anulando qualquer outro efeito sobre ele, e não podem errar. Se o alvo pretendido do movimento também tiver esta habilidade, o movimento não será redirecionado. Quando múltiplos Pokémon com esta habilidade forem alvos possíveis para redirecionamento, o movimento será redirecionado para aquele com o maior Speed, ou, em caso de empate, para um Pokémon empatado aleatório. Follow Me tem precedência sobre esta habilidade. Se o Pokémon for do tipo Ground e, portanto, imune a movimentos Electric, sua imunidade impede o aumento do Special Attack."
+},
+"limber": {
+"pt": "Ágil",
+"d": "Este Pokémon não pode ser paralisado. Se um Pokémon estiver paralisado e adquirir esta habilidade, sua paralisia será curada; isso inclui quando recuperar uma habilidade perdida ao sair da batalha."
+},
+"magma-armor": {
+"pt": "Armadura de Magma",
+"d": "Este Pokémon não pode ser congelado. Se um Pokémon estiver congelado e adquirir esta habilidade, ele descongelará imediatamente; isso inclui quando recuperar uma habilidade perdida ao deixar a batalha. Mundo Aberto: Se algum Pokémon do grupo tiver esta habilidade, o contador de eclosão de cada ovo no grupo tem seu valor diminuído em 2 (em vez de 1) a cada ciclo de passos, fazendo com que os ovos eclodam cerca de duas vezes mais rápido. Este efeito não se acumula se múltiplos Pokémon tiverem esta habilidade ou Flame Body."
+},
+"magnet-pull": {
+"pt": "Atração Magnética",
+"d": "Enquanto este Pokémon estiver em batalha, os Pokémon do tipo Steel oponentes não podem fugir nem ser substituídos. Pokémon com Run Away ainda podem fugir. Os Pokémon ainda podem ser substituídos com o uso de um movimento ou item. Mundo Aberto: Se o Pokémon líder tiver essa habilidade, os Pokémon do tipo Steel terão uma taxa de encontro maior."
+},
+"mega-launcher": {
+"pt": "Mega Lançador",
+"d": "Fortalece a aura e aumenta o poder dos golpes de pulso em 1,5×."
+},
+"mold-breaker": {
+"pt": "Quebra-moldes",
+"d": "Os golpes deste Pokémon ignoram completamente as habilidades que possam atrapalhar ou impedir o efeito delas no alvo. Por exemplo, os golpes deste Pokémon ignoram habilidades que as anulariam totalmente, como Water Absorb; habilidades que impediriam qualquer um de seus efeitos, como Clear Body, Shell Armor ou Sticky Hold; e habilidades que concedem qualquer benefício protetor geral, como Simple, Snow Cloak ou Thick Fat. Se uma habilidade puder atrapalhar ou ajudar os golpes deste Pokémon, por exemplo, Dry Skin ou Unaware, a habilidade é ignorada de qualquer maneira. Habilidades que não se enquadram nesta descrição, mesmo que possam atrapalhar golpes de alguma outra forma, não são afetadas. Por exemplo, Cursed Body afeta apenas usos futuros potenciais do golpe, enquanto Liquid Ooze e Shadow Tag só podem atrapalhar o efeito de um golpe no usuário. Esta habilidade não pode ignorar mudanças de tipo ou forma concedidas por habilidades, por exemplo, Color Change ou Forecast; nem efeitos causados por habilidades que não estão mais vinculados a uma habilidade, como a chuva de Drizzle. Esta habilidade não pode ignorar Multitype de forma alguma. Uma habilidade ignorada por esta habilidade só é anulada enquanto o golpe está sendo usado. Por exemplo, os golpes deste Pokémon podem paralisar um Pokémon com Limber, mas Limber será ativado e curará a paralisia imediatamente depois, e os Spikes deste Pokémon não são afetados por esta habilidade depois de terem sido colocados. Quando este Pokémon entra na batalha, todos os treinadores participantes são notificados de que ele possui esta habilidade. Esta habilidade funciona de forma idêntica a Teravolt e Turboblaze."
+},
+"natural-cure": {
+"pt": "Cura Natural",
+"d": "Este Pokémon é curado de qualquer condição de status grave quando é substituído por outro Pokémon. Se esta habilidade for adquirida durante a batalha, o Pokémon é curado ao deixar a batalha antes de perder a habilidade temporária."
+},
+"no-guard": {
+"pt": "Sem Guarda",
+"d": "Movimentos usados por ou contra este Pokémon nunca erram. Movimentos de KO em um único golpe não são afetados. Movimentos afetados por esta habilidade podem atingir Pokémon durante o turno de preparação de movimentos como Escavar (Dig) ou Voo (Fly). No Mundo Superior: Se o Pokémon na liderança da equipe tiver esta habilidade, a taxa de encontro com Pokémon selvagens é dobrada."
+},
+"oblivious": {
+"pt": "Alheio",
+"d": "Este Pokémon não pode ficar infatuado e é imune a Cativar. Se um Pokémon estiver infatuado e adquirir esta habilidade, sua infatuação será removida."
+},
+"overgrow": {
+"pt": "Supercrescimento",
+"d": "Quando esse Pokémon tem 1/3 ou menos de seus HP restantes, seus ataques do tipo Planta causam 1,5 vezes mais dano normal."
+},
+"own-tempo": {
+"pt": "Ritmo Próprio",
+"d": "Este Pokémon não pode ficar confuso. Se um Pokémon estiver confuso e adquirir esta habilidade, sua confusão será curada imediatamente."
+},
+"parental-bond": {
+"pt": "Vínculo Materno",
+"d": "Permite que quem a possuir acerte duas vezes com golpes que causam dano. O segundo golpe tem metade da potência."
+},
+"pickup": {
+"pt": "recolher",
+"d": "No final de cada turno, se outro Pokémon tiver consumido ou lançado um item que estava em sua posse naquele turno, este Pokémon pega o item, caso ainda não esteja segurando nenhum. Após cada batalha, este Pokémon tem 10% de chance de pegar um item, caso ainda não esteja segurando nenhum. O Balão de Ar e o Botão de Ejetar não podem ser pegos. Os itens que podem ser encontrados variam de acordo com o jogo e, a partir de Pokémon Emerald, de acordo com o nível do Pokémon. Essa habilidade é verificada após o término da batalha, momento em que quaisquer alterações temporárias na habilidade já terão cessado."
+},
+"poison-point": {
+"pt": "Ponto Venenoso",
+"d": "Sempre que um movimento fizer contato com este Pokémon, o usuário do movimento terá 30% de chance de ser envenenado."
+},
+"pressure": {
+"pt": "Pressão",
+"d": "Movimentos direcionados a este Pokémon usam um PP extra. Esta habilidade se acumula se múltiplos alvos a tiverem. Esta habilidade ainda afeta movimentos que falham ou erram. Esta habilidade não afeta movimentos de aliados que tenham como alvo todo o campo ou apenas o seu lado, nem os movimentos de autoalvo deste Pokémon; no entanto, ela afeta movimentos de aliados de alvo único direcionados a este Pokémon, movimentos de aliados que tenham como alvo todos os outros Pokémon e movimentos de oponentes que tenham como alvo todo o campo. Se esta habilidade elevar o custo de PP de um movimento acima do seu PP restante, ele usará todo o PP restante. Quando este Pokémon entra em batalha, todos os treinadores participantes são notificados de que ele possui esta habilidade. Mundo Aberto: Se o Pokémon líder tiver esta habilidade, Pokémon de nível mais alto têm sua taxa de encontro aumentada."
+},
+"rock-head": {
+"pt": "Cabeça de Pedra",
+"d": "Este Pokémon não sofre dano de recuo causado por seus golpes com efeito de recuo. O recuo do golpe Conflito não é afetado. Essa habilidade não impede que o dano de colisão ocorra quando os golpes Chute de Salto ou Chute de Salto Alto erram o alvo."
+},
+"run-away": {
+"pt": "Fuga",
+"d": "Este Pokémon sempre consegue fugir com sucesso de batalhas selvagens, mesmo que esteja preso por um movimento ou habilidade."
+},
+"sand-force": {
+"pt": "Força Arenosa",
+"d": "Durante uma tempestade de areia, os ataques dos tipos Rocha, Terra e Aço deste Pokémon têm 1,3 vezes a potência básica. Este Pokémon não sofre danos causados pela tempestade de areia, independentemente do tipo."
+},
+"sand-stream": {
+"pt": "Tempestade de Areia",
+"d": "O clima muda para uma tempestade de areia quando este Pokémon entra em batalha e não termina, a menos que seja cancelado por outra condição climática. Se vários Pokémon com esta habilidade, Drizzle, Drought ou Snow Warning forem enviados ao mesmo tempo, as habilidades serão ativadas em ordem de Speed, respeitando o Trick Room. O clima de cada habilidade cancelará o clima anterior, e apenas o clima evocado pelo Pokémon mais lento permanecerá. Mundo Aberto: Se o Pokémon líder tiver esta habilidade, a taxa de encontro selvagem é reduzida pela metade em uma tempestade de areia."
+},
+"sand-veil": {
+"pt": "Véu de Areia",
+"d": "Durante uma tempestade de areia, este Pokémon tem sua evasão multiplicada por 1,25 e não sofre dano de tempestade de areia, independentemente do tipo. O bônus de evasão não conta como um modificador de estatística. Mundo Externo: Se o Pokémon líder tiver esta habilidade, a taxa de encontros selvagens é reduzida pela metade em uma tempestade de areia."
+},
+"serene-grace": {
+"pt": "Graça Serena",
+"d": "Os movimentos deste Pokémon têm o dobro de sua chance de efeito habitual. A chance de efeito é a chance de um movimento infligir uma condição de status, causar alteração de atributo ou fazer o alvo recuar, além do efeito principal do movimento. Por exemplo, a chance de Flamethrower queimar o alvo é duplicada, mas a chance de sucesso de Protect e a taxa aumentada de acerto crítico de Air Cutter não são afetadas. Secret Power não é afetado."
+},
+"shadow-tag": {
+"pt": "Sombra Presa",
+"d": "Enquanto este Pokémon estiver em batalha, os Pokémon adversários não podem fugir nem ser substituídos. Outros Pokémon com esta habilidade não são afetados. Pokémon com Fugir ainda podem fugir. Os Pokémon ainda podem ser substituídos com o uso de um movimento ou item."
+},
+"shed-skin": {
+"pt": "Troca de Pele",
+"d": "Após cada turno, esse Pokémon tem 33% de chance de se livrar de qualquer condição grave."
+},
+"shell-armor": {
+"pt": "Armadura de Concha",
+"d": "Os movimentos não podem desferir acertos críticos contra este Pokémon. Esta habilidade funciona exatamente como Armadura de Batalha."
+},
+"shield-dust": {
+"pt": "Poeira Protetora",
+"d": "Este Pokémon é imune aos efeitos adicionais dos movimentos usados contra ele. Um efeito adicional é a chance de um movimento, listada como \"chance de efeito\", de infligir uma condição de status, causar alteração de estatística ou fazer o alvo recuar, além do efeito principal do movimento. Por exemplo, a paralisia de Thunder Shock é um efeito adicional, mas a de Thunder Wave não é, assim como a remoção de item de Knock Off e o aumento da taxa de acerto crítico de Air Cutter."
+},
+"skill-link": {
+"pt": "Encadeamento",
+"d": "Este Pokémon sempre acerta cinco vezes com movimentos de duas a cinco ocorrências, como Estalactite. Ele também ignora a checagem de precisão no segundo e terceiro acertos de Chute Triplo."
+},
+"solar-power": {
+"pt": "Energia Solar",
+"d": "Sob forte luz solar, este Pokémon tem seu Ataque Especial multiplicado por 1,5, mas sofre danos equivalentes a 1/8 de seu HP máximo a cada turno."
+},
+"soundproof": {
+"pt": "À Prova de Som",
+"d": "Este Pokémon é imune a movimentos classificados como baseados em som. Heal Bell não é afetado. Uproar ainda impede que este Pokémon adormeça. Este Pokémon ainda pode receber um contador de Perish Song por meio de Baton Pass, e reterá um contador de Perish Song se adquirir esta habilidade após Perish Song ser usado. Howl, Roar of Time, Sonic Boom e Yawn não são classificados como baseados em som."
+},
+"speed-boost": {
+"pt": "Impulso de Velocidade",
+"d": "A Velocidade deste Pokémon aumenta em um estágio após cada turno."
+},
+"static": {
+"pt": "Estático",
+"d": "Sempre que um movimento fizer contato com este Pokémon, o usuário do movimento tem 30% de chance de ficar paralisado. Pokémon que são imunes a movimentos do tipo Elétrico ainda podem ser paralisados por esta habilidade. Mundo Externo: Se o Pokémon líder tiver esta habilidade, há 50% de chance de que os encontros sejam com um Pokémon do tipo Elétrico, se aplicável."
+},
+"steadfast": {
+"pt": "Inabalável",
+"d": "Sempre que esse Pokémon recuar, sua Velocidade aumenta um nível."
+},
+"stench": {
+"pt": "Fedor",
+"d": "Os movimentos de dano deste Pokémon têm 10% de chance de fazer o alvo recuar a cada acerto, caso já não causem recuo como efeito secundário. Essa habilidade não se acumula com um item equipado. Mundo Externo: A taxa de encontros selvagens é reduzida pela metade enquanto este Pokémon estiver na liderança da equipe."
+},
+"sturdy": {
+"pt": "Resistente",
+"d": "Quando este Pokémon está com o HP máximo, qualquer golpe que o nocautearia o deixará com 1 de HP em vez disso. Independentemente de seu HP atual, ele também é imune aos movimentos de nocaute em um único golpe: Fissure, Guillotine, Horn Drill e Sheer Cold. Se este Pokémon estiver segurando uma Faixa de Foco, esta habilidade tem prioridade e o item não será consumido."
+},
+"suction-cups": {
+"pt": "Ventosas",
+"d": "Este Pokémon não pode ser forçado a sair da batalha por movimentos como Redemoinho. Cauda de Dragão e Arremesso Circular ainda causam dano a este Pokémon. Mundo Externo: Se o Pokémon líder tiver essa habilidade, a taxa de sucesso ao pescar aumenta."
+},
+"swarm": {
+"pt": "Enxame",
+"d": "Quando este Pokémon tem 1/3 ou menos de seus HP restantes, seus ataques do tipo Inseto causam 1,5 vezes mais dano normal. Mundo Aberto: Se o Pokémon inicial tiver essa habilidade, a taxa de encontro com Pokémon selvagens aumenta."
+},
+"swift-swim": {
+"pt": "Natação Rápida",
+"d": "A Speed deste Pokémon é duplicada durante a chuva. Este bônus não conta como um modificador de atributo."
+},
+"synchronize": {
+"pt": "Sincronizar",
+"d": "Sempre que este Pokémon sofre queimadura, paralisia ou envenenamento, o Pokémon que causou essa condição a ele também a recebe. Esta habilidade transfere envenenamento grave quando este Pokémon está gravemente envenenado. Esta habilidade não pode passar uma condição de status que o Pokémon não tenha recebido diretamente de outro Pokémon, como o veneno de Toxic Spikes ou a queimadura de um Flame Orb. Mundo Aberto: Se o Pokémon líder tiver esta habilidade, os Pokémon selvagens têm 50% de chance de ter a natureza do Pokémon líder e 50% de chance de receber uma natureza aleatória como de costume, incluindo a natureza do Pokémon líder. Isso não funciona em Pokémon recebidos fora de batalha ou lendários errantes."
+},
+"technician": {
+"pt": "Técnico",
+"d": "Os golpes deste Pokémon têm 1,5× do seu poder se o poder base for 60 ou menos. Isso inclui golpes de poder variável, como Hidden Power e Magnitude, quando o poder deles é 60 ou menos. O aumento de potência do Helping Hand é levado em conta para qualquer movimento, assim como o aumento de potência do Defense Curl para o Rollout."
+},
+"thick-fat": {
+"pt": "Gordura Espessa",
+"d": "Este Pokémon recebe metade do dano de movimentos dos tipos Fire e Ice."
+},
+"torrent": {
+"pt": "Torrente",
+"d": "Quando esse Pokémon tem 1/3 ou menos de seus HP restantes, seus ataques do tipo Água causam 1,5 vezes mais dano normal."
+},
+"tough-claws": {
+"pt": "Garras Ríspidas",
+"d": "Aumenta o poder dos golpes que acertam o alvo para 1,33 vezes o seu valor original."
+},
+"trace": {
+"pt": "Rastrear",
+"d": "Quando este Pokémon entra em batalha, ele copia a habilidade de um oponente aleatório. Esta habilidade não pode copiar Flower Gift, Forecast, Illusion, Imposter, Multitype, Trace, Wonder Guard ou Zen Mode."
+},
+"vital-spirit": {
+"pt": "Espírito Vital",
+"d": "Este Pokémon não pode estar dormindo. Isso faz com que o comando “Descanso” falhe completamente. Se um Pokémon estiver dormindo e adquirir essa habilidade, ele acordará imediatamente; isso inclui quando recuperar uma habilidade perdida ao sair da batalha. Essa habilidade funciona exatamente como a Insônia durante a batalha. Mundo Aberto: Se o Pokémon inicial tiver essa habilidade, a taxa de encontro com Pokémon de nível mais alto aumenta."
+},
+"volt-absorb": {
+"pt": "Absorção de Volts",
+"d": "Sempre que um movimento do tipo Elétrico atinge este Pokémon, ele se cura em 1/4 do seu HP máximo, anulando qualquer outro efeito nele. Esta habilidade não terá efeito se este Pokémon for do tipo Terra e, portanto, imune a movimentos do tipo Elétrico. Movimentos do tipo Elétrico ignorarão o Substituto deste Pokémon. Este efeito inclui movimentos que não causam dano, ou seja, Onda de Choque."
+},
+"water-absorb": {
+"pt": "Absorção de Água",
+"d": "Sempre que um movimento do tipo Água atinge este Pokémon, ele se cura em 1/4 do seu HP máximo, anulando qualquer outro efeito nele. Movimentos do tipo Água ignorarão o Substituto deste Pokémon."
+},
+"leaf-guard": {
+"pt": "Guarda de Folhas",
+"d": "Este Pokémon não pode sofrer uma condição de status grave sob luz solar intensa. Essa habilidade não cura condições de status pré-existentes. O movimento Rest falhará completamente enquanto essa habilidade estiver em vigor. O movimento Yawn falhará imediatamente se for usado neste Pokémon sob luz solar intensa, e um Yawn já utilizado falhará se o clima mudar para luz solar intensa nesse meio tempo."
+},
+"snow-cloak": {
+"pt": "Manto de Neve",
+"d": "Durante uma tempestade de granizo, este Pokémon tem sua evasão multiplicada por 1,25 e não sofre dano causado pelo granizo, independentemente do tipo. O bônus de evasão não conta como um modificador de estatística. Mundo aberto: se o Pokémon inicial tiver essa habilidade, a taxa de encontro com Pokémon selvagens é reduzida pela metade na neve."
+},
+"protean": {
+"pt": "Mudança de Cor Total (Protean)",
+"d": "Muda o tipo do Pokémon para o do golpe que vai usar: todos os golpes de dano recebem bônus de mesmo tipo (STAB)."
+},
+"aftermath": {
+"pt": "Consequências",
+"d": "Quando este Pokémon é nocauteado por um golpe que faz contato, o usuário do golpe sofre dano equivalente a 1/4 do seu HP máximo."
+},
+"analytic": {
+"pt": "Analítico",
+"d": "Os ataques deste Pokémon têm 1,3 vezes mais potência quando ele é o último a agir em um turno. Os golpes Visão do Futuro e Desejo de Morte não são afetados."
+},
+"anger-point": {
+"pt": "Ponto de Fúria",
+"d": "Sempre que esse Pokémon receber um golpe crítico, seu Ataque aumenta até o máximo de 6 níveis. Essa habilidade ainda terá efeito se o golpe crítico for recebido por um Substituto."
+},
+"anger-shell": {
+"pt": "Concha da Raiva",
+"d": "Quando um ataque faz com que seus HP caiam para a metade ou menos, o Pokémon fica furioso. Isso reduz suas estatísticas de Defesa e Defesa Especial, mas aumenta suas estatísticas de Ataque, Ataque Especial e Velocidade."
+},
+"anticipation": {
+"pt": "Antecipação",
+"d": "Quando este Pokémon entra na batalha, se um de seus oponentes tiver um golpe supereficaz contra ele, Self-Destruct, Explosion ou um golpe de nocaute em um único turno, todos os treinadores participantes serão notificados. O golpe em si não é revelado; apenas que existe tal golpe. Golpes que causam dano sem tipo, como Future Sight, e golpes de tipo variável, como Hidden Power, contam como seus tipos listados. Counter, Metal Burst, Mirror Coat e golpes de KO em um único turno aos quais este Pokémon é imune não ativam esta habilidade."
+},
+"aroma-veil": {
+"pt": "Véu Aromático",
+"d": "Protege os aliados contra ataques que afetam seu estado mental."
+},
+"aura-break": {
+"pt": "Quebra de Aura",
+"d": "Enquanto este Pokémon estiver em campo, Aura Sombria e Aura Feérica enfraquecem os golpes de seus respectivos tipos para 2/3 de sua potência, em vez de fortalecê-los."
+},
+"bad-dreams": {
+"pt": "Pesadelos",
+"d": "Os Pokémon adversários recebem 1/8 de seus HP máximos como dano após cada turno enquanto estiverem dormindo."
+},
+"ball-fetch": {
+"pt": "Busca de Bola",
+"d": "A qualquer momento após o lançamento da primeira Poké Bola que não consiga capturar um Pokémon, no final de um turno, se um Pokémon com Ball Fetch estiver em campo e não estiver segurando outro item, ele recuperará o mesmo tipo de Poké Bola da primeira lançada."
+},
+"battery": {
+"pt": "Bateria",
+"d": "A potência dos movimentos dos Pokémon aliados é aumentada para 1,3×."
+},
+"battle-armor": {
+"pt": "Armadura de Batalha",
+"d": "Movimentos não podem desferir acertos críticos contra este Pokémon. Esta habilidade funciona de forma idêntica à Armadura de Concha."
+},
+"beads-of-ruin": {
+"pt": "Contas da Ruína",
+"d": "O poder das contas da ruína do Pokémon reduz os atributos de Defesa Especial de todos os Pokémon, exceto dele próprio."
+},
+"beast-boost": {
+"pt": "Impulso Feroz",
+"d": "Aumenta a estatística mais alta desse Pokémon em um nível quando ele derrota outro Pokémon."
+},
+"berserk": {
+"pt": "Fúria Desenfreada",
+"d": "Sempre que este Pokémon sofre dano de um golpe que faz com que seus PVs caiam para menos de 50%, seu Ataque Especial aumenta em um nível."
+},
+"big-pecks": {
+"pt": "Peito Largo",
+"d": "A Defesa deste Pokémon não pode ser reduzida por outros Pokémon. No entanto, este Pokémon ainda pode receber modificadores negativos de Defesa por meio dos golpes Troca de Coração ou Troca de Guarda."
+},
+"bulletproof": {
+"pt": "À Prova de Balas",
+"d": "Protege contra ataques com balas, bolas e bombas."
+},
+"cheek-pouch": {
+"pt": "Bolsa na Bochecha",
+"d": "Restaura HP ao comer uma baga, além do efeito da própria baga."
+},
+"chilling-neigh": {
+"pt": "Relincho Gelado",
+"d": "Quando o Pokémon derrota um adversário, ele solta um relincho arrepiante, o que aumenta seu atributo de Ataque."
+},
+"cloud-nine": {
+"pt": "Nas Nuvens",
+"d": "Enquanto este Pokémon estiver em batalha, o clima ainda pode estar ativo, mas não terá nenhum dos seus efeitos. Esta habilidade funciona de forma idêntica a Air Lock."
+},
+"color-change": {
+"pt": "Mudança de Cor",
+"d": "Sempre que este Pokémon sofre dano de um movimento, o tipo do Pokémon muda para corresponder ao movimento. Se o Pokémon tiver dois tipos, ambos são substituídos. O Pokémon deve sofrer dano diretamente; por exemplo, movimentos bloqueados por um Substituto não acionarão esta habilidade, nem movimentos que causam dano indiretamente, como Estacas. Esta habilidade entra em vigor apenas no último golpe de um ataque de múltiplos golpes. Em Pokémon Colosseum e XD: Gale of Darkness, esta habilidade não entra em vigor em movimentos do tipo Sombra."
+},
+"comatose": {
+"pt": "Comatoso",
+"d": "Este Pokémon sempre age como se estivesse Adormecido. Não é possível infligir outra condição de status nele; ele não é afetado por Bocejo; pode usar Conversa Adormecida; e assim por diante."
+},
+"commander": {
+"pt": "Comandante",
+"d": "Quando o Pokémon entra em uma batalha, ele entra na boca de um Dondozo aliado, caso haja um no campo. O Pokémon então dá ordens a partir de lá."
+},
+"competitive": {
+"pt": "Competitivo",
+"d": "Aumenta o Ataque Especial em dois níveis sempre que alguma estatística for reduzida."
+},
+"contrary": {
+"pt": "Contrário",
+"d": "Sempre que as estatísticas desse Pokémon fossem aumentadas, elas são, em vez disso, reduzidas na mesma proporção, e vice-versa."
+},
+"corrosion": {
+"pt": "Corrosão",
+"d": "Os movimentos e itens deste Pokémon ignoram a imunidade habitual dos Pokémon do tipo Veneno e Aço ao tentar causar envenenamento."
+},
+"costar": {
+"pt": "Coestrela",
+"d": "Quando o Pokémon entra em uma batalha, ele copia as alterações nas estatísticas de um aliado."
+},
+"cotton-down": {
+"pt": "Pluma de Algodão",
+"d": "Quando o Pokémon é atingido por um ataque, ele espalha plumas de algodão ao redor e reduz as estatísticas de Velocidade de todos os outros Pokémon."
+},
+"cud-chew": {
+"pt": "Mastigar",
+"d": "Quando o Pokémon comer uma baga, ele a regurgitará no final do próximo turno e a comerá mais uma vez."
+},
+"dancer": {
+"pt": "Dançarino",
+"d": "Sempre que outro Pokémon usar um movimento de dança, este Pokémon usará o mesmo movimento logo em seguida."
+},
+"dark-aura": {
+"pt": "Aura Sombria",
+"d": "Fortalece os movimentos do tipo Escuro de todos os Pokémon aliados e oponentes."
+},
+"dauntless-shield": {
+"pt": "Escudo Destemido",
+"d": "Aumenta o atributo de Defesa do Pokémon na primeira vez que ele entra em uma batalha."
+},
+"dazzling": {
+"pt": "Deslumbrante",
+"d": "Quando um Pokémon adversário tentar usar um movimento que tenha como alvo este Pokémon ou um aliado, e esse movimento tiver prioridade, ele falhará."
+},
+"defeatist": {
+"pt": "Derrotista",
+"d": "O Ataque e o Ataque Especial deste Pokémon são reduzidos pela metade quando ele tem metade dos seus HP ou menos."
+},
+"defiant": {
+"pt": "Desafiador",
+"d": "Quando qualquer uma das estatísticas desse Pokémon é reduzida, seu Ataque aumenta em dois níveis. Se várias estatísticas forem reduzidas ao mesmo tempo, essa habilidade entra em vigor para cada estatística reduzida."
+},
+"disguise": {
+"pt": "Disfarce",
+"d": "Se este Pokémon estiver em sua Forma Disfarçada e sofrer dano causado por um movimento, ele muda para sua Forma Desmascarada e o dano é evitado. Outros efeitos não são evitados. Esta habilidade não pode ser copiada nem substituída. Esta habilidade só tem efeito para o Mimikyu."
+},
+"download": {
+"pt": null,
+"d": "Quando esse Pokémon entra na batalha, seu Ataque ou Ataque Especial — o que corresponder à estatística defensiva total mais fraca de seus oponentes — aumenta em um nível. Em caso de empate, o Ataque Especial é aumentado. Essa habilidade também entra em vigor quando adquirida durante uma batalha."
+},
+"dragons-maw": {
+"pt": "Fauce do Dragão",
+"d": "Aumenta em 50% a potência dos golpes do tipo Dragão usados por este Pokémon."
+},
+"dry-skin": {
+"pt": "Pele Seca",
+"d": "Este Pokémon sofre danos equivalentes a 1/8 de seu HP máximo a cada turno sob luz solar intensa, mas se recupera em 1/8 de seu HP a cada turno durante a chuva. Este Pokémon sofre 1,25 vezes mais dano com movimentos do tipo Fogo, mas sempre que um movimento do tipo Água o atinge, ele se recupera de 1/4 de seu HP máximo."
+},
+"earth-eater": {
+"pt": "Devorador da Terra",
+"d": "Se for atingido por um ataque do tipo Terra, o Pokémon tem seus HP restaurados, em vez de sofrer dano."
+},
+"electric-surge": {
+"pt": "Eletrogênese",
+"d": "Quando esse Pokémon entra na batalha, ele transforma o terreno em Terreno Elétrico."
+},
+"electromorphosis": {
+"pt": "Eletromorfose",
+"d": "O Pokémon fica carregado quando sofre dano, aumentando a potência do próximo movimento do tipo Elétrico que ele usar."
+},
+"emergency-exit": {
+"pt": "Saída de Emergência",
+"d": "Depois que esse Pokémon for atingido por um golpe, se esse golpe fizer com que os HP dele caiam para menos da metade, ele sai da batalha."
+},
+"fairy-aura": {
+"pt": "Aura Feérica",
+"d": "Aumenta a potência dos golpes do tipo Fada para todos os Pokémon aliados e adversários."
+},
+"filter": {
+"pt": "Filtro",
+"d": "Este Pokémon recebe 0,75× de dano de golpes que são supereficazes contra ele. Esta habilidade funciona de forma idêntica a Solid Rock."
+},
+"flare-boost": {
+"pt": "Impulso de Chama",
+"d": "Este Pokémon tem 1,5× seu Ataque Especial quando está queimado."
+},
+"flower-gift": {
+"pt": "Dádiva Floral",
+"d": "Os Pokémon aliados têm 1,5× do seu Ataque e Defesa Especial sob luz solar intensa, caso algum Pokémon aliado possua essa habilidade. Ao contrário de Forecast, Multitype e Zen Mode, essa habilidade não está vinculada à mudança de forma do Pokémon; o Cherrim alternará entre suas formas mesmo que perca essa habilidade. Assim, essa habilidade também funciona se for obtida por um Pokémon que não seja o Cherrim."
+},
+"flower-veil": {
+"pt": "Véu de Flores",
+"d": "Protege os Pokémon do tipo Planta aliados contra a redução de seus atributos por outros Pokémon."
+},
+"fluffy": {
+"pt": "Fofo",
+"d": "O dano causado por movimentos de contato é reduzido pela metade. O dano causado por movimentos de Fogo é duplicado."
+},
+"forecast": {
+"pt": "Previsão",
+"d": "Durante chuva, forte insolação ou granizo, o tipo deste Pokémon muda para Água, Fogo ou Gelo, respectivamente, e sua forma se adapta a essa mudança. Essa habilidade não tem efeito em nenhum outro Pokémon além do Castform. Se o clima acabar ou se tornar qualquer condição que não acione essa habilidade, ou se um Pokémon com Bloqueio de Ar ou Sem Nuvens entrar na batalha, o tipo e a forma desse Pokémon voltam ao padrão. Se essa habilidade for perdida ou desativada, esse Pokémon não poderá alterar seu tipo e forma atuais até que recupere a habilidade."
+},
+"forewarn": {
+"pt": "Previsão",
+"d": "Quando este Pokémon entra na batalha, ele revela o golpe com o maior poder base conhecido por qualquer Pokémon oponente a todos os treinadores participantes. Em caso de empate, um é escolhido aleatoriamente. Golpes sem um poder base listado recebem um valor da seguinte forma: Poder | Golpes ----: | ----- 160 | Golpes de nocaute em um único turno: Fissure, Guillotine, Horn Drill e Sheer Cold 120 | Golpes de contra-ataque: Counter, Metal Burst e Mirror Coat 80 | Poder variável ou dano fixo: Crush Grip, Dragon Rage, Electro Ball, Endeavor, Final Gambit, Flail, Frustration, Grass Knot, Gyro Ball, Heat Crash, Heavy Slam, Hidden Power, Low Kick, Natural Gift, Night Shade, Psywave, Return, Reversal, Seismic Toss, Sonic Boom, Trump Card e Wring Out 0 | Qualquer golpe desse tipo não listado"
+},
+"friend-guard": {
+"pt": "Guarda de Amigos",
+"d": "Todos os Pokémon aliados recebem 0,75× mais dano direto dos golpes enquanto este Pokémon estiver na batalha. Esse efeito se acumula se vários Pokémon aliados o possuírem."
+},
+"frisk": {
+"pt": "Revista",
+"d": "Quando esse Pokémon entra na batalha, ele revela o item que um Pokémon adversário está segurando para todos os treinadores participantes. Em uma batalha dupla, se um dos adversários tiver um item, esse Pokémon fará uma “Revisão” nesse Pokémon; se ambos tiverem um item, ele fará uma “Revisão” em um deles aleatoriamente."
+},
+"full-metal-body": {
+"pt": "Corpo Metálico Sólido",
+"d": "As estatísticas deste Pokémon não podem ser reduzidas por movimentos ou habilidades de outros Pokémon. Esse efeito se aplica apenas a modificações normais nas estatísticas e não a efeitos mais incomuns, como Topsy-Turvy ou Power Swap. Esta Habilidade não é anulada por Mold Breaker, Teravolt ou Turboblaze."
+},
+"fur-coat": {
+"pt": "Pelagem Densa",
+"d": "Reduz pela metade o dano causado por ataques físicos."
+},
+"gale-wings": {
+"pt": "Asas de Vendaval",
+"d": "Aumenta a prioridade dos movimentos aéreos em um nível."
+},
+"galvanize": {
+"pt": "Galvanizar",
+"d": "Quando este Pokémon usa um movimento do tipo Normal, esse movimento passa a ser do tipo Elétrico e sua potência é multiplicada por 1,2."
+},
+"gluttony": {
+"pt": "Gula",
+"d": "Este Pokémon consome qualquer Baga que esteja segurando e que seja ativada por HP baixo quando seu HP cai abaixo de 50%, independentemente do limite normal da Baga."
+},
+"good-as-gold": {
+"pt": "Valioso como Ouro",
+"d": "Um corpo feito de ouro puro e maciço confere ao Pokémon total imunidade aos movimentos de status de outros Pokémon."
+},
+"gooey": {
+"pt": "Viscosidade",
+"d": "Reduz a Velocidade do Pokémon atacante em um nível ao entrar em contato."
+},
+"gorilla-tactics": {
+"pt": "Táticas do Gorila",
+"d": "Aumenta o atributo de Ataque do Pokémon, mas permite apenas o uso do primeiro movimento selecionado."
+},
+"grass-pelt": {
+"pt": "Pele de Grama",
+"d": "Aumenta a Defesa enquanto o Terreno Gramado estiver ativo."
+},
+"grassy-surge": {
+"pt": "Fitogênese",
+"d": "Quando este Pokémon entra em batalha, ele muda o terreno para Terreno Gramado."
+},
+"grim-neigh": {
+"pt": "Relincho Sinistro",
+"d": "Quando o Pokémon derruba um alvo, ele solta um relincho assustador, o que aumenta sua estatística de Ataque Especial."
+},
+"guard-dog": {
+"pt": "Cão de Guarda",
+"d": "Aumenta o atributo de Ataque do Pokémon se ele for intimidado. Movimentos e itens que forçariam o Pokémon a ser substituído também falham."
+},
+"gulp-missile": {
+"pt": "Míssil Gulp",
+"d": "Quando o Pokémon usa Surf ou Dive, ele volta com uma presa. Quando sofre dano, ele cospe a presa para atacar."
+},
+"hadron-engine": {
+"pt": "Motor Hadrônico",
+"d": "Cria um Terreno Elétrico quando o Pokémon entra em batalha. O motor futurista dentro do Pokémon também aumenta o seu atributo de Ataque Especial no Terreno Elétrico."
+},
+"harvest": {
+"pt": "Colheita",
+"d": "Após cada turno, se o último item que esse Pokémon consumiu foi uma Baga e ele não estiver segurando nenhum item no momento, ele tem 50% de chance de recuperar essa Baga, ou 100% de chance sob luz solar intensa."
+},
+"healer": {
+"pt": "Curandeiro",
+"d": "Os Pokémon aliados que estiverem ao lado deste Pokémon em batalhas duplas e triplas têm, cada um, 30% de chance de serem curados de qualquer condição grave após cada turno."
+},
+"heatproof": {
+"pt": "Isolamento Térmico",
+"d": "Este Pokémon sofre metade do dano causado por ataques do tipo Fogo e queimaduras."
+},
+"heavy-metal": {
+"pt": "Metal Pesado",
+"d": "Este Pokémon tem o dobro do peso normal para sua espécie."
+},
+"honey-gather": {
+"pt": "Coleta de Mel",
+"d": "Este Pokémon tem chance de coletar Honey após a batalha. Esta chance começa em 5% e aumenta mais 5% a cada dez níveis: 5% do nível 1–10, 10% do 11–20 e assim por diante, até 50% do 91–100. Esta habilidade é verificada após o término da batalha, momento em que quaisquer alterações temporárias de habilidade já terão acabado."
+},
+"hospitality": {
+"pt": "Hospitalidade",
+"d": "Quando o Pokémon entra em uma batalha, ele demonstra hospitalidade para com seu aliado, restaurando uma pequena quantidade do HP dele."
+},
+"huge-power": {
+"pt": "Superpoder",
+"d": "O Attack deste Pokémon é duplicado enquanto estiver em batalha. Este bônus não conta como um modificador de atributo. Esta habilidade funciona de forma idêntica a Pure Power."
+},
+"hunger-switch": {
+"pt": "Interruptor da Fome",
+"d": "O Pokémon muda de forma, alternando entre o Modo Barriga Cheia e o Modo Faminto após o término de cada turno."
+},
+"hydration": {
+"pt": "Hidratação",
+"d": "Este Pokémon fica livre de qualquer condição grave após cada turno enquanto chove."
+},
+"ice-body": {
+"pt": "Corpo de Gelo",
+"d": "Este Pokémon recupera 1/16 do seu HP máximo após cada turno durante o granizo, e não sofre dano de granizo independentemente do tipo."
+},
+"ice-face": {
+"pt": "Face de Gelo",
+"d": "Quando um Eiscue em sua forma Ice Face é atingido por um golpe físico, ele não sofre dano e muda para a forma Noice Face. Se uma tempestade de granizo ou de neve começar enquanto o Eiscue estiver na forma Noice Face, ou se ele for enviado a campo nessa forma durante uma tempestade de granizo, ele retornará imediatamente à forma Ice Face."
+},
+"ice-scales": {
+"pt": "Escamas de Gelo",
+"d": "O Pokémon é protegido por escamas de gelo que reduzem pela metade o dano recebido de movimentos especiais."
+},
+"illusion": {
+"pt": "Ilusão",
+"d": "Ao entrar em campo, este Pokémon assume a espécie, o apelido e a Poké Bola do último Pokémon da equipe que estiver apto para a batalha. Essa ilusão se desfaz ao ser atingido por um golpe que cause dano. Outros danos, como os causados pelo clima ou por Espinhos, não quebram a ilusão, nem o dano causado a um Substituto. Se a ordem da equipe for temporariamente embaralhada enquanto os Pokémon são substituídos em batalha, esta habilidade escolhe o último Pokémon de acordo com essa ordem embaralhada."
+},
+"infiltrator": {
+"pt": "Infiltrador",
+"d": "Os movimentos deste Pokémon ignoram Tela de Luz, Refletir e Proteção."
+},
+"innards-out": {
+"pt": "Tripas para Fora",
+"d": "Quando este Pokémon desmaia devido a um movimento de um adversário, esse adversário sofre dano igual aos PVs que restavam a este Pokémon."
+},
+"intrepid-sword": {
+"pt": "Espada Intrépida",
+"d": "Aumenta a estatística de Ataque do Pokémon na primeira vez que ele entra em uma batalha."
+},
+"iron-barbs": {
+"pt": "Farpas de Ferro",
+"d": "Sempre que um movimento faz contato com este Pokémon, o usuário do movimento sofre dano equivalente a 1/8 de seu HP máximo. Esta habilidade funciona de forma idêntica à Pele Áspera."
+},
+"iron-fist": {
+"pt": "Punho de Ferro",
+"d": "Os movimentos classificados como baseados em socos têm 1,2× do seu poder básico para este Pokémon. Soco Surpresa não é classificado como baseado em socos; seu nome original em japonês significa apenas \"ataque surpresa\"."
+},
+"justified": {
+"pt": "Justificado",
+"d": "Sempre que um movimento do tipo Escuro atinge este Pokémon, seu Ataque aumenta um nível. O movimento não é anulado de forma alguma."
+},
+"klutz": {
+"pt": "Desastrado",
+"d": "Em batalha, este Pokémon não pode usar o item que segura, nem o item terá qualquer efeito passivo na batalha, seja positivo ou negativo. Este Pokémon também não pode usar Fling. A redução de Velocidade da Iron Ball e dos itens de esforço (Macho Brace, Power Weight, Power Bracer, Power Belt, Power Lens, Power Band e Power Anklet) não é afetada. Itens que não afetam diretamente a batalha, como o Exp. Share, a Amulet Coin ou o Soothe Bell, funcionam normalmente. Todos os itens segurados funcionam normalmente fora de batalha. Outros movimentos que usam o item segurado, como Natural Gift e Switcheroo, funcionam normalmente."
+},
+"libero": {
+"pt": "Líbero",
+"d": "Altera o tipo do Pokémon para o tipo do movimento que ele está prestes a usar. Isso funciona apenas uma vez cada vez que o Pokémon entra na batalha."
+},
+"light-metal": {
+"pt": "Metal Leve",
+"d": "Este Pokémon tem metade do peso normal para sua espécie."
+},
+"lingering-aroma": {
+"pt": "Aroma Persistente",
+"d": "O contato com o Pokémon altera a Habilidade do atacante para “Aroma Persistente”."
+},
+"liquid-ooze": {
+"pt": "Lodo Líquido",
+"d": "Sempre que um Pokémon se recuperasse após acertar este Pokémon com um movimento que retira vida, como Absorção, ele, em vez disso, perde tantos HP quanto normalmente ganharia. O Devorador de Sonhos não é afetado."
+},
+"liquid-voice": {
+"pt": "Voz Líquida",
+"d": "Quando esse Pokémon usa um movimento baseado em som, o tipo desse movimento é Água."
+},
+"long-reach": {
+"pt": "Longo Alcance",
+"d": "Um movimento usado por este Pokémon não causará contato."
+},
+"magic-bounce": {
+"pt": "Reflexo Mágico",
+"d": "Quando este Pokémon é alvo de um movimento marcado como refletível, o movimento é redirecionado para o usuário. Todos os movimentos refletíveis não causam dano, e a maioria dos movimentos que não causam dano e têm como alvo outros Pokémon são refletíveis. Um movimento refletido por esta habilidade ou por Magic Coat não pode ser refletido de volta."
+},
+"magician": {
+"pt": "Mágico",
+"d": "Rouba o item que o alvo está segurando quando o portador usa um movimento que causa dano."
+},
+"marvel-scale": {
+"pt": "Escama Maravilha",
+"d": "Sempre que esse Pokémon estiver com uma condição de status grave, ele terá 1,5× sua Defesa. Esse bônus não conta como um modificador de estatística."
+},
+"merciless": {
+"pt": "Implacável",
+"d": "Os ataques desse Pokémon causam dano crítico contra alvos envenenados."
+},
+"mimicry": {
+"pt": "Mimetismo",
+"d": "Altera o tipo do Pokémon de acordo com o terreno."
+},
+"minus": {
+"pt": "Menos",
+"d": "Este Pokémon tem 1,5× o seu Ataque Especial se algum Pokémon aliado possuir as habilidades Mais ou Menos. Esse bônus não conta como um modificador de estatística. Se qualquer uma das habilidades for desativada por Ácido Gástrico, ambas perdem o efeito."
+},
+"mirror-armor": {
+"pt": "Armadura Espelhada",
+"d": "Rejeita apenas os efeitos de redução de estatísticas que o Pokémon recebe."
+},
+"misty-surge": {
+"pt": "Nebulogênese",
+"d": "Quando este Pokémon entra em batalha, ele muda o terreno para Terreno Nebuloso."
+},
+"moody": {
+"pt": "Inconstante",
+"d": "Após cada turno, uma das estatísticas deste Pokémon, escolhida aleatoriamente, aumenta dois níveis, e outra diminui um nível. Se uma estatística já estiver em 6 ou -6 níveis, ela não será escolhida para aumentar ou diminuir, respectivamente."
+},
+"motor-drive": {
+"pt": "Eletromotor",
+"d": "Sempre que um movimento do tipo Elétrico atingir este Pokémon, sua Velocidade aumenta um nível, anulando qualquer outro efeito sobre ele. Essa habilidade não terá efeito se este Pokémon for imune a movimentos do tipo Elétrico. Os movimentos do tipo Elétrico ignorarão o Substituto deste Pokémon. Esse efeito inclui movimentos que não causam dano, como, por exemplo, Onda Elétrica."
+},
+"moxie": {
+"pt": "Audácia",
+"d": "O Ataque deste Pokémon aumenta um nível ao nocautear outro Pokémon, mesmo que seja um Pokémon aliado. Esta habilidade não entra em vigor quando o Pokémon faz com que outro Pokémon desmaie indiretamente, por exemplo, por envenenamento ou com o movimento Spikes. Se este Pokémon nocautear um Pokémon com Múmia, a habilidade do primeiro mudará sem que o efeito seja aplicado."
+},
+"multitype": {
+"pt": "Multitipo",
+"d": "Se este Pokémon estiver segurando uma Placa elementar, seu tipo e forma mudam para corresponder à Placa. O item que este Pokémon está segurando, seja ele uma Placa ou não, não pode ser tomado por Covet ou Thief, nem removido por Knock Off, nem trocado por Switcheroo ou Trick. Os golpes Covet, Thief e Knock Off ainda causam dano a este Pokémon. Ao contrário do que ocorre com Sticky Hold, este Pokémon não pode usar Fling, Switcheroo ou Trick para se livrar do próprio item, nem ganhar um item por meio de Switcheroo ou Trick se não tiver nenhum. Essa habilidade não tem efeito em nenhum Pokémon que não seja Arceus. Essa habilidade não pode ser trocada com Skill Swap, nem copiada com Role Play ou Trace, nem desativada com Gastro Acid, nem alterada com Worry Seed. Este Pokémon não pode usar Skill Swap ou Role Play para perder sua própria habilidade. O Mold Breaker não pode ignorar essa habilidade. Se um Pokémon se transformar em um Arceus com essa habilidade, ele se transformará na forma padrão do Arceus, do tipo Normal. Se o Pokémon que está se transformando estiver segurando uma Placa, essa habilidade será ativada e transformará o Pokémon na forma correspondente."
+},
+"mummy": {
+"pt": "Múmia",
+"d": "Sempre que um movimento de contato atinge este Pokémon, a habilidade do Pokémon atacante muda para Múmia. A habilidade Multitype não é afetada. Se um Pokémon com a habilidade Autoestima nocautear este Pokémon, a habilidade do primeiro mudará sem entrar em vigor."
+},
+"mycelium-might": {
+"pt": "O Poder do Micélio",
+"d": "O Pokémon sempre agirá mais lentamente ao usar movimentos de status, mas esses movimentos não serão afetados pela Habilidade do alvo."
+},
+"opportunist": {
+"pt": "Oportunista",
+"d": "Se a estatística de um oponente for aumentada, o Pokémon aproveita a oportunidade para aumentar a mesma estatística para si mesmo."
+},
+"orichalcum-pulse": {
+"pt": "Pulso de Oricalco",
+"d": "Intensifica a luz do sol quando o Pokémon entra em batalha. O pulso ancestral que vibra através do Pokémon também aumenta o seu atributo de Ataque sob luz solar intensa."
+},
+"overcoat": {
+"pt": "Sobretudo",
+"d": "Este Pokémon não sofre dano causado pelas condições climáticas."
+},
+"perish-body": {
+"pt": "Corpo Perecível",
+"d": "Quando o Pokémon com a habilidade “Corpo Perecível” for atingido por um golpe de contato, tanto o atacante quanto o Pokémon com a habilidade “Corpo Perecível” desmaiarão em três turnos."
+},
+"pickpocket": {
+"pt": "Batedor de Carteira",
+"d": "Sempre que um ataque atingir este Pokémon, caso ele não esteja segurando nenhum item, ele rouba o item que o atacante está segurando. Este Pokémon não pode roubar ao ser nocauteado. Ele pode roubar se o atacante tiver um Substituto, mas não pode roubar quando seu próprio Substituto for atingido. Se um movimento acertar várias vezes, apenas o último acerto aciona essa habilidade. Se este Pokémon for selvagem, ele não pode roubar de um Pokémon treinado."
+},
+"plus": {
+"pt": "Mais",
+"d": "Este Pokémon tem 1,5× o seu Ataque Especial se algum Pokémon aliado possuir as habilidades Mais ou Menos. Esse bônus não conta como um modificador de estatística. Se qualquer uma das habilidades for desativada por Ácido Gástrico, ambas perdem o efeito."
+},
+"poison-heal": {
+"pt": "Cura Venenosa",
+"d": "Se este Pokémon estiver envenenado, ele se recuperará de 1/8 de seu HP máximo a cada turno, em vez de sofrer dano. Isso inclui envenenamento grave."
+},
+"poison-puppeteer": {
+"pt": "Marionetista Venenoso",
+"d": "Quando um Pokémon é envenenado por qualquer um dos ataques do Pecharunt, ele também fica confuso."
+},
+"poison-touch": {
+"pt": "Toque Venenoso",
+"d": "Os ataques de contato deste Pokémon têm 30% de chance de envenenar o alvo a cada acerto. Isso conta como um efeito extra para os fins da habilidade Pó Protetor. Essa habilidade entra em vigor antes da habilidade Múmia."
+},
+"power-of-alchemy": {
+"pt": "Poder da Alquimia",
+"d": "Quando um aliado desmaia, este Pokémon adquire a Habilidade dele."
+},
+"power-spot": {
+"pt": "Ponto de Energia",
+"d": "O poder dos movimentos usados pelos aliados do Pokémon com Power Spot é aumentado em 30%."
+},
+"prankster": {
+"pt": "Travesso",
+"d": "Os movimentos que não causam dano deste Pokémon têm sua prioridade aumentada em um nível."
+},
+"prism-armor": {
+"pt": "Armadura Prismática",
+"d": "O dano supereficaz que este Pokémon recebe é reduzido para 0,75×. Esta Habilidade não é anulada por Mold Breaker, Teravolt ou Turboblaze."
+},
+"propeller-tail": {
+"pt": "Cauda de Hélice",
+"d": "Ignora os efeitos das Habilidades do Pokémon adversário e dos movimentos que atraem movimentos."
+},
+"protosynthesis": {
+"pt": "Protossíntese",
+"d": "Aumenta a estatística mais alta do Pokémon sob luz solar intensa ou se o Pokémon estiver segurando a Energia Ativadora."
+},
+"psychic-surge": {
+"pt": "Psicogênese",
+"d": "Quando este Pokémon entra em batalha, ele muda o terreno para Terreno Psíquico."
+},
+"punk-rock": {
+"pt": null,
+"d": "Aumenta a potência de movimentos baseados em som. O Pokémon também sofre metade do dano vindo desse tipo de movimento."
+},
+"pure-power": {
+"pt": "Poder Puro",
+"d": "O Ataque deste Pokémon é duplicado em batalha. Esse bônus não conta como um modificador de estatística. Esta habilidade funciona exatamente como Potência Enorme."
+},
+"purifying-salt": {
+"pt": "Sal Purificador",
+"d": "O sal puro do Pokémon o protege contra condições de status e reduz pela metade o dano recebido de ataques do tipo Fantasma."
+},
+"quark-drive": {
+"pt": "Propulsão Quark",
+"d": "Aumenta a estatística mais alta do Pokémon em Terreno Elétrico ou se o Pokémon estiver segurando a Energia Ativadora."
+},
+"quick-draw": {
+"pt": "Saque Rápido",
+"d": "Se um Pokémon com essa Habilidade escolher um ataque que cause dano, ele tem 30% de chance de agir primeiro em sua faixa de prioridade."
+},
+"quick-feet": {
+"pt": "Pés Ágeis",
+"d": "Sempre que este Pokémon estiver com uma condição de status grave, sua Velocidade é multiplicada por 1,5. Este Pokémon não é afetado pela redução habitual de Velocidade causada por paralisia. No Mundo Superior: Se o Pokémon na liderança tiver esta habilidade, a taxa de encontro com Pokémon selvagens é reduzida pela metade."
+},
+"rain-dish": {
+"pt": "Prato de Chuva",
+"d": "Este Pokémon recupera 1/16 de seu HP máximo a cada turno durante a chuva."
+},
+"rattled": {
+"pt": "Aterrorizado",
+"d": "A Velocidade deste Pokémon aumenta um nível a cada acerto de um ataque causador de dano dos tipos Escuro, Fantasma ou Inseto."
+},
+"receiver": {
+"pt": "Receptor",
+"d": "Quando um aliado desmaia, este Pokémon adquire a Habilidade dele."
+},
+"reckless": {
+"pt": "Imprudente",
+"d": "Os golpes com recuo e os golpes de impacto deste Pokémon têm 1,2× do seu poder base. O golpe “Struggle” não é afetado. Os “golpes de impacto” são aqueles que causam dano ao próprio usuário quando erram o alvo: Jump Kick e High Jump Kick."
+},
+"refrigerate": {
+"pt": "Congelamento",
+"d": "Transforma os ataques do tipo Normal do Pokémon que possui essa habilidade em ataques do tipo Gelo. Os ataques alterados por essa habilidade têm 1,3 vezes mais potência."
+},
+"regenerator": {
+"pt": "Regenerador",
+"d": "Este Pokémon recupera 1/3 de seu HP máximo quando é substituído por outro Pokémon em qualquer circunstância, exceto quando desmaia. Essa habilidade não entra em vigor quando a batalha termina."
+},
+"ripen": {
+"pt": "Amadurecer",
+"d": "Amadurece Frutas e duplica o efeito delas."
+},
+"rivalry": {
+"pt": "Rivalidade",
+"d": "Este Pokémon causa 1,25× mais dano normal contra Pokémon do mesmo gênero e 0,75× mais dano normal contra Pokémon do gênero oposto. Se algum dos Pokémon for sem gênero, o dano não é afetado."
+},
+"rks-system": {
+"pt": "Sistema RKS",
+"d": "Altera o tipo deste Pokémon para que corresponda à Memória que ele carrega. Essa habilidade não pode ser copiada, substituída nem anulada. Essa habilidade só tem efeito no Silvally."
+},
+"rocky-payload": {
+"pt": "Carga Rochosa",
+"d": "Aumenta em 50% a potência dos golpes do tipo Rocha usados por este Pokémon."
+},
+"rough-skin": {
+"pt": "Pele Áspera",
+"d": "Sempre que um movimento fizer contato com este Pokémon, o usuário do movimento sofre dano equivalente a 1/8 de seu HP máximo. Esta habilidade funciona de forma idêntica a Iron Barbs."
+},
+"sand-rush": {
+"pt": "Ímpeto de Areia",
+"d": "A Velocidade deste Pokémon dobra durante uma tempestade de areia, e ele não sofre dano causado pela tempestade de areia, independentemente do tipo."
+},
+"sand-spit": {
+"pt": "Cuspisandra",
+"d": "O Pokémon provoca uma tempestade de areia quando é atingido por um ataque."
+},
+"sap-sipper": {
+"pt": "Herbívoro",
+"d": "Sempre que um movimento do tipo Planta atinge este Pokémon, seu Ataque aumenta um nível, anulando qualquer outro efeito dele."
+},
+"schooling": {
+"pt": "Cardume",
+"d": "Se este Pokémon for um Wishiwashi e estiver no Nível 20 ou acima, ao entrar na batalha e no início de cada turno, ele assume a Forma de Cardume se seus PVs estiverem em 25% ou mais; caso contrário, assume a Forma Individual. Esta habilidade não pode ser substituída, copiada ou anulada."
+},
+"scrappy": {
+"pt": "Valente",
+"d": "Este Pokémon ignora a imunidade de Pokémon do tipo Ghost a golpes dos tipos Normal e Fighting. Os outros tipos de Pokémon do tipo Ghost afetam o dano normalmente."
+},
+"seed-sower": {
+"pt": "Semear",
+"d": "Transforma o solo em terreno gramado quando o Pokémon é atingido por um ataque."
+},
+"shadow-shield": {
+"pt": "Escudo das Sombras",
+"d": "Quando este Pokémon está com os PS cheios, o dano normal (que não seja dano fixo!) causado por movimentos é reduzido pela metade. Esta habilidade não pode ser anulada."
+},
+"sharpness": {
+"pt": "Nitidez",
+"d": "Aumenta a potência de todos os golpes de “corte” em 50%."
+},
+"sheer-force": {
+"pt": "Força Bruta",
+"d": "Os ataques deste Pokémon com efeitos adicionais têm 1,3 vezes mais potência, mas perdem esses efeitos adicionais. A chance de efeito é a probabilidade de um ataque causar uma condição de status, provocar uma alteração nas estatísticas ou fazer o alvo recuar, além do efeito principal do ataque. Por exemplo, a paralisia de Thunder Shock é um efeito extra, mas a de Thunder Wave não é, assim como a remoção de itens de Knock Off e o aumento da taxa de acerto crítico de Air Cutter. Movimentos que reduzem as estatísticas do usuário não são afetados."
+},
+"shields-down": {
+"pt": "Escudos Abaixados",
+"d": "Quando este Pokémon entra na batalha e no final de cada turno, se seus HP estiverem em 50% ou mais, ele assume a Forma Meteoro; caso contrário, assume a Forma Núcleo. Na Forma Meteoro, ele não pode sofrer uma condição grave (embora as já existentes não sejam curadas), não pode ficar sonolento com o “Bocejo” e não pode usar o “Descanso” (que simplesmente falhará). Essa habilidade não pode ser copiada, substituída ou anulada. Essa habilidade só tem efeito para o Minior."
+},
+"simple": {
+"pt": "Simples",
+"d": "Cada nível dos modificadores de estatísticas deste Pokémon conta como dois níveis. Esses níveis duplicados continuam limitados a um mínimo de -6 e um máximo de 6. Este Pokémon ainda pode acumular menos de -3 ou mais de 3 níveis de modificadores de estatísticas, mesmo que os níveis extras não tenham efeito após a duplicação."
+},
+"slow-start": {
+"pt": "Início Lento",
+"d": "O Ataque e a Velocidade deste Pokémon são reduzidos pela metade por cinco turnos ao entrar na batalha. Essa habilidade também entra em vigor quando adquirida durante a batalha. Se este Pokémon perder sua habilidade antes do término dos cinco turnos, seu Ataque e sua Velocidade voltam ao normal; se ele recuperar essa habilidade sem sair da batalha, seu Ataque e sua Velocidade são reduzidos pela metade novamente, mas o contador continua a partir de onde parou."
+},
+"slush-rush": {
+"pt": "Varredura de Gelo",
+"d": "Durante a Nevasca, este Pokémon tem o dobro da Velocidade."
+},
+"sniper": {
+"pt": "Atirador de Elite",
+"d": "Este Pokémon causa o triplo de dano com golpes críticos, em vez do dobro de dano habitual."
+},
+"snow-warning": {
+"pt": "Nevasca",
+"d": "O clima muda para granizo quando este Pokémon entra na batalha e não termina a menos que seja cancelado por outra condição climática. Se vários Pokémon com esta habilidade, Drizzle, Drought ou Sand Stream forem enviados ao mesmo tempo, as habilidades serão ativadas em ordem de Speed, respeitando o Trick Room. O clima de cada habilidade cancelará o clima anterior, e apenas o clima invocado pelo Pokémon mais lento permanecerá."
+},
+"solid-rock": {
+"pt": "Rocha Sólida",
+"d": "Este Pokémon recebe 0,75× de dano de golpes que são supereficazes contra ele. Esta habilidade funciona de forma idêntica a Filter."
+},
+"soul-heart": {
+"pt": "Coração de Alma",
+"d": "O Ataque Especial deste Pokémon aumenta em um nível toda vez que um Pokémon desmaia."
+},
+"stakeout": {
+"pt": "Vigilância",
+"d": "Os ataques desse Pokémon têm o dobro de poder contra os Pokémon que entraram em campo neste turno."
+},
+"stalwart": {
+"pt": "Inabalável",
+"d": "Ignora os efeitos das Habilidades do Pokémon adversário e dos movimentos que atraem movimentos."
+},
+"stamina": {
+"pt": "Resistência",
+"d": "Aumenta a Defesa desse Pokémon em um nível quando ele sofre dano de um ataque."
+},
+"stance-change": {
+"pt": "Mudança de Postura",
+"d": "Transforma o Aegislash na Forma Lâmina antes de usar um ataque que cause dano, ou na Forma Escudo antes de usar o Escudo do Rei."
+},
+"steam-engine": {
+"pt": "Motor a Vapor",
+"d": "Aumenta a Velocidade do usuário em três estágios quando ele é atingido por um movimento do tipo Fire ou Water. O movimento ainda causa dano."
+},
+"steelworker": {
+"pt": "Metalúrgico",
+"d": "Os ataques do tipo Aço deste Pokémon têm 1,5× mais potência."
+},
+"steely-spirit": {
+"pt": "Espírito de Aço",
+"d": "Potencializa os ataques do tipo Aço do Pokémon e de seus aliados."
+},
+"sticky-hold": {
+"pt": "Grude Pegajoso",
+"d": "O item que este Pokémon carrega não pode ser removido por outros Pokémon. Movimentos que causam dano e que removeriam o item deste Pokémon ainda podem causar dano a ele, por exemplo, Derrubada ou Pluck. Este Pokémon ainda pode usar movimentos que envolvem a perda de seu próprio item, por exemplo, Arremesso ou Truque. Mundo Aberto: Se o Pokémon líder tiver essa habilidade, a taxa de encontro ao pescar aumenta."
+},
+"storm-drain": {
+"pt": "Dreno de Tempestade",
+"d": "Os golpes do tipo Water de alvo único de todos os outros Pokémon são redirecionados para este Pokémon, se ele for um alvo elegível. Os golpes de Water de outros Pokémon aumentam o Special Attack deste Pokémon em um estágio, anulando qualquer outro efeito sobre ele, e não podem errá-lo. Se o alvo pretendido do golpe também tiver esta habilidade, o golpe não é redirecionado. Quando vários Pokémon com esta habilidade forem alvos possíveis para redirecionamento, o golpe é redirecionado para aquele com a maior estatística de Speed ou, em caso de empate, para um Pokémon empatado aleatório. Follow Me tem precedência sobre esta habilidade."
+},
+"strong-jaw": {
+"pt": "Mandíbulas Fortes",
+"d": "Aumenta o poder dos golpes de mordida para 1,5×."
+},
+"super-luck": {
+"pt": "Sorte Incrível",
+"d": "Os golpes desse Pokémon têm taxas de acerto crítico um nível acima do normal."
+},
+"supersweet-syrup": {
+"pt": "Xarope Superdoce",
+"d": "Um aroma enjoativo se espalha pelo campo na primeira vez que o Pokémon entra em uma batalha, reduzindo a evasão dos Pokémon adversários."
+},
+"surge-surfer": {
+"pt": "Surfista Elétrico",
+"d": "Duplica a Velocidade desse Pokémon em Terreno Elétrico."
+},
+"sweet-veil": {
+"pt": "Véu Doce",
+"d": "Impede que os Pokémon aliados adormeçam."
+},
+"sword-of-ruin": {
+"pt": "Espada da Ruína",
+"d": "O poder da espada da ruína do Pokémon reduz os atributos de Defesa de todos os Pokémon, exceto dele próprio."
+},
+"symbiosis": {
+"pt": "Simbiose",
+"d": "Passa o item que o portador está segurando para um aliado quando esse aliado esgota seu item."
+},
+"tablets-of-ruin": {
+"pt": "Tabletas da Ruína",
+"d": "O poder das tábuas da ruína do Pokémon reduz os atributos de Ataque de todos os Pokémon, exceto dele próprio."
+},
+"tangled-feet": {
+"pt": "Pés Cambaleantes",
+"d": "Quando esse Pokémon fica confuso, sua evasão dobra."
+},
+"telepathy": {
+"pt": "Telepatia",
+"d": "Este Pokémon não sofre dano com os ataques de Pokémon aliados, incluindo ataques direcionados a um único alvo que tenham ele como alvo."
+},
+"tera-shift": {
+"pt": "Mutação Tera",
+"d": "Quando o Pokémon entra em uma batalha, ele absorve a energia ao seu redor e se transforma em sua Forma Terastal."
+},
+"teravolt": {
+"pt": "Teravoltagem",
+"d": "Os movimentos deste Pokémon ignoram completamente habilidades que possam atrapalhar ou impedir seu efeito no alvo. Por exemplo, os movimentos deste Pokémon ignoram habilidades que os negariam totalmente, como Absorção de Água; habilidades que impediriam qualquer um de seus efeitos, como Corpo Limpo, Armadura de Concha ou Agarramento Pegajoso; e habilidades que concedem qualquer benefício protetor geral, como Simples, Manto de Neve ou Gordura Espessa. Se uma habilidade puder atrapalhar ou ajudar os movimentos deste Pokémon, por exemplo, Pele Seca ou Desatento, a habilidade é ignorada de qualquer forma. Habilidades que não se encaixam nesta descrição, mesmo que possam atrapalhar movimentos de alguma outra forma, não são afetadas. Por exemplo, Corpo Amaldiçoado afeta apenas usos futuros potenciais do movimento, enquanto Lodo Líquido e Sombra Presa só podem atrapalhar o efeito de um movimento no usuário. Esta habilidade não pode ignorar mudanças de tipo ou forma concedidas por habilidades, por exemplo, Mudança de Cor ou Previsão; nem efeitos causados por habilidades que não estão mais vinculados a uma habilidade, como a chuva de Chuvisco. Esta habilidade não pode ignorar Multitype de forma alguma. Uma habilidade ignorada por esta habilidade só é anulada enquanto o movimento está sendo usado. Por exemplo, os movimentos deste Pokémon podem paralisar um Pokémon com Flexibilidade, mas a Flexibilidade será ativada e curará a paralisia imediatamente depois, e os Espinhos deste Pokémon não são afetados por esta habilidade após terem sido colocados. Quando este Pokémon entra na batalha, todos os treinadores participantes são notificados de que ele possui esta habilidade. Esta habilidade funciona de forma idêntica a Quebra-Molde e Turboblaze."
+},
+"thermal-exchange": {
+"pt": "Termoconversão",
+"d": "Aumenta o atributo Ataque quando o Pokémon é atingido por um movimento do tipo Fogo. Além disso, o Pokémon não pode sofrer queimaduras."
+},
+"tinted-lens": {
+"pt": "Lentes Coloridas",
+"d": "Este Pokémon causa o dobro de dano com golpes que não são muito efetivos contra o alvo."
+},
+"toxic-boost": {
+"pt": "Impulso Tóxico",
+"d": "Este Pokémon tem 1,5× do seu Ataque quando envenenado."
+},
+"toxic-chain": {
+"pt": "Cadeia Tóxica",
+"d": "O poder da cadeia tóxica do Pokémon pode envenenar gravemente qualquer alvo que ele acerte com um movimento."
+},
+"toxic-debris": {
+"pt": "Detritos Tóxicos",
+"d": "Espalha espinhos envenenados aos pés do time adversário quando o Pokémon sofre dano causado por golpes físicos."
+},
+"transistor": {
+"pt": null,
+"d": "Aumenta em 50% a potência dos golpes do tipo Elétrico usados por este Pokémon."
+},
+"truant": {
+"pt": "Preguiça",
+"d": "A cada dois turnos em que esse Pokémon deveria tentar usar um movimento, ele, em vez disso, não fará nada (\"ficar sem fazer nada\"). Ficar sem fazer nada interrompe movimentos que levam vários turnos, da mesma forma que a paralisia, o recuo, etc. A maioria desses movimentos, como, por exemplo, Bide ou Rollout, é simplesmente interrompida quando o Pokémon fica sem fazer nada. Ataques com um turno de recarga, como Hyper Beam, não precisam recarregar; ataques com um turno de preparação, como Fly, acabam não sendo usados. Movimentos que são forçados a se estender por vários turnos e continuam mesmo após falhas, como Outrage, Uproar ou qualquer movimento forçado por Encore, continuam normalmente. Se este Pokémon estiver confuso, sua confusão não é verificada quando ele fica ocioso; o Pokémon não pode se machucar, e sua confusão não termina nem se aproxima do fim. Se este Pokémon tentar se mover, mas falhar — por exemplo, devido à paralisia ou à Gravidade —, ainda assim conta como tendo se movido e ficará ocioso no próximo turno. Se ele não tentar se mover, por exemplo, por estar adormecido ou congelado, o que quer que ele tivesse feito será adiado até sua próxima tentativa; ou seja, ele ficará ocioso ou se moverá normalmente, dependendo do que fez pela última vez. Essa habilidade não pode ser alterada com Semente da Preocupação, mas pode ser desativada com Ácido Gástrico, alterada com Intercâmbio de Papéis ou trocada com Troca de Habilidades."
+},
+"turboblaze": {
+"pt": "Turbochama",
+"d": "Os movimentos deste Pokémon ignoram completamente habilidades que possam atrapalhar ou impedir seu efeito no alvo. Por exemplo, os movimentos deste Pokémon ignoram habilidades que os negariam totalmente, como Absorção de Água; habilidades que impediriam qualquer um de seus efeitos, como Corpo Limpo, Armadura de Concha ou Agarramento Pegajoso; e habilidades que concedem qualquer benefício protetor geral, como Simples, Manto de Neve ou Gordura Espessa. Se uma habilidade puder atrapalhar ou ajudar os movimentos deste Pokémon, por exemplo, Pele Seca ou Desatento, a habilidade é ignorada de qualquer forma. Habilidades que não se encaixam nesta descrição, mesmo que possam atrapalhar movimentos de alguma outra forma, não são afetadas. Por exemplo, Corpo Amaldiçoado afeta apenas usos futuros potenciais do movimento, enquanto Lodo Líquido e Sombra Presa só podem atrapalhar o efeito de um movimento no usuário. Esta habilidade não pode ignorar mudanças de tipo ou forma concedidas por habilidades, por exemplo, Mudança de Cor ou Previsão; nem efeitos causados por habilidades que não estão mais vinculados a uma habilidade, como a chuva de Chuvisco. Esta habilidade não pode ignorar Multitype de forma alguma. Uma habilidade ignorada por esta habilidade só é anulada enquanto o movimento está sendo usado. Por exemplo, os movimentos deste Pokémon podem paralisar um Pokémon com Flexibilidade, mas a Flexibilidade será ativada e curará a paralisia imediatamente depois, e os Espinhos deste Pokémon não são afetados por esta habilidade após terem sido colocados. Quando este Pokémon entra na batalha, todos os treinadores participantes são notificados de que ele possui esta habilidade. Esta habilidade funciona de forma idêntica a Quebra-Molde e Teravolt."
+},
+"unaware": {
+"pt": "Inconsciente",
+"d": "Este Pokémon ignora os modificadores de estatísticas de outros Pokémon para fins de cálculo de dano e precisão. Na prática, isso afeta modificadores de todas as estatísticas, exceto Velocidade. O poder de Punishment e Stored Power é calculado normalmente. Quando este Pokémon se machuca por confusão, seus modificadores de estatísticas afetam o dano normalmente."
+},
+"unburden": {
+"pt": "Leveza",
+"d": "Quando esse Pokémon usa ou perde o item que está segurando, sua Velocidade é duplicada. Se ele ganhar outro item ou sair da batalha, esse bônus é perdido. Isso inclui quando o Pokémon deixa cair o item devido ao movimento Derrubada. Esse bônus não conta como um modificador de estatística. Não há notificação quando essa habilidade entra em vigor."
+},
+"unnerve": {
+"pt": "Aterrorizar",
+"d": "Os Pokémon adversários não podem comer as Bagas que carregam enquanto este Pokémon estiver em batalha. Os Pokémon afetados ainda podem usar Bug Bite ou Pluck para comer a Baga do alvo."
+},
+"unseen-fist": {
+"pt": "Punho Invisível",
+"d": "Se o Pokémon usar golpes que causem contato direto, ele poderá atacar o alvo mesmo que este se proteja."
+},
+"vessel-of-ruin": {
+"pt": "Vaso da Ruína",
+"d": "O poder do receptáculo da ruína do Pokémon reduz os atributos de Ataque Especial de todos os Pokémon, exceto dele próprio."
+},
+"victory-star": {
+"pt": "Estrela da Vitória",
+"d": "Todos os movimentos dos Pokémon aliados, incluindo os próprios movimentos deste Pokémon, têm 1,1x de sua precisão habitual enquanto este Pokémon estiver em batalha."
+},
+"wandering-spirit": {
+"pt": "Espírito Errante",
+"d": "O Pokémon troca de Habilidades com um Pokémon que o acerte com um movimento que cause contato direto."
+},
+"water-bubble": {
+"pt": "Bolha d'Água",
+"d": "Quando este Pokémon é atingido por um ataque do tipo Fogo, o dano é reduzido pela metade. Quando este Pokémon usa um ataque do tipo Água, o poder é duplicado. Este Pokémon não pode sofrer queimadura e, caso sofra, a queimadura é curada imediatamente."
+},
+"water-compaction": {
+"pt": "Compactação Aquática",
+"d": "Aumenta a Defesa desse Pokémon em dois níveis quando ele é atingido por um ataque do tipo Água."
+},
+"water-veil": {
+"pt": "Véu de Água",
+"d": "Este Pokémon não pode sofrer queimaduras. Se um Pokémon estiver com queimadura e adquirir essa habilidade, a queimadura é curada; isso inclui quando ele recupera uma habilidade perdida ao sair da batalha."
+},
+"weak-armor": {
+"pt": "Armadura Frágil",
+"d": "Sempre que esse Pokémon for atingido por um movimento físico, sua Velocidade aumenta em um nível e sua Defesa diminui em um nível. Essa habilidade é ativada a cada acerto de um movimento com múltiplos acertos."
+},
+"well-baked-body": {
+"pt": "Corpo Bem-passado",
+"d": "O Pokémon não sofre dano quando é atingido por ataques do tipo Fogo. Em vez disso, seu atributo de Defesa aumenta significativamente."
+},
+"white-smoke": {
+"pt": "Fumaça Branca",
+"d": "Este Pokémon não pode ter suas estatísticas reduzidas por outros Pokémon. Essa habilidade não impede perdas de estatísticas que não sejam causadas por modificadores de estatísticas, como a redução na Velocidade causada pela paralisia; nem quedas de estatísticas autoinfligidas, como a queda no Ataque Especial causada por Superaquecimento; nem aumentos de estatísticas provocados pelo adversário, como o aumento no Ataque causado por Exibição. Este Pokémon ainda pode receber modificadores negativos de estatísticas por meio de Troca de Guarda, Troca de Coração ou Troca de Poder. Essa habilidade funciona de maneira idêntica à Corpo Puro em batalha. Mundo Aberto: Se o Pokémon inicial tiver essa habilidade, a taxa de encontro com Pokémon selvagens é reduzida pela metade."
+},
+"wimp-out": {
+"pt": "Covardia",
+"d": "Depois que esse Pokémon for atingido por um golpe, se esse golpe fizer com que os HP dele caiam para menos da metade, ele sai da batalha."
+},
+"wind-power": {
+"pt": "Energia Eólica",
+"d": "O Pokémon fica carregado quando é atingido por um ataque do tipo Vento, o que aumenta a potência do próximo ataque do tipo Elétrico que ele usar."
+},
+"wind-rider": {
+"pt": "Cavaleiro dos Ventos",
+"d": "Aumenta a estatística de Ataque do Pokémon se Tailwind entrar em vigor ou se o Pokémon for atingido por um movimento de vento. Além disso, o Pokémon não sofre dano de movimentos de vento."
+},
+"wonder-guard": {
+"pt": "Guarda Maravilha",
+"d": "Este Pokémon é imune a movimentos de dano que não sejam supereficazes contra ele. Movimentos que causam dano fixo, como Night Shade ou Seismic Toss, são considerados supereficazes se seus tipos forem. Danos não causados diretamente por movimentos, como danos por clima, condições de status ou Spikes, não são evitados. Esta habilidade não pode ser copiada com Role Play nem trocada com Skill Swap, mas pode ser copiada com Trace, desativada com Gastro Acid ou alterada com Worry Seed. Este Pokémon ainda pode usar Role Play para perder esta habilidade, mas não Skill Swap. Se este Pokémon tiver um Substitute, esta habilidade bloqueará os movimentos normalmente e quaisquer movimentos não bloqueados reagirão ao Substitute normalmente."
+},
+"wonder-skin": {
+"pt": "Pele Milagrosa",
+"d": "Os golpes que não causam danos têm exatamente 50% de precisão básica contra este Pokémon."
+},
+"zen-mode": {
+"pt": "Modo Zen",
+"d": "Este Pokémon alterna entre o Modo Padrão e o Modo Zen após cada turno, dependendo do seu HP. Abaixo de 50% do seu HP máximo, ele muda para o Modo Zen e, com 50% ou mais, muda para o Modo Padrão. Este Pokémon retorna ao Modo Padrão ao sair da batalha ou perder esta habilidade. Esta habilidade não tem efeito se este Pokémon não for um Darmanitan."
+},
+"zero-to-hero": {
+"pt": "Do Abismo ao Heroísmo",
+"d": "O Pokémon se transforma em sua Forma de Herói quando é substituído em batalha."
+}
+}

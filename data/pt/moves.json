@@ -2090,5 +2090,1001 @@
 "skill-swap": {
 "pt": "Troca de Habilidades",
 "d": "O usuário emprega seu poder psíquico para trocar Habilidades com o alvo."
+},
+"mat-block": {
+"pt": "Defesa de Tatame",
+"d": "Usando um tapete estendido como escudo, o usuário protege a si mesmo e aos seus aliados contra ataques que causam dano. Isso não impede o efeito de ataques que causam alterações de estado."
+},
+"water-shuriken": {
+"pt": "Shuriken de Água",
+"d": "O usuário acerta o alvo com estrelas ninja de duas a cinco vezes seguidas. Esse movimento sempre é executado em primeiro lugar."
+},
+"accelerock": {
+"pt": "Acelarochas",
+"d": "O usuário colide com o alvo em alta velocidade. Esse movimento sempre é executado primeiro."
+},
+"anchor-shot": {
+"pt": "Tiro de Âncora",
+"d": "O usuário prende o alvo com sua corrente de âncora enquanto o ataca. O alvo fica impossibilitado de fugir."
+},
+"apple-acid": {
+"pt": "Ácido Málico",
+"d": "O usuário ataca o alvo com um líquido ácido produzido a partir de maçãs ácidas. Isso também reduz a estatística de Defesa Especial do alvo."
+},
+"aqua-cutter": {
+"pt": "Corte Aquático",
+"d": "O usuário expele água pressurizada para cortar o alvo como se fosse uma lâmina. Esse movimento tem uma chance maior de causar um golpe crítico."
+},
+"aqua-step": {
+"pt": "Passo Aquático",
+"d": "O usuário brinca com o alvo e o ataca com passos de dança leves e fluidos. Isso também aumenta a estatística de Velocidade do usuário."
+},
+"armor-cannon": {
+"pt": "Canhão Blindado",
+"d": "O usuário lança sua própria armadura como projéteis em chamas. Isso também reduz as estatísticas de Defesa e Defesa Especial do usuário."
+},
+"aromatic-mist": {
+"pt": "Névoa Aromática",
+"d": "O usuário aumenta a Defesa Especial de um Pokémon aliado usando um aroma misterioso."
+},
+"assist": {
+"pt": "Auxiliar",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser reaprendido."
+},
+"attack-order": {
+"pt": "Ordem de Ataque",
+"d": "O usuário convoca seus subordinados para atacar o alvo. Esse movimento tem uma chance maior de causar um golpe crítico."
+},
+"attract": {
+"pt": "Atrair",
+"d": "Se o alvo for do sexo oposto ao do usuário, ele se apaixona pelo usuário e, às vezes, fica incapaz de usar seus ataques."
+},
+"aura-wheel": {
+"pt": "Roda da Aura",
+"d": "Morpeko ataca e aumenta seu atributo de Velocidade com a energia armazenada em suas bochechas. O tipo desse movimento varia de acordo com a forma do usuário."
+},
+"aurora-veil": {
+"pt": "Véu da Aurora",
+"d": "Este movimento reduz o dano causado por ataques físicos e especiais por cinco turnos. Ele só pode ser usado quando está nevando."
+},
+"baneful-bunker": {
+"pt": "Bunker Sinistro",
+"d": "Além de proteger o usuário contra ataques, essa medida também envenena qualquer invasor que entre em contato direto com ele."
+},
+"barb-barrage": {
+"pt": "Barragem de Espinhos",
+"d": "O usuário lança inúmeras flechas venenosas para causar dano. Isso também pode envenenar o alvo. O poder desse ataque é duplicado se o alvo já estiver envenenado."
+},
+"beak-blast": {
+"pt": "Bico Explosivo",
+"d": "O usuário primeiro aquece o bico e, em seguida, ataca o alvo. O contato direto com o usuário enquanto ele está aquecendo o bico causa uma queimadura."
+},
+"bestow": {
+"pt": "Presentear",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser reaprendido."
+},
+"bitter-blade": {
+"pt": "Lâmina Amarga",
+"d": "O usuário canaliza seus sentimentos amargos em relação ao mundo dos vivos em um ataque cortante. Os PVs do usuário são restaurados em até metade do dano sofrido pelo alvo."
+},
+"bleakwind-storm": {
+"pt": "Tempestade Gélida",
+"d": "O usuário ataca com ventos violentos e gelados que fazem o corpo e o espírito tremerem. Isso também pode reduzir os atributos de Velocidade dos Pokémon adversários."
+},
+"blue-flare": {
+"pt": "Chama Azul",
+"d": "O usuário ataca envolvendo o alvo em uma chama azul intensa, mas bela. Isso também pode causar queimaduras no alvo."
+},
+"body-press": {
+"pt": "Supino",
+"d": "O usuário ataca lançando seu corpo contra o alvo. Quanto maior for o atributo de Defesa do usuário, maior será o dano causado por esse golpe."
+},
+"bolt-beak": {
+"pt": "Bico Relâmpago",
+"d": "O usuário perfura o alvo com seu bico eletrificado. Se o usuário atacar antes do alvo, o poder desse golpe é duplicado."
+},
+"bolt-strike": {
+"pt": "Relâmpago Trovejante",
+"d": "O usuário se envolve em uma grande quantidade de eletricidade e ataca o alvo. Isso também pode causar paralisia no alvo."
+},
+"boomburst": {
+"pt": "Estrondo",
+"d": "O usuário ataca tudo ao seu redor com o poder destrutivo de um som terrível e explosivo."
+},
+"branch-poke": {
+"pt": "Estocada de Galho",
+"d": "O usuário ataca o alvo cutucando-o com um galho bem pontiagudo."
+},
+"breaking-swipe": {
+"pt": "Giro Destruidor",
+"d": "O usuário balança sua cauda resistente com violência e ataca os Pokémon adversários. Isso também reduz os atributos de Ataque deles."
+},
+"brutal-swing": {
+"pt": "Giro Brutal",
+"d": "O usuário balança o corpo violentamente para causar danos a tudo ao seu redor."
+},
+"burning-bulwark": {
+"pt": "Baluarte em Chamas",
+"d": "A pelagem extremamente quente do usuário o protege contra ataques e também queima qualquer agressor que entre em contato direto com ela."
+},
+"chatter": {
+"pt": "Tagarela",
+"d": "O usuário ataca o alvo com ondas sonoras de tagarelice ensurdecedora. Isso confunde o alvo."
+},
+"chip-away": {
+"pt": "Golpe Perfurante",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser relembrado."
+},
+"clanging-scales": {
+"pt": "Escamas Metálicas",
+"d": "O usuário esfrega as escamas por todo o corpo e emite um barulho ensurdecedor para atacar os Pokémon adversários. A estatística de Defesa do usuário é reduzida após o ataque."
+},
+"clangorous-soul": {
+"pt": "Alma Estrondosa",
+"d": "O usuário aumenta todas as suas estatísticas ao usar parte de seus próprios HP."
+},
+"collision-course": {
+"pt": "Rota de Colisão",
+"d": "O usuário se transforma e se joga no chão, provocando uma enorme explosão pré-histórica. O poder desse golpe aumenta mais do que o normal se for um golpe supereficaz."
+},
+"confide": {
+"pt": "Confiar",
+"d": "O usuário conta um segredo ao alvo, e este perde a capacidade de se concentrar. Isso reduz a estatística de Ataque Especial do alvo."
+},
+"core-enforcer": {
+"pt": "Castigador do Núcleo",
+"d": "Se os Pokémon aos quais o usuário causou dano já tiverem usado seus movimentos, este movimento anula o efeito da Habilidade do alvo."
+},
+"court-change": {
+"pt": "Troca de Lado",
+"d": "Com seu poder misterioso, o usuário inverte os efeitos em cada lado do campo."
+},
+"crafty-shield": {
+"pt": "Escudo Engenoso",
+"d": "O usuário protege a si mesmo e aos seus aliados contra ataques de status com um poder misterioso. Isso não impede os ataques que causam dano."
+},
+"crush-grip": {
+"pt": "Aperto Esmagador",
+"d": "O alvo é esmagado com grande força. Quanto mais HP o alvo ainda tiver, maior será o poder do golpe."
+},
+"dark-void": {
+"pt": "Vazio Sombrio",
+"d": "Os Pokémon adversários são arrastados para um mundo de escuridão total que os faz adormecer."
+},
+"darkest-lariat": {
+"pt": "Lariat das Trevas",
+"d": "O usuário balança os dois braços e acerta o alvo. As mudanças nas estatísticas do alvo não afetam o dano causado por este golpe."
+},
+"decorate": {
+"pt": "Decorar",
+"d": "O usuário aumenta significativamente as estatísticas de Ataque e Ataque Especial do alvo ao decorá-lo."
+},
+"defend-order": {
+"pt": "Ordem de Defesa",
+"d": "O usuário convoca seus subordinados para proteger seu corpo, aumentando suas estatísticas de Defesa e Defesa Especial."
+},
+"diamond-storm": {
+"pt": "Tempestade de Diamantes",
+"d": "O usuário cria uma tempestade de diamantes para causar dano aos Pokémon adversários. Isso também pode aumentar significativamente o atributo Defesa do usuário."
+},
+"dire-claw": {
+"pt": "Garra Terrível",
+"d": "O usuário ataca o alvo com garras devastadoras. Isso também pode deixar o alvo envenenado, paralisado ou adormecido."
+},
+"doodle": {
+"pt": "Rabisco",
+"d": "O usuário captura a própria essência do alvo em um esboço. Isso altera as Habilidades do usuário e de seu Pokémon aliado, tornando-as iguais às do alvo."
+},
+"doom-desire": {
+"pt": "Desejo de Destruição",
+"d": "Duas rodadas após o uso dessa jogada, um feixe concentrado de luz atinge o alvo."
+},
+"double-iron-bash": {
+"pt": "Batida de Ferro Dupla",
+"d": "O usuário gira, centralizando a porca sextavada no peito, e então desfere dois golpes consecutivos com os braços. Isso também pode fazer com que o alvo recue."
+},
+"double-shock": {
+"pt": "Duplo Choque",
+"d": "O usuário descarrega toda a eletricidade de seu corpo para realizar um ataque de alto dano. Após usar esse movimento, o usuário não será mais do tipo Elétrico."
+},
+"dragon-darts": {
+"pt": "Dardos do Dragão",
+"d": "O usuário ataca duas vezes com o Dreepy. Se houver dois Pokémon adversários, esse movimento atinge cada um deles uma vez."
+},
+"dragon-energy": {
+"pt": "Energia do Dragão",
+"d": "Transformando sua energia vital em poder, o usuário ataca os Pokémon adversários. Quanto menor for o HP do usuário, menor será o poder do movimento."
+},
+"dragon-hammer": {
+"pt": "Martelo Dragão",
+"d": "O usuário usa o próprio corpo como um martelo para atacar o alvo e causar dano."
+},
+"drum-beating": {
+"pt": "Batida de Tambor",
+"d": "O usuário toca seu tambor, controlando as raízes do tambor para atacar o alvo. Isso também reduz o atributo Velocidade do alvo."
+},
+"dual-wingbeat": {
+"pt": "Batida de Asas Dupla",
+"d": "O usuário golpeia o alvo com suas asas para causar dano. O alvo é atingido duas vezes seguidas."
+},
+"dynamax-cannon": {
+"pt": "Canhão Dynamax",
+"d": "O usuário concentra energia em seu corpo e a libera a partir de seu centro para causar dano."
+},
+"electrify": {
+"pt": "Eletrificar",
+"d": "Se o alvo for eletrificado antes de usar um movimento durante esse turno, o movimento do alvo passa a ser do tipo Elétrico."
+},
+"electro-drift": {
+"pt": "Eletrodrift",
+"d": "O usuário avança a velocidades ultrarrápidas, atingindo seu alvo com eletricidade futurística. O poder desse golpe é ampliado ainda mais do que o normal se for um golpe supereficaz."
+},
+"electro-shot": {
+"pt": "Eletrodisparo",
+"d": "O usuário acumula eletricidade no primeiro turno, aumentando sua estatística de Ataque Especial, e, em seguida, dispara um tiro de alta voltagem no turno seguinte. O tiro será disparado imediatamente se estiver chovendo."
+},
+"electroweb": {
+"pt": "Teia Eletrizante",
+"d": "O usuário captura os Pokémon adversários com uma rede elétrica para causar dano. Isso também reduz os atributos de Velocidade deles."
+},
+"entrainment": {
+"pt": "Embalo",
+"d": "O usuário dança com um ritmo peculiar que leva o alvo a imitá-lo, fazendo com que a Habilidade do alvo passe a ser a mesma do usuário."
+},
+"eternabeam": {
+"pt": "Eternarai",
+"d": "Este é o ataque mais poderoso do Eternatus em sua forma original. O usuário não pode se mover no próximo turno."
+},
+"expanding-force": {
+"pt": "Força Expansiva",
+"d": "O usuário ataca o alvo com seu poder psíquico. Quando o terreno é do tipo Psíquico, a potência desse movimento é aumentada e causa dano a todos os Pokémon adversários."
+},
+"fairy-lock": {
+"pt": "Feitiço de Fada",
+"d": "Ao bloquear o campo de batalha, o usuário impede que todos os Pokémon fujam durante o próximo turno."
+},
+"false-surrender": {
+"pt": "Rendição Falsa",
+"d": "O usuário finge abaixar a cabeça, mas, em seguida, apunhala o alvo com seus cabelos despenteados. Esse ataque nunca erra."
+},
+"fickle-beam": {
+"pt": "Feixe Instável",
+"d": "O usuário dispara um feixe de luz para causar dano. Às vezes, todas as cabeças do usuário disparam feixes em uníssono, dobrando a potência do golpe."
+},
+"fiery-dance": {
+"pt": "Dança Ardente",
+"d": "Envolto em chamas, o usuário ataca o alvo dançando e batendo as asas. Isso também pode aumentar a estatística de Ataque Especial do usuário."
+},
+"fillet-away": {
+"pt": "Filetagem",
+"d": "O usuário aumenta drasticamente suas estatísticas de Ataque, Ataque Especial e Velocidade ao usar seus próprios PVs."
+},
+"fire-lash": {
+"pt": "Chicote de Fogo",
+"d": "O usuário atinge o alvo com um chicote em chamas. Isso também reduz a estatística de Defesa do alvo."
+},
+"first-impression": {
+"pt": "Primeira Impressão",
+"d": "Embora esse movimento tenha grande poder, ele só funciona no primeiro turno sempre que o usuário entra na batalha."
+},
+"fishious-rend": {
+"pt": "Despedaçamento Ictíico",
+"d": "O usuário rasga o alvo com suas brânquias duras. Se o usuário atacar antes do alvo, a potência desse golpe é duplicada."
+},
+"flame-burst": {
+"pt": "Explosão de Chamas",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não pode ser relembrado."
+},
+"flash": {
+"pt": "Clarão",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, este movimento não poderá ser relembrado."
+},
+"fleur-cannon": {
+"pt": "Canhão Flor",
+"d": "O usuário lança um feixe poderoso. O coice desse movimento reduz drasticamente a estatística de Ataque Especial do usuário."
+},
+"flip-turn": {
+"pt": "Giro de Retirada",
+"d": "Depois de lançar seu ataque, o usuário corre de volta para trocar de lugar com um Pokémon do grupo que está à espera."
+},
+"floral-healing": {
+"pt": "Cura Floral",
+"d": "O usuário restaura os HP do alvo em até metade de seus HP máximos. Mais HP são restaurados quando o terreno é gramado."
+},
+"flower-shield": {
+"pt": "Escudo das Flores",
+"d": "O usuário aumenta os atributos de Defesa de todos os Pokémon do tipo Planta durante a batalha por meio de um poder misterioso."
+},
+"flower-trick": {
+"pt": "Truque da Flor",
+"d": "O usuário arremessa um buquê de flores armadilhado contra o alvo. Esse ataque nunca erra e sempre causa um dano crítico."
+},
+"flying-press": {
+"pt": "Voo Acrobático",
+"d": "O usuário mergulha do céu em direção ao alvo. Esse movimento é dos tipos Luta e Voo ao mesmo tempo."
+},
+"focus-blast": {
+"pt": "Explosão Focalizada",
+"d": "O usuário intensifica seu foco mental e libera todo o seu poder. Isso também pode reduzir a estatística de Defesa Especial do alvo."
+},
+"force-palm": {
+"pt": "Palma de Força",
+"d": "O alvo é atingido por uma onda de choque. Isso também pode causar paralisia no alvo."
+},
+"forests-curse": {
+"pt": "A Maldição da Floresta",
+"d": "O usuário lança uma maldição da floresta sobre o alvo. Isso adiciona o tipo Planta ao tipo do alvo."
+},
+"frost-breath": {
+"pt": "Sopro Gélido",
+"d": "O usuário ataca soprando seu hálito gelado sobre o alvo. Esse golpe sempre causa um dano crítico."
+},
+"frustration": {
+"pt": "Frustração",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser relembrado."
+},
+"fusion-bolt": {
+"pt": "Raio da Fusão",
+"d": "O usuário lança um raio gigante. O poder desse golpe aumenta quando influenciado por uma chama enorme."
+},
+"fusion-flare": {
+"pt": "Chama da Fusão",
+"d": "O usuário lança uma chama gigantesca. O poder desse golpe é ampliado quando influenciado por um enorme raio."
+},
+"gear-grind": {
+"pt": "Engrenagens Giratórias",
+"d": "O usuário ataca lançando engrenagens de aço contra seu alvo duas vezes."
+},
+"gear-up": {
+"pt": "Engrenar",
+"d": "O usuário aciona suas engrenagens para aumentar as estatísticas de Ataque e Ataque Especial dos Pokémon aliados com a habilidade “Plus” ou “Minus”."
+},
+"geomancy": {
+"pt": "Geomancia",
+"d": "O usuário absorve energia e aumenta drasticamente suas estatísticas de Ataque Especial, Defesa Especial e Velocidade no próximo turno."
+},
+"gigaton-hammer": {
+"pt": "Martelo Gigaton",
+"d": "O usuário gira o corpo inteiro para atacar com seu enorme martelo. Esse movimento não pode ser usado duas vezes seguidas."
+},
+"glaciate": {
+"pt": "Glaciação",
+"d": "O usuário ataca soprando ar gelado nos Pokémon adversários. Isso também reduz seus atributos de Velocidade."
+},
+"glaive-rush": {
+"pt": "Investida de Glaive",
+"d": "O usuário lança todo o seu corpo em uma investida imprudente. Após o uso desse movimento, os ataques contra o usuário não podem errar e causarão o dobro de dano até o próximo turno do usuário."
+},
+"grass-knot": {
+"pt": "Nó de Grama",
+"d": "O usuário prende o alvo com grama e o faz tropeçar. Quanto mais pesado for o alvo, maior será a potência do movimento."
+},
+"grav-apple": {
+"pt": "Maçã Gravitacional",
+"d": "O usuário causa dano ao jogar uma maçã de uma altura elevada. Isso também reduz a estatística de Defesa do alvo."
+},
+"head-charge": {
+"pt": "Investida de Cabeça",
+"d": "O usuário lança-se de cabeça contra o alvo, utilizando seus poderosos pelos de cobertura. Isso também causa um pequeno dano ao próprio usuário."
+},
+"heal-order": {
+"pt": "Ordem de Cura",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser relembrado."
+},
+"heart-stamp": {
+"pt": "Carimbo de Coração",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser reaprendido."
+},
+"heart-swap": {
+"pt": "Troca de Corações",
+"d": "O usuário emprega seu poder psíquico para trocar as alterações nas estatísticas com o alvo."
+},
+"heat-crash": {
+"pt": "Batida Térmica",
+"d": "O usuário se lança contra o alvo com o corpo envolto em chamas. Quanto maior for a diferença de peso entre o usuário e o alvo, maior será a potência do golpe."
+},
+"horn-leech": {
+"pt": "Chifre Sanguessuga",
+"d": "O usuário drena a energia do alvo com seus chifres. A vida do usuário é restaurada em até metade do dano recebido pelo alvo."
+},
+"hydro-steam": {
+"pt": "Vapor Hidráulico",
+"d": "O usuário lança água fervente sobre o alvo. O poder desse golpe não diminui sob a luz solar intensa; pelo contrário, é aumentado em 50%."
+},
+"hyperspace-hole": {
+"pt": "Fenda Hiperespaço",
+"d": "Ao utilizar um buraco no hiperespaço, o usuário aparece bem ao lado do alvo e ataca. Esse ataque pode atingir um alvo que esteja usando um movimento como “Proteger” ou “Detectar”."
+},
+"ice-ball": {
+"pt": "Bola de Gelo",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, este movimento não poderá ser reaprendido."
+},
+"ice-hammer": {
+"pt": "Martelo de Gelo",
+"d": "O usuário lança seu punho forte e pesado contra o alvo para causar dano. Isso também reduz a estatística de Velocidade do usuário."
+},
+"ice-spinner": {
+"pt": "Giro de Gelo",
+"d": "O usuário cobre os pés com uma fina camada de gelo e gira, colidindo com o alvo. O movimento giratório desse golpe também destrói o terreno."
+},
+"instruct": {
+"pt": "Instruir",
+"d": "O usuário instrui o alvo a reutilizar o movimento usado por ele pela última vez."
+},
+"ion-deluge": {
+"pt": "Chuva de Íons",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser relembrado."
+},
+"ivy-cudgel": {
+"pt": "Tacape de Hera",
+"d": "O usuário ataca com um bastão envolto em hera. O tipo desse golpe varia de acordo com a máscara usada pelo usuário, e ele tem uma chance maior de causar um golpe crítico."
+},
+"jaw-lock": {
+"pt": "Trava de Mandíbula",
+"d": "Esse movimento impede que o usuário e o alvo troquem de lugar até que um deles desmaie. O efeito cessa se qualquer um dos Pokémon sair do campo."
+},
+"jet-punch": {
+"pt": "Soco a Jato",
+"d": "O usuário concentra uma torrente de energia em torno do punho e desferra um soco a uma velocidade ofuscante. Esse golpe é sempre executado em primeiro lugar."
+},
+"judgment": {
+"pt": "Julgamento",
+"d": "O usuário dispara inúmeros feixes de luz contra o alvo. O tipo desse movimento varia de acordo com o tipo de placa que o usuário segura."
+},
+"jungle-healing": {
+"pt": "Cura na Selva",
+"d": "O usuário se funde com a selva, restaurando HP e curando condições de status para si mesmo e para o Pokémon aliado que estiver na batalha no momento."
+},
+"kings-shield": {
+"pt": "Escudo do Rei",
+"d": "O usuário assume uma postura defensiva enquanto se protege contra danos. Além disso, reduz a estatística de Ataque de qualquer atacante que entrar em contato direto com ele."
+},
+"kowtow-cleave": {
+"pt": "Golpe Submisso",
+"d": "O usuário desere um golpe contra o alvo após se prostrar, para fazer com que o alvo baixasse a guarda. Esse ataque nunca erra."
+},
+"lands-wrath": {
+"pt": "Fúria da Terra",
+"d": "O usuário absorve a energia da terra e concentra esse poder nos Pokémon adversários para causar dano a eles."
+},
+"last-respects": {
+"pt": "Últimas Homenagens",
+"d": "O usuário ataca para vingar seus aliados. Quanto mais aliados derrotados houver no grupo do usuário, maior será o poder do movimento."
+},
+"leaf-tornado": {
+"pt": "Tornado de Folhas",
+"d": "O usuário ataca seu alvo cercando-o com folhas afiadas. Esse ataque também pode reduzir a precisão do alvo."
+},
+"lumina-crash": {
+"pt": "Impacto Lumina",
+"d": "O usuário ataca lançando uma luz peculiar que chega a afetar a mente. Isso também reduz drasticamente a estatística de Defesa Especial do alvo."
+},
+"lunar-blessing": {
+"pt": "Bênção Lunar",
+"d": "O usuário recebe uma bênção da lua crescente, que restaura os PVs e cura as condições de status dele e do Pokémon aliado que estiver na batalha no momento."
+},
+"lunar-dance": {
+"pt": "Dança Lunar",
+"d": "O usuário desmaia. Em troca, o Pokémon que assumir seu lugar terá seus HP e PP restaurados e suas condições de status curadas."
+},
+"lunge": {
+"pt": "Investida Brusca",
+"d": "O usuário dá uma estocada no alvo, atacando com toda a força. Isso também reduz a estatística de Ataque do alvo."
+},
+"magic-powder": {
+"pt": "Pó Mágico",
+"d": "O usuário espalha uma nuvem de pó mágico que altera o tipo do alvo para Psíquico."
+},
+"magic-room": {
+"pt": "Sala Mágica",
+"d": "O usuário cria uma área estranha na qual os itens que os Pokémon carregam perdem seus efeitos por cinco turnos."
+},
+"magma-storm": {
+"pt": "Tempestade de Magma",
+"d": "O usuário aprisiona o alvo dentro de um redemoinho de fogo que causa dano por quatro a cinco turnos."
+},
+"make-it-rain": {
+"pt": "Que Chova Dinheiro",
+"d": "O usuário ataca lançando uma grande quantidade de moedas. Isso também reduz a estatística de Ataque Especial do usuário. O dinheiro é ganho após a batalha."
+},
+"malignant-chain": {
+"pt": "Cadeia Maligna",
+"d": "O usuário injeta toxinas no alvo, envolvendo-o em uma corrente tóxica e corrosiva. Isso também pode deixar o alvo gravemente envenenado."
+},
+"matcha-gotcha": {
+"pt": "Golpe de Matcha",
+"d": "O usuário dispara um jato do chá que preparou. Os PVs do usuário são restaurados em até metade do dano sofrido pelo alvo. Isso também pode causar uma queimadura no alvo."
+},
+"metal-burst": {
+"pt": "Explosão Metálica",
+"d": "O usuário revida com uma força muito maior contra o adversário que lhe causou dano por último."
+},
+"meteor-assault": {
+"pt": "Ataque de Meteoros",
+"d": "O usuário ataca violentamente com seu alho-poró grosso. O usuário não consegue se mover no próximo turno, pois a força desse golpe o faz cambalear."
+},
+"mighty-cleave": {
+"pt": "Corte Poderoso",
+"d": "O usuário empunha a luz que se acumulou no topo de sua cabeça para cortar o alvo. Esse golpe acerta mesmo que o alvo se proteja."
+},
+"mind-blown": {
+"pt": "Explosão Mental",
+"d": "O usuário ataca tudo ao seu redor fazendo com que sua própria cabeça exploda. Isso também causa danos ao próprio usuário."
+},
+"moongeist-beam": {
+"pt": "Feixe Luar Fantasma",
+"d": "O usuário emite um raio sinistro para atacar o alvo. Esse movimento pode ser usado contra o alvo, independentemente da habilidade dele."
+},
+"mortal-spin": {
+"pt": "Giro Mortal",
+"d": "O usuário realiza um ataque giratório que também pode neutralizar os efeitos de movimentos como “Bind”, “Wrap” e “Leech Seed”. Além disso, envenena os Pokémon adversários."
+},
+"multi-attack": {
+"pt": "Multiataque",
+"d": "Envolvendo-se em alta energia, o usuário se lança contra o alvo. A memória armazenada determina o tipo do golpe."
+},
+"mystical-fire": {
+"pt": "Fogo Místico",
+"d": "O usuário ataca expirando um fogo especial e quente. Isso também reduz a estatística de Ataque Especial do alvo."
+},
+"mystical-power": {
+"pt": "Poder Místico",
+"d": "O usuário ataca emitindo um poder misterioso. Isso também aumenta a estatística de Ataque Especial do usuário."
+},
+"nature-power": {
+"pt": "Poder Natural",
+"d": "Esse ataque aproveita o poder da natureza. Seus efeitos variam de acordo com o ambiente em que o usuário se encontra."
+},
+"natures-madness": {
+"pt": "Fúria da Natureza",
+"d": "O usuário atinge o alvo com a força da natureza. Isso reduz pela metade os HP do alvo."
+},
+"needle-arm": {
+"pt": "Soco de Espinhos",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, este movimento não poderá ser reaprendido."
+},
+"night-daze": {
+"pt": "Ilusão Noturna",
+"d": "O usuário lança uma onda de choque negra como a noite contra o alvo para causar dano. Isso também pode reduzir a precisão do alvo."
+},
+"no-retreat": {
+"pt": "Sem Recuo",
+"d": "Esse movimento aumenta todas as estatísticas do usuário, mas o impede de trocar de pokémon ou fugir."
+},
+"noble-roar": {
+"pt": "Rugido Nobre",
+"d": "Ao soltar um rugido majestoso, o usuário intimida o alvo e reduz suas estatísticas de Ataque e Ataque Especial."
+},
+"oblivion-wing": {
+"pt": "Asa do Esquecimento",
+"d": "O usuário absorve os HP do alvo. Os HP do usuário são restaurados em mais da metade do dano recebido pelo alvo."
+},
+"obstruct": {
+"pt": "Obstruir",
+"d": "Esse movimento permite que o usuário se proteja contra todos os ataques. A chance de falha aumenta se ele for usado repetidamente. O contato direto reduz drasticamente o atributo de Defesa do atacante."
+},
+"octolock": {
+"pt": "Abraço Oitavado",
+"d": "O usuário imobiliza o alvo e impede que ele fuja. Esse movimento também reduz a Defesa e a Def. Esp. do alvo a cada turno."
+},
+"order-up": {
+"pt": "Alinhamento",
+"d": "O usuário ataca com elegância e equilíbrio. Se o usuário tiver um Tatsugiri na boca, esse movimento aumenta uma de suas estatísticas, dependendo da forma do Tatsugiri."
+},
+"overdrive": {
+"pt": "Superdrive",
+"d": "O usuário ataca os Pokémon adversários tocando uma guitarra ou um baixo, causando um eco enorme e uma forte vibração."
+},
+"parabolic-charge": {
+"pt": "Carga Parabólica",
+"d": "O usuário ataca tudo ao seu redor. O HP do usuário é restaurado com metade do dano sofrido pelos alvos atingidos."
+},
+"parting-shot": {
+"pt": "Despedida",
+"d": "Com uma ameaça de despedida, o usuário reduz as estatísticas de Ataque e Ataque Especial do alvo. Em seguida, ele troca de lugar com um Pokémon do time que está à espera."
+},
+"phantom-force": {
+"pt": "Força Fantasma",
+"d": "O usuário desaparece em algum lugar e, no turno seguinte, atinge o alvo. Esse movimento acerta mesmo que o alvo se proteja."
+},
+"photon-geyser": {
+"pt": "Gêiser de Fótons",
+"d": "O usuário ataca o alvo com um pilar de luz. Esse movimento causa dano com base na estatística de Ataque ou Ataque Especial — a que for maior para o usuário."
+},
+"plasma-fists": {
+"pt": "Punhos de Plasma",
+"d": "O usuário ataca com os punhos eletrizados. Esse movimento transforma os golpes do tipo Normal em golpes do tipo Elétrico."
+},
+"pollen-puff": {
+"pt": "Rajada de Pólen",
+"d": "O usuário ataca o inimigo com uma nuvem de pólen que explode. Se o alvo for um aliado, ele recebe uma nuvem de pólen que restaura seu HP."
+},
+"population-bomb": {
+"pt": "Bomba Populacional",
+"d": "Os companheiros do usuário se reúnem em grande número para realizar um ataque combinado que atinge o alvo de uma a dez vezes seguidas."
+},
+"powder": {
+"pt": "Pó",
+"d": "O usuário cobre o alvo com um pó inflamável. Se o alvo usar um movimento do tipo Fogo, o pó explode e causa dano ao alvo."
+},
+"power-trip": {
+"pt": "Delírio de Poder",
+"d": "O usuário demonstra sua força e ataca o alvo. Quanto mais as estatísticas do usuário forem aumentadas, maior será o poder do movimento."
+},
+"prismatic-laser": {
+"pt": "Raio Prismático",
+"d": "O usuário dispara lasers poderosos utilizando a energia de um prisma. O usuário não pode se mover no próximo turno."
+},
+"psyblade": {
+"pt": "Psicolâmina",
+"d": "O usuário corta o alvo com uma lâmina etérea. O poder desse golpe aumenta em 50% se o usuário estiver em terreno elétrico."
+},
+"psychic-fangs": {
+"pt": "Presas Psíquicas",
+"d": "O usuário ataca mordendo o alvo com seus poderes psíquicos. Esse movimento também pode romper barreiras, como a Tela de Luz e o Refletir."
+},
+"psychic-terrain": {
+"pt": "Terreno Psíquico",
+"d": "Isso protege os Pokémon que estão no chão contra ataques prioritários e aumenta o poder dos ataques do tipo Psíquico por cinco turnos."
+},
+"psycho-boost": {
+"pt": "Impulso Psíquico",
+"d": "O usuário ataca o alvo com toda a sua força. O coice desse movimento reduz drasticamente a estatística de Ataque Especial do usuário."
+},
+"psyshield-bash": {
+"pt": "Investida Psigc",
+"d": "Envolvendo-se em energia psíquica, o usuário se lança contra o alvo. Isso também aumenta a estatística de Defesa do usuário."
+},
+"purify": {
+"pt": "Purificar",
+"d": "O usuário cura a condição de status do alvo. Se o movimento for bem-sucedido, ele também restaura o próprio HP do usuário."
+},
+"pyro-ball": {
+"pt": "Bola de Fogo",
+"d": "O usuário ataca acendendo uma pedrinha e lançando-a como uma bola de fogo contra o alvo. Isso também pode causar uma queimadura no alvo."
+},
+"relic-song": {
+"pt": "Canção da Relíquia",
+"d": "O usuário canta uma canção antiga e ataca tocando o coração dos Pokémon adversários que a ouvem. Isso também pode induzir o sono."
+},
+"return": {
+"pt": "Retorno",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser relembrado."
+},
+"revelation-dance": {
+"pt": "Dança da Revelação",
+"d": "O usuário ataca o alvo dançando com todas as suas forças. Esse movimento passa a ser do mesmo tipo que o do usuário."
+},
+"revival-blessing": {
+"pt": "Bênção do Avivamento",
+"d": "O usuário concede uma bênção amorosa, revivendo um Pokémon do grupo que tenha desmaiado e restaurando metade do PV máximo desse Pokémon."
+},
+"rising-voltage": {
+"pt": "Voltagem Crescente",
+"d": "O usuário ataca com uma descarga elétrica que surge do solo. O poder desse golpe é duplicado se o alvo estiver em terreno elétrico."
+},
+"roar-of-time": {
+"pt": "Rugido do Tempo",
+"d": "O usuário atinge o alvo com uma energia capaz de distorcer até mesmo o tempo. O usuário não pode se mover no próximo turno."
+},
+"rock-climb": {
+"pt": "Escalada",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser reaprendido."
+},
+"rock-wrecker": {
+"pt": "Destruidor de Rocha",
+"d": "O usuário arremessa uma enorme pedra contra o alvo para atacá-lo. O usuário não pode se mover no próximo turno."
+},
+"rototiller": {
+"pt": "Cultivador",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser reaprendido."
+},
+"ruination": {
+"pt": "Ruína",
+"d": "O usuário invoca um desastre devastador. Isso reduz pela metade os PVs do alvo."
+},
+"sacred-sword": {
+"pt": "Espada Sagrada",
+"d": "O usuário ataca com um golpe de espada. As alterações nas estatísticas do alvo não afetam o dano causado por este golpe."
+},
+"salt-cure": {
+"pt": "Cura Salina",
+"d": "O usuário salga o alvo, causando dano a cada turno. Os tipos Aço e Água são mais fortemente afetados por esse movimento."
+},
+"sandsear-storm": {
+"pt": "Tempestade Areia Ardente",
+"d": "O usuário ataca envolvendo os Pokémon adversários em ventos violentos e areia escaldante. Isso também pode causar queimaduras neles."
+},
+"scald": {
+"pt": "Escaldar",
+"d": "O usuário ataca lançando água fervente contra o alvo. Isso também pode causar queimaduras no alvo."
+},
+"searing-shot": {
+"pt": "Tiro Incandescente",
+"d": "O usuário incendeia tudo ao seu redor em um inferno de chamas escarlates. Isso também pode causar queimaduras nos alvos atingidos."
+},
+"secret-power": {
+"pt": "Poder Secreto",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser reaprendido."
+},
+"secret-sword": {
+"pt": "Espada Secreta",
+"d": "O usuário ataca com seu chifre comprido. O poder misterioso contido no chifre causa dano físico ao alvo."
+},
+"seed-flare": {
+"pt": "Chama de Sementes",
+"d": "O usuário emite uma onda de choque a partir do próprio corpo para atacar seu alvo. Isso também pode reduzir drasticamente a estatística de Defesa Especial do alvo."
+},
+"shadow-force": {
+"pt": "Força das Sombras",
+"d": "O usuário desaparece no primeiro turno e, em seguida, ataca no turno seguinte. Esse ataque acerta mesmo que o alvo se proteja."
+},
+"shed-tail": {
+"pt": "Descarte de Cauda",
+"d": "O usuário cria um substituto de si mesmo usando seus próprios PVs antes de trocar de lugar com um Pokémon do time que está à espera."
+},
+"shell-trap": {
+"pt": "Armadilha de Carapaça",
+"d": "O usuário coloca uma armadilha de concha. Se o usuário for atingido por um ataque físico, a armadilha explodirá e causará dano aos Pokémon adversários."
+},
+"shift-gear": {
+"pt": "Troca de Marcha",
+"d": "O usuário gira suas engrenagens, aumentando seu atributo de Ataque e elevando significativamente seu atributo de Velocidade."
+},
+"shore-up": {
+"pt": "Reforçar",
+"d": "O usuário restaura o seu próprio HP em até metade do seu HP máximo. Ele recupera mais HP durante uma tempestade de areia."
+},
+"silk-trap": {
+"pt": "Armadilha de Seda",
+"d": "O usuário lança uma armadilha de seda, protegendo-se de danos e, ao mesmo tempo, reduzindo o atributo Velocidade de qualquer atacante que entrar em contato direto com ela."
+},
+"skitter-smack": {
+"pt": "Golpe Sorrateiro",
+"d": "O usuário se esgueira por trás do alvo para atacar. Isso também reduz a estatística de Ataque Especial do alvo."
+},
+"sky-drop": {
+"pt": "Queda Livre",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser reaprendido."
+},
+"smelling-salts": {
+"pt": "Sais Aromáticos",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser reaprendido."
+},
+"snatch": {
+"pt": "Arrancada",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser reaprendido."
+},
+"snipe-shot": {
+"pt": "Tiro Preciso",
+"d": "O usuário ignora os efeitos dos golpes e das Habilidades do Pokémon adversário que desviam golpes, permitindo que esse golpe atinja o alvo escolhido."
+},
+"solar-blade": {
+"pt": "Lâmina Solar",
+"d": "O usuário absorve a luz no primeiro turno, depois enche uma lâmina com a energia da luz e ataca no turno seguinte."
+},
+"spacial-rend": {
+"pt": "Corte Espacial",
+"d": "O usuário rasga o alvo junto com o espaço ao seu redor. Acertos críticos ocorrem com mais facilidade."
+},
+"sparkling-aria": {
+"pt": "Ária Cintilante",
+"d": "O usuário começa a cantar, soltando muitas bolhas. Qualquer Pokémon que esteja com queimadura será curado ao entrar em contato com essas bolhas."
+},
+"spectral-thief": {
+"pt": "Roubo Espectral",
+"d": "O usuário se esconde na sombra do alvo, rouba os bônus de atributos do alvo e, em seguida, ataca."
+},
+"speed-swap": {
+"pt": "Troca Rápida",
+"d": "O usuário troca as estatísticas de Velocidade com o alvo."
+},
+"spicy-extract": {
+"pt": "Extrato Picante",
+"d": "O usuário libera um extrato incrivelmente picante, aumentando drasticamente a estatística de Ataque do alvo e reduzindo drasticamente a estatística de Defesa do alvo."
+},
+"spiky-shield": {
+"pt": "Escudo Espinhoso",
+"d": "Além de proteger o usuário contra ataques, essa ação também causa danos a qualquer invasor que entre em contato direto com ele."
+},
+"spin-out": {
+"pt": "Derrapagem",
+"d": "O usuário gira furiosamente, tensionando as pernas, causando dano ao alvo. Isso também reduz drasticamente a estatística de Velocidade do usuário."
+},
+"spirit-break": {
+"pt": "Quebra de Espírito",
+"d": "O usuário ataca o alvo com tanta força que isso pode abalar o ânimo dele. Isso também reduz a estatística de Ataque Especial do alvo."
+},
+"spirit-shackle": {
+"pt": "Grilhões Espirituais",
+"d": "O usuário ataca enquanto, ao mesmo tempo, prende a sombra do alvo ao chão para impedir que ele fuja."
+},
+"spotlight": {
+"pt": "Holofote",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser reaprendido."
+},
+"springtide-storm": {
+"pt": "Tempestade Primaveril",
+"d": "O usuário ataca envolvendo os Pokémon adversários em ventos violentos repletos de amor e ódio. Isso também pode reduzir suas estatísticas de Ataque."
+},
+"steam-eruption": {
+"pt": "Erupção de Vapor",
+"d": "O usuário mergulha o alvo em vapor superaquecido. Isso também pode causar uma queimadura no alvo."
+},
+"steamroller": {
+"pt": "Rolo Compressor",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser relembrado."
+},
+"steel-roller": {
+"pt": "Rolador de Aço",
+"d": "O usuário ataca enquanto destrói o terreno. Esse movimento falha se o solo ainda não tiver se transformado em terreno."
+},
+"stone-axe": {
+"pt": "Machado de Pedra",
+"d": "O usuário brandiu seus machados de pedra contra o alvo. Estilhaços de pedra deixados por esse ataque flutuam ao redor do alvo."
+},
+"strength-sap": {
+"pt": "Drenagem de Força",
+"d": "O usuário restaura seus próprios HP em uma quantidade igual ao valor da estatística de Ataque do alvo. Em seguida, reduz a estatística de Ataque do alvo."
+},
+"stuff-cheeks": {
+"pt": "Estufar Bochechas",
+"d": "O usuário come a Baga que está com ele e, em seguida, aumenta drasticamente seu atributo de Defesa."
+},
+"sunsteel-strike": {
+"pt": "Golpe Solar",
+"d": "O usuário se lança contra o alvo com a força de um meteoro. Esse golpe pode ser usado contra o alvo, independentemente da habilidade dele."
+},
+"synchronoise": {
+"pt": "Sincrorruído",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não poderá ser relembrado."
+},
+"syrup-bomb": {
+"pt": "Bomba de Xarope",
+"d": "O usuário provoca uma explosão de calda de doce pegajosa, que reveste o alvo e faz com que a estatística de Velocidade dele diminua a cada turno, por três turnos."
+},
+"tachyon-cutter": {
+"pt": "Cortador de Táquions",
+"d": "O usuário ataca lançando lâminas de partículas contra o alvo duas vezes seguidas. Esse ataque nunca erra."
+},
+"tail-glow": {
+"pt": "Brilho na cauda",
+"d": "O usuário fica olhando para luzes piscantes para concentrar a mente, aumentando drasticamente seu atributo de Ataque Especial."
+},
+"tail-slap": {
+"pt": "Tapa de Cauda",
+"d": "O usuário ataca golpeando o alvo com sua cauda dura. Esse golpe acerta de duas a cinco vezes seguidas."
+},
+"take-heart": {
+"pt": "Ânimo Renovado",
+"d": "O usuário se anima, curando suas próprias condições de status e aumentando suas estatísticas de Ataque Especial e Defesa Especial."
+},
+"tar-shot": {
+"pt": "Tiro de Piche",
+"d": "O usuário derrama alcatrão pegajoso sobre o alvo, reduzindo a estatística de Velocidade do alvo. O alvo fica mais vulnerável a golpes do tipo Fogo."
+},
+"teatime": {
+"pt": "Hora do Chá",
+"d": "O usuário toma o chá da tarde com todos os Pokémon que estão na batalha no momento. Cada Pokémon come a Baga que está segurando."
+},
+"techno-blast": {
+"pt": "Tecno-Disparo",
+"d": "O usuário dispara um feixe de luz contra o alvo. O tipo do movimento muda dependendo do Drive que o usuário estiver segurando."
+},
+"telekinesis": {
+"pt": "Telecinesia",
+"d": "Este movimento não pode ser usado. Recomenda-se que ele seja esquecido. Uma vez esquecido, esse movimento não pode ser relembrado."
+},
+"tera-starstorm": {
+"pt": "Tempestade Estelar Tera",
+"d": "Com o poder de seus cristais, o usuário ataca e elimina o alvo. Quando usado por Terapagos em sua Forma Estelar, esse movimento causa dano a todos os Pokémon adversários."
+},
+"terrain-pulse": {
+"pt": "Pulso do Terreno",
+"d": "O usuário aproveita a energia do terreno para atacar. O tipo e a potência desse movimento variam de acordo com o terreno no momento em que ele é executado."
+},
+"thief": {
+"pt": "Ladrão",
+"d": "O usuário ataca e rouba o item que o alvo está segurando simultaneamente. O usuário não pode roubar nada se já estiver segurando um item."
+},
+"thousand-arrows": {
+"pt": "Mil Flechas",
+"d": "Esse movimento também atinge os Pokémon adversários que estiverem no ar. Esses Pokémon são derrubados no chão."
+},
+"thousand-waves": {
+"pt": "Mil Ondas",
+"d": "O usuário ataca com uma onda que se arrasta pelo chão. Quem for atingido por ela não pode fugir da batalha."
+},
+"thunder-cage": {
+"pt": "Gaiola do Trovão",
+"d": "O usuário aprisiona o alvo dentro de uma jaula de eletricidade com faíscas que causa dano por quatro a cinco turnos."
+},
+"thunderclap": {
+"pt": "Estrondo",
+"d": "Esse movimento permite que o usuário ataque primeiro com uma descarga elétrica. Esse movimento falha se o alvo não estiver se preparando para um ataque."
+},
+"tidy-up": {
+"pt": "Faxina",
+"d": "O usuário limpa o campo de batalha e remove os efeitos de Spikes, Stealth Rock, Sticky Web, Toxic Spikes e Substitute. Isso também aumenta as estatísticas de Ataque e Velocidade do usuário."
+},
+"topsy-turvy": {
+"pt": "De Cabeça para Baixo",
+"d": "Todas as alterações nas estatísticas que afetam o alvo se invertem e passam a ser o oposto do que eram."
+},
+"torch-song": {
+"pt": "Canção da Tocha",
+"d": "O usuário lança chamas violentas como se estivesse cantando uma música, queimando o alvo. Isso também aumenta a estatística de Ataque Especial do usuário."
+},
+"trick-or-treat": {
+"pt": "Gostosuras ou Travessuras",
+"d": "O usuário leva o alvo para pedir doces ou travessuras. Isso adiciona o tipo Fantasma ao tipo do alvo."
+},
+"trick-room": {
+"pt": "Sala de Truques",
+"d": "O usuário cria uma área peculiar na qual os Pokémon mais lentos têm prioridade de movimento por cinco turnos."
+},
+"triple-dive": {
+"pt": "Mergulho Triplo",
+"d": "O usuário realiza um mergulho triplo com sincronização perfeita, atingindo o alvo com jatos de água três vezes seguidas."
+},
+"trop-kick": {
+"pt": "Chute Tropical",
+"d": "O usuário desferiu um chute intenso, de origem tropical, no alvo. Isso também reduz a estatística de Ataque do alvo."
+},
+"v-create": {
+"pt": "Vitória em V",
+"d": "Com uma chama ardente na testa, o usuário se lança contra o alvo. Isso reduz as estatísticas de Defesa, Defesa Especial e Velocidade do usuário."
+},
+"venom-drench": {
+"pt": "Encharcamento de Veneno",
+"d": "Os Pokémon adversários ficam encharcados por um líquido venenoso estranho. Isso reduz os atributos de Ataque, Ataque Especial e Velocidade de um alvo envenenado."
+},
+"volt-switch": {
+"pt": "Giro Volt",
+"d": "Depois de lançar seu ataque, o usuário corre de volta para trocar de lugar com um Pokémon do time que está à espera."
+},
+"wicked-blow": {
+"pt": "Golpe Cruel",
+"d": "O usuário, tendo dominado o estilo das Trevas, desferra um golpe violento no alvo. Esse movimento sempre causa um golpe crítico."
+},
+"wild-charge": {
+"pt": "Carga Selvagem",
+"d": "O usuário se envolve em eletricidade e se lança contra o alvo. Isso também causa um pequeno dano ao próprio usuário."
+},
+"wildbolt-storm": {
+"pt": "Tempestade Raio Selvagem",
+"d": "O usuário invoca uma tempestade estrondosa e ataca violentamente com raios e ventos. Isso também pode causar paralisia nos Pokémon adversários."
+},
+"zing-zap": {
+"pt": "Zumbido Elétrico",
+"d": "O usuário colide com o alvo, causando um forte choque elétrico. Isso também pode fazer com que o alvo se encolha."
+},
+"fiery-wrath": {
+"pt": "Ira Ardente",
+"d": "O usuário transforma sua ira em uma aura semelhante a fogo para atacar. Isso também pode fazer com que os Pokémon adversários recuem."
+},
+"freezing-glare": {
+"pt": "Olhar Gélido",
+"d": "O usuário dispara seu poder psíquico pelos olhos para atacar. Isso também pode deixar o alvo paralisado."
+},
+"shadow-bone": {
+"pt": "Osso Sombrio",
+"d": "O usuário ataca golpeando o alvo com um osso que contém um espírito. Isso também pode reduzir a estatística de Defesa do alvo."
+},
+"shell-side-arm": {
+"pt": "Concha Lateral",
+"d": "Este movimento é físico ou especial — o que causar mais dano. Isso também pode envenenar o alvo."
+},
+"snap-trap": {
+"pt": "Armadilha de Espinhos",
+"d": "O usuário prende o alvo em uma armadilha de mola por quatro a cinco turnos."
+},
+"strange-steam": {
+"pt": "Vapor Estranho",
+"d": "O usuário ataca o alvo emitindo vapor. Isso também pode confundir o alvo."
+},
+"thunderous-kick": {
+"pt": "Chute Estrondoso",
+"d": "O usuário desestabiliza o alvo com um movimento rápido como um raio antes de desferir um chute. Isso também reduz a estatística de Defesa do alvo."
 }
 }

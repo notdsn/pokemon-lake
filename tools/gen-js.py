@@ -7,6 +7,7 @@ CAT={'physical':'p','special':'s','status':'t'}
 mons={}
 for m in d['mons']:
     mons[m['id']]=dict(n=m['name'],t=m['types'],s=m['stats'],c=m['capture'],x=m['xp'],g=m['growth'],L=1 if m['legend'] else 0,e=m['evo'],l=m['learn'],eg=m['eggs'],gr=m['gender'],hc=m['hatch'],ab=m['abil'])
+    if m.get('fm'): mons[m['id']]['fm']=m['fm']; mons[m['id']]['rg']=m['rg']
 mons[700]['ab']='pixilate'
 mons[658]['ab']='protean'
 megas={}

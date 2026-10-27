@@ -9,7 +9,7 @@ let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m
   const shot = async (n, w = 700) => { await p.waitForTimeout(w); return p.screenshot({ path: `${OUT}${tag}-${TAGN}-${n}.png` }); }; const clr = () => p.evaluate(() => document.querySelector('#modal-root').innerHTML = ''); const ev = (f, a) => p.evaluate(f, a);
   const busy = async () => { for (let w = 0; w < 60 && await ev(() => PokeApp.debug.B && PokeApp.debug.B.busy); w++) await p.waitForTimeout(300); };
   const click = sel => ev(s => { const e = document.querySelector(s); if (e) e.click(); return !!e; }, sel);
-  const winBattle = async () => { for (let t = 0; t < 12 && await ev(() => !!PokeApp.debug.B && !PokeApp.debug.B.s.over); t++) { await busy(); await ev(() => { const B = PokeApp.debug.B; if (!B || B.busy) return; B.s.sides[1].party.forEach(m => m.hp = 1); const mv = B.s.sides[0].b.m.moves[0]; PokeApp.debug.act({ type: 'move', n: mv.n }); }); await p.waitForTimeout(900); } };
+  const winBattle = async () => { for (let t = 0; t < 30 && await ev(() => !!PokeApp.debug.B && !PokeApp.debug.B.s.over); t++) { await busy(); await ev(() => { const B = PokeApp.debug.B; if (!B || B.busy) return; B.s.sides[1].party.forEach(m => m.hp = 1); B.s.sides[0].party.forEach(m => { m.hp = PokeApp.PE.maxhp(m); m.status = null; }); const pm = B.s.sides[0].b.m, sure = PDATA.mons[B.s.sides[1].b.m.id].t.includes('ghost') ? 'shadow-ball' : 'swift'; if (PDATA.moves[sure]) pm.moves[0] = { n: sure, pp: 20 }; const mv = B.s.sides[0].b.m.moves[0]; PokeApp.debug.act({ type: 'move', n: mv.n }); }); await p.waitForTimeout(900); } };
   await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
   await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="4"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
   await p.waitForTimeout(600); await clr();
@@ -19,7 +19,7 @@ let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m
     await ev(() => PokeApp.debug.go('rogue')); await shot('rogue', 300);
     await click('[data-a="rgstart"]'); ok(await ev(() => PokeApp.debug.S.rogue.run.party.length === 3), `${tag} corrida com 3 Pokémon`); await shot('rogue-run', 300);
     await click('[data-a="rgfight"]'); await p.waitForTimeout(2600); ok(await ev(() => !!(PokeApp.debug.B && PokeApp.debug.B.o.rogue)), `${tag} onda 1 começou`); await shot('rogue-battle', 100);
-    await winBattle(); await p.waitForTimeout(3500); for (let i = 0; i < 10 && !(await ev(() => !!document.querySelector('.rgopt'))); i++) await p.waitForTimeout(700);
+    await winBattle(); await p.waitForTimeout(3500); for (let i = 0; i < 30 && !(await ev(() => !!document.querySelector('.rgopt'))); i++) await p.waitForTimeout(700);
     ok(await ev(() => document.querySelectorAll('.rgopt').length === 3), `${tag} escolha 1 de 3`); await shot('rogue-choose', 500);
     await ev(() => { const o = [...document.querySelectorAll('.rgopt')]; (o.find(x => /Faixa|Colete|Pena|Fruta/.test(x.textContent)) || o[0]).click(); }); await p.waitForTimeout(500);
     ok(await ev(() => PokeApp.debug.S.rogue.run.wave === 2), `${tag} avançou para onda 2`);
