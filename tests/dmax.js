@@ -23,5 +23,5 @@ const st = { seed: 5 }, mk = (id, l, o) => PE.makeMon(id, l, st, o || {});
 // 4) migração de save v2 -> v3 remove dmax e mantém tudo
 { global.localStorage = { _: {}, getItem(k) { return this._[k] ?? null; }, setItem(k, v) { this._[k] = String(v); } }; require('../js/sha256.js'); require('../js/save.js');
   const sv = { v: 2, user: 'x', trainer: 'E', party: [{ id: 6, lvl: 50, dmax: { t: 2, g: 1 }, moves: [] }], box: [{ id: 1 }], gifts: { a: 1 } }; const m = PS.migrate(JSON.parse(JSON.stringify(sv)));
-  ok(m.v === 3 && !m.party[0].dmax && m.party.length === 1 && m.box.length === 1 && m.gifts.a === 1, 'migração v3 segura'); }
+  ok(m.v === PS.SAVE_VERSION && !m.party[0].dmax && m.party.length === 1 && m.box.length === 1 && m.gifts.a === 1, 'migração v3 segura'); }
 console.log(fail ? 'FALHAS: ' + fail : 'tudo ok'); process.exit(fail ? 1 : 0);

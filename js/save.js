@@ -1,19 +1,22 @@
 // Saves versionados. NUNCA apagar saves: para mudar o formato, incremente SAVE_VERSION e adicione uma migração.
 (function (G) {
   const ls = G.localStorage;
-  const SAVE_VERSION = 3, P = 'pkLake.';
+  const SAVE_VERSION = 4, P = 'pkLake.';
   const MIGRATIONS = {
     // v1 -> v2: Johto, Creche/Ovos, Mega Evolução, Pontos de Batalha. Só ADICIONA campos (S.gifts e tudo mais é mantido).
     // v2 -> v3: Dinamax/Gigantamax. Só remove estado temporário de batalha (dmax) se tiver sobrado.
+    // v3 -> v4: Missões, marcos da Pokédex, conquistas, pesca, mini-jogos, música. Só ADICIONA campos.
+    3: s => s,
     2: s => { [...(s.party || []), ...(s.box || [])].forEach(m => { if (m && m.dmax) delete m.dmax; }); return s; },
     1: s => { [...(s.party || []), ...(s.box || [])].forEach(m => { if (m && m.mega) delete m.mega; }); return s; },
   };
   function fresh(user) {
     return { v: SAVE_VERSION, user, created: Date.now(), trainer: null, avatar: 'red', money: 3000, party: [], box: [],
       bag: { 'poke-ball': 5, potion: 3 }, badges: [], elite: 0, champion: false, champs: 0, dex: { seen: {}, caught: {}, shiny: {} },
-      trainersBeaten: {}, stats: { battles: 0, wins: 0, caught: 0, shinies: 0, steps: 0, playMs: 0 }, daily: { last: null, streak: 0 },
-      tower: { best: 0, cur: 0 }, settings: { sound: true, speed: 1 }, lastMap: null,
-      gifts: {}, jbadges: [], jelite: 0, jchampion: false, jchamps: 0, region: 'kanto', elmGift: false, rewards: {}, bp: 0, eggs: [], daycare: { slots: [], since: 0, lastEgg: 0 } };
+      trainersBeaten: {}, stats: { battles: 0, wins: 0, caught: 0, shinies: 0, steps: 0, playMs: 0, fished: 0, hatched: 0, quizRight: 0, questsDone: 0, megas: 0, dmaxes: 0 }, daily: { last: null, streak: 0 },
+      tower: { best: 0, cur: 0 }, settings: { sound: true, speed: 1, music: true, mvol: 0.35, svol: 0.8 }, lastMap: null,
+      gifts: {}, jbadges: [], jelite: 0, jchampion: false, jchamps: 0, region: 'kanto', elmGift: false, rewards: {}, bp: 0, eggs: [], daycare: { slots: [], since: 0, lastEgg: 0 },
+      quests: {}, dexm: {}, ach: {}, achInit: 0, title: null, mini: {} };
   }
   function migrate(s) {
     if (!s || typeof s !== 'object') throw new Error('save inválido');

@@ -20,7 +20,7 @@
   function tone(f, d = 0.08, type = 'square', vol = 0.06, when = 0, slide = 0) {
     if (!audioOn()) return; const c = actx(); if (!c) return; const t = c.currentTime + when, o = c.createOscillator(), g = c.createGain();
     o.type = type; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, f + slide), t + d);
-    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(g).connect(c.destination); o.start(t); o.stop(t + d + 0.02);
+    g.gain.setValueAtTime(vol * ((S && S.settings.svol) ?? 0.8) / 0.8, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(g).connect(c.destination); o.start(t); o.stop(t + d + 0.02);
   }
   function noise(d = 0.15, vol = 0.12, when = 0) { if (!audioOn()) return; const c = actx(); if (!c) return; const b = c.createBuffer(1, c.sampleRate * d, c.sampleRate), x = b.getChannelData(0);
     for (let i = 0; i < x.length; i++) x[i] = (Math.random() * 2 - 1) * (1 - i / x.length); const s = c.createBufferSource(), g = c.createGain(); s.buffer = b; g.gain.value = vol; s.connect(g).connect(c.destination); s.start(c.currentTime + when); }
@@ -72,8 +72,8 @@
     const hc = D.mons[id].hc || 20; S.eggs.push({ id, iv, steps: hc * 12, total: hc * 12, from: a ? 'Creche' : 'Prof. Elm', at: Date.now() }); A.newEgg = 1; }
   function eggSteps(n) { if (!n) return; for (const e of S.eggs) e.steps = Math.max(0, e.steps - n); }
   async function checkEggs() { if (B || !S.trainer) return; const i = S.eggs.findIndex(e => e.steps <= 0); if (i < 0) { if (A.newEgg) { A.newEgg = 0; toast('🥚 A Creche encontrou um Ovo! Veja em Time.', 'good'); } return; }
-    const e = S.eggs.splice(i, 1)[0]; const m = PE.makeMon(e.id, 1, { seed: (R() * 2 ** 31) | 0 }, { ot: S.trainer, caughtAt: 'Chocado de um Ovo (' + e.from + ')', iv: e.iv, shiny: R() < 1 / 256 });
-    addCaught(m); S.stats.caught++; if (S.party.length < 6) S.party.push(m); else S.box.push(m); save();
+    const e = S.eggs.splice(i, 1)[0]; const m = PE.makeMon(e.id, 1, { seed: (R() * 2 ** 31) | 0 }, { ot: S.trainer, caughtAt: 'Chocado de um Ovo (' + e.from + ')', iv: e.iv, shiny: R() < shinyP() });
+    addCaught(m); S.stats.caught++; if (m.shiny) S.stats.shinies++; S.stats.hatched = (S.stats.hatched || 0) + 1; track('hatch'); if (S.party.length < 6) S.party.push(m); else S.box.push(m); save();
     modal(`<div class="center hatch"><div class="eggbig" id="eggbig"></div><h2 id="hatchT">Hã? O ovo está se mexendo!</h2><p id="hatchP" class="mut"></p><div class="mbtns"><button class="btn primary wide hidden" id="hatchOk" data-a="close">Que fofo!</button></div></div>`);
     SFX.shake(); await sleep(900); $('#eggbig')?.classList.add('crack'); SFX.shake(); await sleep(1300);
     const eb = $('#eggbig'); if (!eb) return; eb.outerHTML = `<img class="hatched" src="${spr(m)}" alt="">`; SFX.caught(); cry(m.id);
@@ -120,19 +120,20 @@
   const battleWeather = w => w === 'rain' || w === 'storm' ? 'rain' : w === 'sun' ? 'sun' : null;
 
   // ---------- navegação ----------
-  const MORE_TABS = ['shop', 'center', 'bag', 'dex', 'card', 'saves', 'settings', 'daycare'];
+  const MORE_TABS = ['shop', 'center', 'bag', 'dex', 'card', 'saves', 'settings', 'daycare', 'quests', 'games', 'ach'];
   const moreOk = k => k !== 'daycare' || FEAT.daycare;
   function go(t, s) { tab = t; sub = s || null; render(); window.scrollTo(0, 0); }
   function render() {
     if (!S) return;
     const nav = [['home', '🏠', 'Início'], ['team', '🎒', 'Time'], ['maps', '🗺️', 'Mapas'], ['battle', '⚔️', 'Batalha'], ['more', '☰', 'Mais']];
-    const V = { daycare: vDaycare, home: vHome, team: vTeam, maps: vMaps, battle: vBattle, more: vMore, shop: vShop, center: vCenter, bag: vBag, dex: vDex, card: vCard, saves: vSaves, settings: vSettings, explore: vExplore };
+    const V = { quests: vQuests, games: vGames, ach: vAch, daycare: vDaycare, home: vHome, team: vTeam, maps: vMaps, battle: vBattle, more: vMore, shop: vShop, center: vCenter, bag: vBag, dex: vDex, card: vCard, saves: vSaves, settings: vSettings, explore: vExplore };
+    ensureQuests(); const nbadge = questClaimable() + dexClaimable();
     const on = k => tab === k || (k === 'more' && MORE_TABS.includes(tab)) || (k === 'maps' && tab === 'explore');
     app.innerHTML = `<header class="top"><div class="brand" data-a="tab" data-t="home"><img src="img/items/poke-ball.png" alt=""><b>Pokémon <i>Lake</i></b></div>
       <div class="topr"><span class="chip money">${fmt(S.money)}</span><span class="chip hide-xs">${PERIOD_PT[period()]}</span></div></header>
-      <nav class="nav">${nav.map(([k, i, l]) => `<button class="${on(k) ? 'on' : ''}" data-a="tab" data-t="${k}"><span>${i}</span><small>${l}</small></button>`).join('')}</nav>
+      <nav class="nav">${nav.map(([k, i, l]) => `<button class="${on(k) ? 'on' : ''}" data-a="tab" data-t="${k}"><span>${i}</span><small>${l}</small>${k === 'more' && nbadge ? `<i class="ndot">${nbadge}</i>` : ''}</button>`).join('')}</nav>
       <section class="screen s-${tab}">${MORE_TABS.includes(tab) ? `<button class="btn small ghost backbtn" data-a="tab" data-t="more">← Mais</button>` : ''}${V[tab]()}</section>`;
-    document.body.dataset.period = period();
+    document.body.dataset.period = period(); if (!B) MUS.want(mapTheme());
   }
   document.addEventListener('click', e => {
     const b = e.target.closest('[data-a]'); if (!b || b.disabled) return; const a = b.dataset.a; SFX.click(); actx();
@@ -172,7 +173,7 @@
     $$('.acc').forEach(b => b.onclick = () => { $('#au').value = b.dataset.u; $('#ap').focus(); });
     $('#accForm').onsubmit = e => { e.preventDefault(); try { const u = mode === 'login' ? PS.login($('#au').value, $('#ap').value) : PS.createAccount($('#au').value, $('#ap').value); startUser(u); } catch (er) { $('#aerr').textContent = er.message; } };
   }
-  function startUser(u) { user = u; sessionStorage.setItem(SESSION_KEY, u); S = PS.read(u); sessionStart = Date.now(); if (!S.trainer) onboarding(); else { retroRewards(); checkDaily(); repairMoves(); try { daycareTick(); setTimeout(checkEggs, 1500); } catch (e) {} go('home'); } }
+  function startUser(u) { user = u; sessionStorage.setItem(SESSION_KEY, u); S = PS.read(u); sessionStart = Date.now(); if (!S.trainer) onboarding(); else { retroRewards(); checkDaily(); try { ensureQuests(); checkAch(); } catch (e) {} repairMoves(); try { daycareTick(); setTimeout(checkEggs, 1500); } catch (e) {} go('home'); } }
   function retroBand() { if (S.champion && S.bag['mega-bracelet'] && !S.bag['dynamax-band']) { S.bag['dynamax-band'] = 1; save(); setTimeout(() => modal(`<div class="center badgewin"><div class="bigbadge megab"><img src="img/items/dynamax-band.png" alt=""></div><h2>Pulseira Dinamax!</h2><p>Como Campeão, você também recebeu a <b>Pulseira Dinamax</b>. Uma vez por batalha, toque em <b>⬣ Dinamax</b> no menu de golpes: o Pokémon fica gigante por 3 turnos, com o dobro de HP e Golpes Max!</p><p class="mut small">Charizard, Venusaur, Blastoise, Pikachu, Eevee, Snorlax e outros viram <b>Gigantamax</b> com golpes G-Max exclusivos. Não dá para usar Mega e Dinamax na mesma batalha.</p><button class="btn primary wide" data-a="close">Incrível!</button></div>`), 1400); } }
   function retroRewards() { retroBand(); if (S.champion && !S.bag['mega-bracelet']) { S.bag['mega-bracelet'] = 1; save(); setTimeout(() => modal(`<div class="center badgewin"><div class="bigbadge megab"><img src="img/items/mega-bracelet.png" alt=""></div><h2>Mega Pulseira!</h2><p>Como Campeão de Kanto, você recebeu a <b>Mega Pulseira</b>. Faça um Pokémon segurar a Mega Pedra certa e toque em <b>🧬 Mega Evoluir</b> no menu de golpes!</p><p class="mut small">Mega Pedras: achados raros nos mapas, prêmios de Ginásios/Elite e loja de Pontos da Torre de Batalha. Johto também foi liberado!</p><button class="btn primary wide" data-a="close">Incrível!</button></div>`), 900); } }
   ACT.logout = () => { save(); sessionStorage.removeItem(SESSION_KEY); accountsScreen(); };
@@ -221,7 +222,7 @@
   const dexCount = () => [Object.keys(S.dex.seen).length, Object.keys(S.dex.caught).length];
   function trainerCard(big) {
     const [se, ca] = dexCount(); const h = Math.floor(S.stats.playMs / 36e5), mi = Math.floor(S.stats.playMs / 6e4) % 60;
-    return `<div class="tcard ${big ? 'big' : ''}"><div class="tcl"><img src="img/tr/${S.avatar}.png" alt=""></div><div class="tcr"><small>CARTÃO DE TREINADOR</small>${S.nat && S.nat.wins ? '<span class="ttitle">🌈 Mestre Eevee</span>' : ''}<h2>${esc(S.trainer)}${S.champion ? ' 👑' : ''}</h2>
+    return `<div class="tcard ${big ? 'big' : ''}"><div class="tcl"><img src="img/tr/${S.avatar}.png" alt=""></div><div class="tcr"><small>CARTÃO DE TREINADOR</small>${titleOf() ? `<span class="ttitle">🏆 ${titleOf()}</span>` : S.nat && S.nat.wins ? '<span class="ttitle">🌈 Mestre Eevee</span>' : ''}<h2>${esc(S.trainer)}${S.champion ? ' 👑' : ''}</h2>
       <div class="badges">${C.BADGES.map((_, i) => badgeHtml(i, S.badges.includes(i))).join('')}</div>${S.nat && S.nat.wins ? '<span class="badge natb on" title="Insígnia Nat">🌈</span>' : ''}${S.champion && FEAT.johto ? `<div class="badges j">${C.JBADGES.map((_, i) => jbadgeHtml(i, S.jbadges.includes(i))).join('')}</div>` : ''}
       <div class="tstats"><span><b>${ca}</b> capturados</span><span><b>${se}</b> vistos</span><span><b>${Object.keys(S.dex.shiny).length}</b> ✨</span>${big ? `<span><b>${S.stats.wins}</b> vitórias</span><span><b>${h}h${String(mi).padStart(2, '0')}</b> jogadas</span><span><b>${S.tower.best}</b> torre</span>` : ''}</div></div></div>`;
   }
@@ -243,7 +244,7 @@
   function monCard(m, i, where) {
     const p = hpPct(m), d = D.mons[m.id];
     return `<button class="mcard ${m.hp <= 0 ? 'fainted' : ''}" data-a="mon" data-i="${i}" data-w="${where}" style="--tc:${C.TYPE_COLOR[d.t[0]]}">
-      <div class="msp">${m.shiny ? '<span class="shinytag">✨</span>' : ''}${m.item ? `<span class="helditem" title="${C.ITEM_NAME[m.item] || ''}">${itemImg(m.item)}</span>` : ''}<img src="${spr(m)}" alt="" loading="lazy"></div>
+      <div class="msp">${m.shiny ? '<span class="shinytag">★</span>' : ''}${m.item ? `<span class="helditem" title="${C.ITEM_NAME[m.item] || ''}">${itemImg(m.item)}</span>` : ''}<img src="${spr(m)}" alt="" loading="lazy"></div>
       <div class="minfo"><div class="row between"><b>${esc(pn(m))}</b><small>Nv ${m.lvl}</small></div><div class="types">${d.t.map(typeChip).join('')}${stChip(m.status)}</div>
       <div class="hpbar"><i style="width:${p}%;background:${hpCol(p)}"></i></div><small class="mut">${m.hp}/${PE.maxhp(m)} HP</small></div></button>`;
   }
@@ -354,7 +355,7 @@
     return `<div class="grid"><div class="card span2 explore theme-${mp.theme} w-${w} per-${period()}" id="scene"><div class="sky"><i class="sun"></i></div><div class="wx"></div><div class="ground"></div>
       <div class="grass-row">${'<i></i>'.repeat(12)}</div><img class="me" src="img/tr/${S.avatar}.png" alt=""><div class="alertmark">!</div>
       <div class="ex-top"><button class="btn small ghost" data-a="tab" data-t="maps">← Mapas</button><span class="chip">${WEATHER[w][1]} ${WEATHER[w][0]}</span><span class="chip">${PERIOD_PT[period()]}</span></div>
-      <div class="ex-bot"><h2>${mp.emoji} ${mp.name}</h2><p>${mp.desc}</p><button class="btn primary big" data-a="search" id="searchBtn">🔍 Procurar Pokémon</button></div></div>
+      <div class="ex-bot"><h2>${mp.emoji} ${mp.name}</h2><p>${mp.desc}</p><div class="exbtns"><button class="btn primary big" data-a="search" id="searchBtn">🔍 Procurar Pokémon</button>${isWater(mp) ? '<button class="btn big fishbtn" data-a="fish" id="fishBtn0">🎣 Pescar</button>' : ''}</div></div></div>
       <div class="card"><h3>Pokémon desta área</h3><div class="enc">${mp.enc.map((e, i) => { const sn = S.dex.seen[e[0]], leg = e[4]?.legend; if (leg && !sn) return ''; const pc = ws[i] / tot * 100;
         return `<div class="encm ${sn ? '' : 'unk'}"><img src="${sprId(e[0])}" class="${sn ? '' : 'sil'}" alt="" loading="lazy"><small>${sn ? D.mons[e[0]].n : '???'}</small><small class="mut">${pc < 1 ? 'raro' : Math.round(pc) + '%'}${S.dex.caught[e[0]] ? ' ●' : ''}</small></div>`; }).join('')}${mp.enc.some(e => e[4]?.legend && !S.dex.seen[e[0]]) ? '<div class="encm unk"><span class="q">⭐</span><small>Lendário?</small></div>' : ''}</div>
         <p class="mut small">${w !== 'clear' ? `${WEATHER[w][1]} O clima de agora favorece alguns tipos.` : 'Clima estável.'} ● = já capturado</p></div>
@@ -366,13 +367,13 @@
     if (searching) return; if (!S.party.some(m => m.hp > 0)) return toast('Seus Pokémon estão sem energia! Vá ao Centro Pokémon.', 'bad');
     const mp = C.MAPS.find(m => m.id === sub); searching = true; const sc = $('#scene'); sc.classList.add('walking'); $('#searchBtn').disabled = true;
     const steps = 2 + Math.floor(R() * 3); for (let i = 0; i < steps; i++) { SFX.rustle(); const g = $$('.grass-row i', sc)[Math.floor(R() * 12)]; g?.classList.add('rustle'); setTimeout(() => g?.classList.remove('rustle'), 600); await sleep(420); }
-    S.stats.steps += steps; sc.classList.remove('walking');
+    S.stats.steps += steps; track('steps', steps); sc.classList.remove('walking');
     const w = weatherOf(mp), ws = encWeights(mp, w), tot = ws.reduce((a, b) => a + b, 0); let r = R() * tot, k = 0; while (k < ws.length - 1 && r > ws[k]) r -= ws[k++];
     const e = mp.enc[k]; const lvl = PE.ri(st, e[2], e[3]);
     eggSteps(steps); setTimeout(checkEggs, 2500);
     if (mp.finds && R() < (A.findRate || 0.035)) { const f = pickFind(mp); if (f) { searching = false; $('#searchBtn').disabled = false; S.bag[f] = (S.bag[f] || 0) + 1; save(); SFX.caught();
       modal(`<div class="center badgewin"><div class="bigbadge megab"><img src="img/items/${f}.png" alt=""></div><h2>Você encontrou algo brilhando!</h2><p>Achou <b>${C.ITEM_NAME[f]}</b> escondida em ${mp.name}!</p><p class="mut small">Faça o Pokémon certo segurar para Mega Evoluir.</p><button class="btn primary wide" data-a="close">Uau!</button></div>`); return render(); } }
-    const m = PE.makeMon(e[0], lvl, st, { shinyRate: A.shinyRate || 1 / 256, shiny: e[4] && e[4].shiny ? true : undefined }); m.caughtAt = mp.name;
+    const m = PE.makeMon(e[0], lvl, st, { shinyRate: A.shinyRate || shinyP(), shiny: e[4] && e[4].shiny ? true : undefined }); m.caughtAt = mp.name;
     sc.classList.add('alert'); tone(1200, 0.1); await sleep(600); searching = false;
     startBattle({ kind: 'wild', enemy: [m], map: mp, weather: battleWeather(w), legend: !!e[4]?.legend });
   };
@@ -432,12 +433,13 @@
 
   // ---------- Mais ----------
   function vMore() {
-    const it = [['shop', '🛒', 'Loja Pokémon', 'Bolas, poções, pedras'], ['center', '❤️', 'Centro Pokémon', 'Cura grátis do time'], ['bag', '🎒', 'Mochila', 'Seus itens'], ['dex', '📕', 'Pokédex', 'Vistos e capturados'],
+    const qc = questClaimable(), dc = dexClaimable(), gq = quizState();
+    const it = [['quests', '📜', 'Missões', qc ? `🎁 ${qc} recompensa(s) para resgatar!` : 'Diárias e semanais'], ['games', '🎮', 'Mini-jogos', `Quem é esse Pokémon? (${QUIZ_ROUNDS - gq.n} hoje) • Pesca`], ['ach', '🏆', 'Conquistas', `${Object.keys(S.ach || {}).length}/${ACH.length} • títulos`], ['shop', '🛒', 'Loja Pokémon', 'Bolas, poções, pedras'], ['center', '❤️', 'Centro Pokémon', 'Cura grátis do time'], ['bag', '🎒', 'Mochila', 'Seus itens'], ['dex', '📕', 'Pokédex', dc ? `🏅 ${dc} marco(s) para resgatar!` : 'Vistos, capturados e marcos'],
       ['daycare', '🏡', 'Creche Pokémon', `Deixe 2 Pokémon, ganhe XP e ovos${S.eggs.length ? ' • ' + S.eggs.length + ' ovo(s)' : ''}`], ['card', '🪪', 'Cartão de Treinador', 'Perfil e insígnias'], ['saves', '💾', 'Salvar / Backup', 'Exportar e importar save'], ['settings', '⚙️', 'Configurações', 'Som e velocidade']];
-    return `<div class="grid">${it.map(([k, i, t, dsc]) => `<button class="card morec" data-a="tab" data-t="${k}"><span class="mi">${i}</span><div><b>${t}</b><small class="mut">${dsc}</small></div></button>`).join('')}<button class="card morec" data-a="logout"><span class="mi">🚪</span><div><b>Trocar de conta</b><small class="mut">Sair de ${esc(S.trainer)}</small></div></button></div>`;
+    return `<div class="grid">${it.map(([k, i, t, dsc]) => `<button class="card morec ${(k === 'quests' && qc) || (k === 'dex' && dc) ? 'hasrw' : ''}" data-a="tab" data-t="${k}"><span class="mi">${i}</span><div><b>${t}</b><small class="mut">${dsc}</small></div></button>`).join('')}<button class="card morec" data-a="logout"><span class="mi">🚪</span><div><b>Trocar de conta</b><small class="mut">Sair de ${esc(S.trainer)}</small></div></button></div>`;
   }
   function vShop() {
-    return `<div class="card"><div class="row between"><h3>🛒 Loja Pokémon</h3><span class="chip money">${fmt(S.money)}</span></div><p class="mut small">Mais itens aparecem conforme você ganha insígnias.</p></div><div class="grid shop">${C.SHOP.map(x => { const ok = S.badges.length >= x.req;
+    return `<div class="card"><div class="row between"><h3>🛒 Loja Pokémon</h3><span class="chip money">${fmt(S.money)}</span></div><p class="mut small">Mais itens aparecem conforme você ganha insígnias.</p></div><div class="grid shop">${ROD_SHOP.map(([id, pr, rq]) => { const ok = S.badges.length >= rq, has = S.bag[id]; return `<div class="card item ${ok ? '' : 'locked'}">${itemImg(id)}<div class="iinfo grow"><b>${C.ITEM_NAME[id]}</b><small class="mut">${ok ? KEY_ITEMS[id] : `🔒 ${rq} insígnia(s)`}</small></div><div class="buy"><b>${has ? '✅' : fmt(pr)}</b>${has ? '' : `<button class="btn small" ${ok && S.money >= pr ? '' : 'disabled'} data-a="buyrod" data-id="${id}">Comprar</button>`}</div></div>`; }).join('')}${C.SHOP.map(x => { const ok = S.badges.length >= x.req;
       return `<div class="card item ${ok ? '' : 'locked'}">${itemImg(x.id)}<div class="iinfo grow"><b>${x.name}</b><small class="mut">${ok ? x.desc : `🔒 ${x.req} insígnia(s)`}</small><small>Na mochila: ${S.bag[x.id] || 0}</small></div><div class="buy"><b>${fmt(x.price)}</b><div class="row">
       <button class="btn small" ${ok && S.money >= x.price ? '' : 'disabled'} data-a="buy" data-id="${x.id}" data-n="1">+1</button><button class="btn small" ${ok && S.money >= x.price * 5 ? '' : 'disabled'} data-a="buy" data-id="${x.id}" data-n="5">+5</button></div></div></div>`; }).join('')}</div>`;
   }
@@ -453,14 +455,15 @@
     const it = Object.entries(S.bag).filter(([k, v]) => v > 0 && C.ITEM_NAME[k]);
     return `<div class="card"><h3>🎒 Mochila</h3>${it.length ? `<div class="ilist">${it.map(([k, v]) => `<button class="irow" data-a="bagitem" data-id="${k}">${itemImg(k)}<b>${C.ITEM_NAME[k]}</b><small>x${v}</small></button>`).join('')}</div>` : '<p class="mut">Vazia.</p>'}<p class="mut small">Toque num item para usar em um Pokémon do time.</p></div>`;
   }
-  ACT.bagitem = d => { if (PE.BALLS[d.id]) return toast('Bolas são usadas durante batalhas contra Pokémon selvagens.');
+  ACT.buyrod = d => { const x = ROD_SHOP.find(r => r[0] === d.id); if (!x || S.bag[x[0]] || S.money < x[1] || S.badges.length < x[2]) return; S.money -= x[1]; S.bag[x[0]] = 1; SFX.coin(); toast(`Comprou ${C.ITEM_NAME[x[0]]}! 🎣`, 'good'); save(); render(); };
+  ACT.bagitem = d => { if (KEY_ITEMS[d.id]) return toast(`${C.ITEM_NAME[d.id]}: ${KEY_ITEMS[d.id]}`); if (PE.BALLS[d.id]) return toast('Bolas são usadas durante batalhas contra Pokémon selvagens.');
     const mm = modal(`<h3>Usar ${C.ITEM_NAME[d.id]} em...</h3><div class="mgrid">${S.party.map((m, i) => monCard(m, i, 'x')).join('')}</div><div class="mbtns"><button class="btn" data-a="close">Cancelar</button></div>`);
     $$('.mcard', mm).forEach(b => b.onclick = e => { e.stopPropagation(); useBagItem(d.id, S.party[+b.dataset.i]); }); };
   let dexFilter = 'all';
   function vDex() {
     const ids = Object.keys(D.mons).map(Number).sort((a, b) => a - b); const [se, ca] = dexCount();
     return `<div class="card"><div class="row between"><h3>📕 Pokédex</h3><b>${ca}/${ids.length}</b></div><div class="progress"><i style="width:${ca / ids.length * 100}%"></i></div><p class="mut small">${se} vistos • ${ca} capturados • ${Object.keys(S.dex.shiny).length} shiny</p>
-      <div class="seg">${[['all', 'Todos'], ['caught', 'Capturados'], ['missing', 'Faltando']].filter(x => moreOk(x[0])).map(([k, l]) => `<button class="${dexFilter === k ? 'on' : ''}" data-a="dexf" data-k="${k}">${l}</button>`).join('')}</div></div>
+      <div class="seg">${[['all', 'Todos'], ['caught', 'Capturados'], ['missing', 'Faltando']].filter(x => moreOk(x[0])).map(([k, l]) => `<button class="${dexFilter === k ? 'on' : ''}" data-a="dexf" data-k="${k}">${l}</button>`).join('')}</div></div>${dexRewardsCard()}
       <div class="dex">${ids.filter(id => dexFilter === 'all' || (dexFilter === 'caught' ? S.dex.caught[id] : !S.dex.caught[id])).map(id => { const sn = S.dex.seen[id], c = S.dex.caught[id];
         return `<button class="dx ${c ? 'c' : ''}" ${sn ? `data-a="dexinfo" data-id="${id}"` : ''}><small>#${String(id).padStart(3, '0')}</small><img src="${sprId(id, !!S.dex.shiny[id])}" class="${sn ? '' : 'sil'}" loading="lazy" alt=""><b>${sn ? D.mons[id].n : '???'}</b>${c ? '<i>●</i>' : ''}</button>`; }).join('')}</div>`;
   }
@@ -483,7 +486,7 @@
   ACT.imp = () => doImport($('#imp').value);
   document.addEventListener('change', e => { if (e.target.id === 'impf' && e.target.files[0]) e.target.files[0].text().then(doImport); });
   function vSettings() {
-    return `<div class="card"><h3>⚙️ Configurações</h3><div class="setrow"><span>Som</span><div class="seg">${[[true, 'Ligado'], [false, 'Desligado']].map(([v, l]) => `<button class="${S.settings.sound === v ? 'on' : ''}" data-a="set" data-k="sound" data-v="${v}">${l}</button>`).join('')}</div></div>
+    return `<div class="card"><h3>⚙️ Configurações</h3><div class="setrow"><span>Som</span><div class="seg">${[[true, 'Ligado'], [false, 'Desligado']].map(([v, l]) => `<button class="${S.settings.sound === v ? 'on' : ''}" data-a="set" data-k="sound" data-v="${v}">${l}</button>`).join('')}</div></div>${audioSettings()}
       <div class="setrow"><span>Velocidade da batalha</span><div class="seg">${[[1.4, 'Lenta'], [1, 'Normal'], [0.6, 'Rápida'], [0.3, 'Turbo']].map(([v, l]) => `<button class="${S.settings.speed === v ? 'on' : ''}" data-a="set" data-k="speed" data-v="${v}">${l}</button>`).join('')}</div></div>
       <button class="btn wide ghost" data-a="lock">🔒 Bloquear site neste aparelho</button></div>
       <div class="card"><h3>🎁 Código de presente</h3><p class="mut small">Tem um código? Digite aqui para receber o presente (cada código vale uma vez por conta).</p>
@@ -580,7 +583,7 @@
   const wait = ms => sleep(ms * spd());
   const bq = q => $(q, $('#battle'));
   function startBattle(o) {
-    const enemyParty = o.enemy; enemyParty.forEach(m => see(m.id)); S.stats.battles++;
+    const enemyParty = o.enemy; enemyParty.forEach(m => see(m.id)); S.stats.battles++; MUS.want('battle');
     if (S.party[0].hp <= 0) { const i = S.party.findIndex(m => m.hp > 0); if (i > 0) S.party.unshift(S.party.splice(i, 1)[0]); }
     const bs = PE.createBattle({ kind: o.kind, seed: (R() * 2 ** 31) | 0, weather: o.weather, sides: [{ party: S.party, name: S.trainer, mega: (S.bag['mega-bracelet'] || 0) > 0, dyna: (S.bag['dynamax-band'] || 0) > 0 }, { party: enemyParty, name: o.name || '', ai: o.ai || 0, mega: enemyParty.some(m => m.item), dyna: !!o.dyna }] });
     B = { o, s: bs, busy: true };
@@ -619,7 +622,7 @@
       log(o.legend ? `⭐ Um <b>${D.mons[e.id].n}</b> lendário apareceu!` : `Um <b>${D.mons[e.id].n}</b> selvagem apareceu!`);
       if (o.legend) $('#battle').classList.add('legend-aura');
       await wait(900);
-      if (e.shiny) { sparkle(1); SFX.sparkle(); S.stats.shinies++; log(`✨ Uau! É um ${D.mons[e.id].n} <b>SHINY</b>! ✨`); await wait(1300); }
+      if (e.shiny) { sparkle(1); SFX.shiny(); shinyBurst(); S.stats.shinies++; log(`✨ Uau! É um ${D.mons[e.id].n} <b>SHINY</b>! ✨`); await wait(1300); }
       em.classList.remove('slidein'); }
     $('#metr').classList.add('leave'); log(`Vai, <b>${esc(pn(p))}</b>!`); await sendOut(0, p); B.busy = false; showMain();
   }
@@ -717,8 +720,8 @@
         case 'caught': { $('#cball')?.classList.add('click'); SFX.click2(); await wait(350); starsFx(); SFX.caught(); log(`🎉 ${e.text}`); await wait(1700); break; }
         case 'escape': { $('#cball')?.remove(); const el = mon(1); el.classList.remove('caught'); el.classList.add('breakout'); popFx(1); SFX.escape(); log(e.text); await wait(900); el.classList.remove('breakout'); break; }
         case 'run': log(e.text); tone(600, 0.2, 'sine', 0.05, 0, 300); await wait(800); break;
-        case 'mega': await megaAnim(e); break;
-        case 'dyna': await dynaAnim(e); break;
+        case 'mega': if (e.side === 0) S.stats.megas = (S.stats.megas || 0) + 1; await megaAnim(e); break;
+        case 'dyna': if (e.side === 0) S.stats.dmaxes = (S.stats.dmaxes || 0) + 1; await dynaAnim(e); break;
         case 'undyna': { const el = bq(e.side ? '.emon' : '.pmon'); if (e.text) log(e.text); el.classList.add('shrink'); await wait(450); el.classList.remove('dmax', 'gmax', 'shrink'); $(e.side ? '#esp' : '#psp').src = spr(B.s.sides[e.side].b.m, !e.side); drawInfo(e.side); setHP(e.side, e.hp, e.max); await wait(e.quiet ? 100 : 700); break; }
         case 'weather': if (e.text) { log(e.text); await wait(800); } break;
         case 'end': break;
@@ -762,7 +765,7 @@
   async function endBattle() {
     const s = B.s, o = B.o; let msg = '';
     if (s.ran) return closeBattle();
-    if (s.caught) { const m = s.caught; m.ot = S.trainer; m.caughtAt = (o.map ? o.map.name : '') + ' • ' + new Date().toLocaleDateString('pt-BR'); const isNew = !S.dex.caught[m.id]; addCaught(m); S.stats.caught++;
+    if (s.caught) { const m = s.caught; m.ot = S.trainer; m.caughtAt = (o.map ? o.map.name : '') + ' • ' + new Date().toLocaleDateString('pt-BR'); const isNew = !S.dex.caught[m.id]; addCaught(m); S.stats.caught++; track('catch', 1, m); if (isNew) track('newdex');
       let where; if (S.party.length < 6) { S.party.push(m); where = 'entrou no seu time'; } else { S.box.push(m); where = 'foi enviado para o PC'; }
       await award(); save(); await finishEvos(); closeBattle();
       const m2 = modal(`<div class="center caughtm"><div class="burstbg"></div><img class="bigspr ${m.shiny ? 'shiny-glow' : ''}" src="${spr(m)}" alt=""><h2>${D.mons[m.id].n} capturado! ${m.shiny ? '✨' : ''}</h2>${isNew ? '<p class="newdex">🆕 Registrado na Pokédex!</p>' : ''}<p>Nv ${m.lvl} • ${where}.</p><p class="mut small">Pokédex: ${Object.keys(S.dex.caught).length} capturados</p><div class="mbtns"><button class="btn" id="nick">✏️ Dar apelido</button><button class="btn primary" data-a="close">Continuar</button></div></div>`);
@@ -770,7 +773,7 @@
       return;
     }
     if (s.winner === 0) {
-      await award(); S.stats.wins++;
+      await award(); S.stats.wins++; track('win'); if (o.kind === 'trainer') track('trainer'); MUS.victory();
       if (o.kind === 'trainer') { const f = $('#foe'); if (f) { f.classList.remove('leave'); f.classList.add('back'); } const prize = o.prize; S.money += prize; SFX.win(); log(`🏆 Você venceu ${esc(o.name)}! Ganhou <b>${fmt(prize)}</b>.`); await wait(2000);
         if (o.key) S.trainersBeaten[o.key] = (S.trainersBeaten[o.key] || 0) + 1;
         if (o.badge != null && !S.badges.includes(o.badge)) { S.badges.push(o.badge); S.badges.sort((a, b) => a - b); msg = 'badge:' + o.badge; }
@@ -810,6 +813,273 @@
     save(); const ov = $('#battle'); B = null; if (ov) { ov.classList.add('closing'); setTimeout(() => { ov.remove(); document.body.classList.remove('in-battle'); render(); }, 350); }
   }
   A.debug = { get S() { return S; }, startBattle, go, get B() { return B; }, healAll, save, render, act: a => act(a), runAct: (k, d) => ACT[k](d || {}), daycareTick: (ms) => daycareTick(ms), checkEggs: () => checkEggs(), mkTeam };
+
+  // =====================================================================
+  // v4: Missões, Pokédex com recompensas, Shiny, Pesca, Mini-jogos, Conquistas, Música
+  // =====================================================================
+  const dayKey = (d = new Date()) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  const weekKey = () => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return 'W' + dayKey(d); };
+  function hseed(str) { let h = 2166136261; for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function srng(seed) { return () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  const addItems = r => giveReward(r);
+  const rewardText = r => Object.entries(r).map(([k, v]) => k === 'money' ? fmt(v) : `${v}x ${C.ITEM_NAME[k] || k}`).join(' + ');
+  const rewardIcons = r => Object.entries(r).map(([k, v]) => k === 'money' ? `<span class="rw">💰${v >= 1000 ? (v / 1000) + 'k' : v}</span>` : `<span class="rw">${itemImg(k)}${v > 1 ? 'x' + v : ''}</span>`).join('');
+  Object.assign(C.ITEM_NAME, { 'old-rod': 'Vara Velha', 'good-rod': 'Vara Boa', 'super-rod': 'Super Vara', 'shiny-charm': 'Amuleto Brilhante' });
+  const KEY_ITEMS = { 'old-rod': 'Use em mapas com água: botão 🎣 Pescar.', 'good-rod': 'Pesca Pokémon melhores em mapas com água.', 'super-rod': 'Pesca os Pokémon mais raros e fortes.', 'shiny-charm': 'Triplica a chance de encontrar Pokémon shiny (1/512 → 3/512).' };
+
+  // ---------- shiny ----------
+  const shinyP = () => (S && S.bag['shiny-charm'] ? 3 : 1) / 512;
+  A.shinyP = shinyP;
+
+  // ---------- progresso / eventos ----------
+  const TYPES_Q = ['fire', 'water', 'grass', 'bug', 'normal', 'flying', 'poison', 'electric', 'psychic', 'rock', 'ground', 'fighting'];
+  const QD_DAY = [r => ({ k: 'catch', n: 3 + Math.floor(r() * 3) }), r => ({ k: 'catchT', t: TYPES_Q[Math.floor(r() * TYPES_Q.length)], n: 2 }), r => ({ k: 'win', n: 4 + Math.floor(r() * 3) }),
+    () => ({ k: 'trainer', n: 2 }), () => ({ k: 'fish', n: 3 }), () => ({ k: 'steps', n: 25 }), () => ({ k: 'quiz', n: 3 })];
+  const QD_WEEK = [() => ({ k: 'catch', n: 15 }), () => ({ k: 'win', n: 25 }), () => ({ k: 'trainer', n: 8 }), () => ({ k: 'fish', n: 12 }), () => ({ k: 'hatch', n: 1 }),
+    r => ({ k: 'catchT', t: TYPES_Q[Math.floor(r() * TYPES_Q.length)], n: 6 }), () => ({ k: 'newdex', n: 4 }), () => ({ k: 'quiz', n: 10 }), () => ({ k: 'steps', n: 150 })];
+  const RW_DAY = [{ money: 1500, 'great-ball': 3 }, { money: 2000, 'super-potion': 2 }, { money: 2500, 'ultra-ball': 2 }, { money: 1800, 'rare-candy': 1 }];
+  const STONES = ['fire-stone', 'water-stone', 'thunder-stone', 'leaf-stone', 'moon-stone', 'sun-stone'];
+  function qText(q) {
+    const t = q.t ? C.TYPE_PT[q.t] : '';
+    return { catch: `Capture ${q.n} Pokémon`, catchT: `Capture ${q.n} Pokémon do tipo ${t}`, win: `Vença ${q.n} batalhas`, trainer: `Vença ${q.n} treinadores`, fish: `Fisgue ${q.n} Pokémon pescando`,
+      steps: `Explore ${q.n} passos na grama`, quiz: `Acerte ${q.n} no "Quem é esse Pokémon?"`, hatch: `Choque ${q.n} ovo na Creche`, newdex: `Registre ${q.n} Pokémon novos na Pokédex` }[q.k];
+  }
+  const qIcon = q => ({ catch: '🔴', catchT: '🧬', win: '⚔️', trainer: '🧢', fish: '🎣', steps: '👣', quiz: '❓', hatch: '🥚', newdex: '📕' }[q.k]);
+  function roll(defs, n, seed, rws) {
+    const r = srng(hseed(seed)), pool = defs.slice(), out = [];
+    while (out.length < n && pool.length) { const d = pool.splice(Math.floor(r() * pool.length), 1)[0](r); if (d.k === 'hatch' && !FEAT.daycare) continue; d.p = 0; d.c = 0; d.r = rws(r, out.length); out.push(d); }
+    return out;
+  }
+  function ensureQuests() {
+    if (!S.quests) S.quests = {}; const q = S.quests, dk = dayKey(), wk = weekKey();
+    if (q.day !== dk) { q.day = dk; q.bonus = 0; q.d = roll(QD_DAY, 3, user + dk, (r, i) => Object.assign({}, RW_DAY[(i + Math.floor(r() * 4)) % 4])); }
+    if (q.week !== wk) { q.week = wk; q.w = roll(QD_WEEK, 4, user + wk, r => ({ money: 6000, 'rare-candy': 2, [STONES[Math.floor(r() * STONES.length)]]: 1 })); }
+    return q;
+  }
+  function track(ev, n = 1, m) {
+    if (!S) return; const q = ensureQuests(); let done = 0;
+    for (const x of [...q.d, ...q.w]) { if (x.p >= x.n) continue;
+      if (x.k === ev && (ev !== 'catchT' || (m && D.mons[m.id].t.includes(x.t)))) { x.p = Math.min(x.n, x.p + n); if (x.p >= x.n) done++; } }
+    if (ev === 'catch' && m) track('catchT', 1, m);
+    if (done) { SFX.coin(); toast(`📜 Missão concluída! Resgate em Mais → Missões.`, 'good'); }
+    checkAch();
+  }
+  A.track = track;
+  const questClaimable = () => { if (!S || !S.quests || !S.quests.d) return 0; const q = S.quests; return [...q.d, ...q.w].filter(x => x.p >= x.n && !x.c).length + (q.d.every(x => x.c) && !q.bonus ? 1 : 0); };
+  const DAY_BONUS = { 'ultra-ball': 3, 'rare-candy': 1 };
+  function vQuests() {
+    const q = ensureQuests(); const h = new Date(); const left = 24 - h.getHours();
+    const row = (x, i, w) => `<div class="quest ${x.c ? 'done' : x.p >= x.n ? 'ready' : ''}"><span class="qi">${qIcon(x)}</span><div class="grow"><b>${qText(x)}</b><div class="progress"><i style="width:${x.p / x.n * 100}%"></i></div><small class="mut">${x.p}/${x.n} • ${rewardIcons(x.r)}</small></div>
+      ${x.c ? '<span class="qok">✅</span>' : `<button class="btn small ${x.p >= x.n ? 'primary pulse' : ''}" ${x.p >= x.n ? '' : 'disabled'} data-a="qclaim" data-w="${w}" data-i="${i}">Resgatar</button>`}</div>`;
+    const allc = q.d.every(x => x.c);
+    return `<div class="card qhead"><h3>📜 Missões</h3><p class="mut small">Diárias renovam à meia-noite (faltam ~${left}h) • semanais toda segunda-feira.</p></div>
+      <div class="card"><h3>☀️ Hoje</h3>${q.d.map((x, i) => row(x, i, 'd')).join('')}<div class="quest bonus ${q.bonus ? 'done' : allc ? 'ready' : ''}"><span class="qi">🎁</span><div class="grow"><b>Bônus: complete as 3 diárias</b><small class="mut">${rewardIcons(DAY_BONUS)}</small></div>${q.bonus ? '<span class="qok">✅</span>' : `<button class="btn small ${allc ? 'primary pulse' : ''}" ${allc ? '' : 'disabled'} data-a="qbonus">Abrir</button>`}</div></div>
+      <div class="card"><h3>📅 Semana</h3>${q.w.map((x, i) => row(x, i, 'w')).join('')}</div>`;
+  }
+  ACT.qclaim = d => { const q = ensureQuests(), x = q[d.w][+d.i]; if (!x || x.c || x.p < x.n) return; x.c = 1; addItems(x.r); S.stats.questsDone = (S.stats.questsDone || 0) + 1; SFX.caught(); toast(`🎉 ${rewardText(x.r)}`, 'good'); checkAch(); save(); render(); };
+  ACT.qbonus = () => { const q = ensureQuests(); if (q.bonus || !q.d.every(x => x.c)) return; q.bonus = 1; addItems(DAY_BONUS); SFX.win(); toast(`🎁 Bônus diário: ${rewardText(DAY_BONUS)}`, 'good'); save(); render(); };
+
+  // ---------- Pokédex com recompensas ----------
+  const dexTotal = () => Object.keys(D.mons).length;
+  const DEXM = [[10, { 'great-ball': 10 }], [25, { 'ultra-ball': 5, 'rare-candy': 3 }], [50, { 'shiny-charm': 1, 'rare-candy': 5 }], [75, { 'super-rod': 1, money: 20000 }], [100, { 'master-ball': 1, 'rare-candy': 5 }],
+    [150, { 'master-ball': 1, 'fire-stone': 1, 'water-stone': 1, 'thunder-stone': 1, 'leaf-stone': 1 }], [200, { 'master-ball': 2, 'rare-candy': 10 }], [251, { 'master-ball': 3, money: 100000 }], ['all', { special: 1 }]];
+  const dmN = x => x === 'all' ? dexTotal() : x;
+  const dexClaimable = () => { if (!S) return 0; const ca = Object.keys(S.dex.caught).length; return DEXM.filter(([k]) => ca >= dmN(k) && !(S.dexm || {})[k]).length; };
+  function dexRewardsCard() {
+    const ca = Object.keys(S.dex.caught).length, dm = S.dexm || {}, nx = DEXM.find(([k]) => ca < dmN(k));
+    const prev = [...DEXM].reverse().find(([k]) => ca >= dmN(k)), lo = prev ? dmN(prev[0]) : 0, hi = nx ? dmN(nx[0]) : lo;
+    return `<div class="card dexrw"><div class="row between"><h3>🏅 Recompensas da Pokédex</h3><small class="mut">${nx ? `próxima: ${dmN(nx[0])}` : 'completa!'}</small></div><div class="progress gold"><i style="width:${nx ? (ca - lo) / (hi - lo) * 100 : 100}%"></i></div>
+      <div class="dmlist">${DEXM.map(([k, r]) => { const n = dmN(k), got = dm[k], ok = ca >= n;
+        return `<div class="dm ${got ? 'got' : ok ? 'ready' : ''}"><b>${n}</b><div class="dmr">${r.special ? '<span class="rw">⭐ Celebi ✨ especial</span>' : rewardIcons(r)}</div>${got ? '<small>✅</small>' : ok ? `<button class="btn small primary pulse" data-a="dexclaim" data-k="${k}">Pegar</button>` : `<small class="mut">${ca}/${n}</small>`}</div>`; }).join('')}</div>
+      <p class="mut small">✨ Shinies encontrados: <b>${S.stats.shinies || 0}</b> • chance atual 1/${Math.round(1 / shinyP())}${S.bag['shiny-charm'] ? ' (Amuleto Brilhante ativo)' : ''}</p></div>`;
+  }
+  ACT.dexclaim = d => { const k = d.k === 'all' ? 'all' : +d.k, e = DEXM.find(x => x[0] === k); S.dexm = S.dexm || {}; if (!e || S.dexm[k] || Object.keys(S.dex.caught).length < dmN(k)) return;
+    S.dexm[k] = Date.now(); const r = e[1];
+    if (r.special) { const m = PE.makeMon(251, 50, st, { shiny: true, ot: S.trainer, caughtAt: 'Prêmio Pokédex completa' }); m.nick = 'Celebi'; addCaught(m); S.stats.shinies++; if (S.party.length < 6) S.party.push(m); else S.box.push(m); S.bag['master-ball'] = (S.bag['master-ball'] || 0) + 5;
+      save(); SFX.shiny(); return modal(`<div class="center caughtm"><div class="burstbg"></div><img class="bigspr shiny-glow" src="${spr(m)}" alt=""><h2>Pokédex completa! 🏆</h2><p>Você ganhou um <b>Celebi ✨ shiny</b> Nv 50 e 5 Master Balls!</p><button class="btn primary wide" data-a="close">Incrível!</button></div>`); }
+    addItems(r); save(); SFX.caught();
+    modal(`<div class="center badgewin"><div class="bigbadge megab">${r['shiny-charm'] ? itemImg('shiny-charm') : '🏅'}</div><h2>Marco de ${dmN(k)} capturados!</h2><p>${rewardText(r)}</p>${r['shiny-charm'] ? '<p class="mut small">O Amuleto Brilhante triplica a chance de shiny!</p>' : ''}${r['super-rod'] ? '<p class="mut small">Agora você pode pescar os Pokémon mais raros!</p>' : ''}<button class="btn primary wide" data-a="close">Oba!</button></div>`); render(); };
+
+  // ---------- shiny: efeito de encontro ----------
+  SFX.shiny = () => { [1319, 1568, 1976, 2637, 3136].forEach((f, i) => tone(f, 0.18, 'sine', 0.06, i * 0.08)); [659, 988].forEach((f, i) => tone(f, 0.5, 'triangle', 0.05, 0.4 + i * 0.12)); };
+  function shinyBurst() { const ov = document.createElement('div'); ov.className = 'shinyburst'; ov.innerHTML = '<b>✨ SHINY! ✨</b>' + '<i></i>'.repeat(14); ($('#battle') || document.body).appendChild(ov); setTimeout(() => ov.remove(), 2200); }
+
+  // ---------- pesca ----------
+  const RODS = {
+    'old-rod': { n: 'Vara Velha', win: 950, pool: [[129, 70, 5, 12], [60, 12, 6, 12], [118, 12, 6, 12], [72, 6, 6, 12]] },
+    'good-rod': { n: 'Vara Boa', win: 800, pool: [[60, 14, 15, 25], [118, 14, 15, 25], [116, 10, 15, 25], [98, 10, 15, 25], [120, 10, 15, 25], [54, 10, 15, 25], [79, 8, 15, 25], [170, 8, 15, 25], [129, 14, 15, 25], [147, 2, 15, 20]] },
+    'super-rod': { n: 'Super Vara', win: 650, pool: [[119, 12, 30, 42], [121, 8, 32, 42], [130, 8, 30, 40], [99, 10, 30, 42], [117, 10, 30, 42], [171, 10, 30, 42], [222, 8, 30, 42], [211, 8, 30, 42], [224, 8, 30, 42], [226, 6, 30, 42], [147, 5, 30, 38], [131, 3, 35, 45]] },
+  };
+  const ROD_ORDER = ['super-rod', 'good-rod', 'old-rod'];
+  const ROD_SHOP = [['good-rod', 8000, 3], ['super-rod', 30000, 6]];
+  const isWater = mp => mp && (mp.theme === 'water' || /lago|lake|rio|mar|praia|cabo|ilha/i.test(mp.name));
+  A.isWater = isWater;
+  ACT.fish = async d => {
+    const mp = C.MAPS.find(m => m.id === sub); if (!isWater(mp)) return;
+    if (!S.party.some(m => m.hp > 0)) return toast('Seus Pokémon estão sem energia! Vá ao Centro Pokémon.', 'bad');
+    if (!ROD_ORDER.some(k => S.bag[k])) { S.bag['old-rod'] = 1; save(); SFX.caught(); return modal(`<div class="center badgewin"><div class="bigbadge megab">${itemImg('old-rod')}</div><h2>Um pescador te deu uma Vara Velha!</h2><p class="mut">“Pesque à vontade! Quando a boia afundar, puxe rápido!”</p><button class="btn primary wide" data-a="fish">🎣 Pescar agora</button></div>`); }
+    const owned = ROD_ORDER.filter(k => S.bag[k]); const rod = d.rod && S.bag[d.rod] ? d.rod : (S.lastRod && S.bag[S.lastRod] ? S.lastRod : owned[0]); S.lastRod = rod;
+    fishGame(mp, rod, owned);
+  };
+  let fishSt = null;
+  function fishGame(mp, rod, owned) {
+    const R0 = RODS[rod];
+    const m = modal(`<div class="fishg"><h3>🎣 ${R0.n} • ${mp.name}</h3>${owned.length > 1 ? `<div class="seg">${owned.map(k => `<button class="${k === rod ? 'on' : ''}" data-a="fish" data-rod="${k}">${RODS[k].n}</button>`).join('')}</div>` : ''}
+      <div class="pond per-${period()}" id="pond"><div class="line"></div><div class="bob" id="bob"></div><div class="rip"></div><div class="fishshadow"></div><div class="bite hidden" id="bite">!</div></div>
+      <p id="fishT" class="center">Lançando a linha…</p><button class="btn primary big wide" id="fishBtn">🎣 Puxar!</button><button class="btn ghost wide" data-a="close">Sair</button></div>`, 'fishm');
+    const tok = {}; fishSt = tok; let phase = 'wait', biteAt = 0; SFX.throw();
+    const T = $('#fishT', m), bob = $('#bob', m), pond = $('#pond', m);
+    const delay = 1400 + R() * 3200;
+    (async () => { const nib = Math.floor(R() * 3); for (let i = 0; i < nib; i++) { await sleep(delay / (nib + 1)); if (fishSt !== tok || phase !== 'wait') return; bob.classList.add('nib'); tone(300, 0.05, 'sine', 0.04); await sleep(250); bob.classList.remove('nib'); }
+      await sleep(delay / (nib + 1)); if (fishSt !== tok || phase !== 'wait') return; T.textContent = 'Esperando…';
+      phase = 'bite'; biteAt = performance.now(); bob.classList.add('dip'); pond.classList.add('biting'); $('#bite', m).classList.remove('hidden'); tone(1400, 0.12, 'square', 0.07); tone(1800, 0.12, 'square', 0.06, 0.1); T.innerHTML = '<b>Fisgou! PUXE!</b>';
+      await sleep(R0.win); if (fishSt !== tok || phase !== 'bite') return; phase = 'end'; bob.classList.remove('dip'); $('#bite', m).classList.add('hidden'); pond.classList.remove('biting'); T.textContent = 'Ah… o Pokémon escapou. Tente de novo!'; SFX.escape(); again(); })();
+    T.textContent = 'Esperando a boia afundar…';
+    const again = () => { const b = $('#fishBtn', m); b.textContent = '🎣 Lançar de novo'; b.onclick = () => ACT.fish({ rod }); };
+    $('#fishBtn', m).onclick = async () => {
+      if (phase === 'wait') { phase = 'end'; T.textContent = 'Cedo demais! Você espantou o Pokémon.'; SFX.escape(); return again(); }
+      if (phase !== 'bite') return; phase = 'end'; const rt = Math.round(performance.now() - biteAt);
+      T.innerHTML = `<b>Pegou!</b> <small class="mut">(${rt} ms)</small>`; SFX.click2(); S.stats.fished = (S.stats.fished || 0) + 1; track('fish');
+      const pool = R0.pool, tot = pool.reduce((a, b) => a + b[1], 0); let r = R() * tot, k = 0; while (k < pool.length - 1 && r > pool[k][1]) r -= pool[k++][1];
+      const e = pool[k], mon = PE.makeMon(e[0], PE.ri(st, e[2], e[3]), st, { shinyRate: A.shinyRate || shinyP() }); mon.caughtAt = mp.name + ' (pesca)';
+      pond.classList.add('splash'); noise(0.3, 0.15); await sleep(700); closeModal();
+      startBattle({ kind: 'wild', enemy: [mon], map: mp, weather: battleWeather(weatherOf(mp)), fish: 1 });
+    };
+  }
+
+  // ---------- mini-jogo: Quem é esse Pokémon? ----------
+  const QUIZ_ROUNDS = 5, QUIZ_COIN = 400;
+  function quizState() { S.mini = S.mini || {}; const dk = dayKey(); if (S.mini.day !== dk) { S.mini.day = dk; S.mini.n = 0; S.mini.right = 0; } return S.mini; }
+  function vGames() {
+    const q = quizState(), left = QUIZ_ROUNDS - q.n; const fishMaps = C.MAPS.filter(isWater).filter(mp => mapUnlocked(mp)).map(mp => mp.name);
+    return `<div class="grid"><div class="card quizcard"><div class="quizhero"><img class="sil" src="${sprId(25)}" alt=""><span>?</span></div><h3>❓ Quem é esse Pokémon?</h3><p class="mut small">Adivinhe pela silhueta! ${QUIZ_ROUNDS} rodadas por dia • ${fmt(QUIZ_COIN)} por acerto.</p>
+      <p>Hoje: <b>${q.right}</b> acertos • ${left > 0 ? `${left} rodada(s) restante(s)` : 'volte amanhã!'}</p><button class="btn primary big wide" data-a="quiz" ${left > 0 ? '' : 'disabled'}>${q.n ? 'Continuar' : 'Jogar'}</button></div>
+      <div class="card"><h3>🎣 Pesca</h3><p class="mut small">Em mapas com água, toque em <b>🎣 Pescar</b>. Quando a boia afundar e aparecer <b>!</b>, puxe rápido.</p>
+      <div class="rods">${ROD_ORDER.slice().reverse().map(k => `<div class="rod ${S.bag[k] ? '' : 'locked'}">${itemImg(k)}<small>${RODS[k].n}</small></div>`).join('')}</div>
+      <p class="small">${fishMaps.length ? '📍 ' + fishMaps.join(', ') : '📍 Libere o Cabo de Cerulean (2 insígnias).'}</p><p class="mut small">Vara Boa e Super Vara: na Loja (3 e 6 insígnias) ou no marco 75 da Pokédex.</p></div></div>`;
+  }
+  const mapUnlocked = mp => { try { return unlocked(mp); } catch (e) { return true; } };
+  ACT.quiz = () => {
+    const q = quizState(); if (q.n >= QUIZ_ROUNDS) return toast('Volte amanhã para jogar de novo!');
+    const ids = Object.keys(D.mons).map(Number).filter(i => i <= 251), r = () => ids[Math.floor(R() * ids.length)];
+    const ans = r(), opts = new Set([ans]); while (opts.size < 4) opts.add(r()); const ol = [...opts].sort(() => R() - 0.5);
+    const m = modal(`<div class="quiz center"><small class="mut">Rodada ${q.n + 1}/${QUIZ_ROUNDS}</small><h3>Quem é esse Pokémon?</h3><div class="quizimg"><img id="qimg" class="sil" src="${sprId(ans)}" alt=""></div>
+      <div class="qopts">${ol.map(id => `<button class="btn" data-id="${id}">${D.mons[id].n}</button>`).join('')}</div><p id="qres"></p><div class="mbtns"><button class="btn primary wide hidden" id="qnext"></button></div></div>`, 'quizm');
+    m.dataset.lock = 1; tone(660, 0.1, 'square', 0.05); tone(880, 0.1, 'square', 0.05, 0.12);
+    $$('.qopts button', m).forEach(b => b.onclick = () => {
+      if (m.dataset.done) return; m.dataset.done = 1; const ok = +b.dataset.id === ans; q.n++; $('#qimg', m).classList.remove('sil'); $('#qimg', m).classList.add('reveal'); cry(ans);
+      $$('.qopts button', m).forEach(x => { if (+x.dataset.id === ans) x.classList.add('right'); else if (x === b) x.classList.add('wrong'); x.disabled = true; });
+      if (ok) { q.right++; S.money += QUIZ_COIN; S.stats.quizRight = (S.stats.quizRight || 0) + 1; SFX.coin(); $('#qres', m).innerHTML = `<b>É o ${D.mons[ans].n}!</b> +${fmt(QUIZ_COIN)}`; track('quiz'); }
+      else { SFX.escape(); $('#qres', m).innerHTML = `Era o <b>${D.mons[ans].n}</b>!`; }
+      see(ans); save(); const nx = $('#qnext', m); nx.classList.remove('hidden');
+      if (q.n < QUIZ_ROUNDS) { nx.textContent = 'Próxima ▶'; nx.onclick = () => { closeModal(); ACT.quiz(); }; } else { nx.textContent = `Fim! ${q.right}/${QUIZ_ROUNDS} acertos`; nx.onclick = () => { closeModal(); render(); }; }
+    });
+  };
+
+  // ---------- conquistas e títulos ----------
+  const dexC = () => Object.keys(S.dex.caught).length;
+  const ACH = [
+    ['first', '🔴', 'Primeira captura', 'Capture 1 Pokémon', () => S.stats.caught >= 1, 'Novato'],
+    ['c50', '🎒', 'Colecionador', 'Registre 50 capturados', () => dexC() >= 50, 'Colecionador'],
+    ['c151', '📕', 'Kanto completo', 'Registre 151 capturados', () => dexC() >= 151, 'Pesquisador'],
+    ['call', '🏆', 'Mestre Pokémon', 'Complete a Pokédex', () => dexC() >= dexTotal(), 'Mestre Pokémon'],
+    ['shiny1', '✨', 'Brilho raro', 'Encontre 1 shiny', () => (S.stats.shinies || 0) >= 1, 'Caçador de Brilhos'],
+    ['shiny5', '🌟', 'Caçador de shinies', 'Encontre 5 shinies', () => (S.stats.shinies || 0) >= 5, 'Lenda Brilhante'],
+    ['fish1', '🎣', 'Primeira fisgada', 'Fisgue 1 Pokémon', () => (S.stats.fished || 0) >= 1, 'Pescador'],
+    ['fish50', '🐟', 'Mestre pescador', 'Fisgue 50 Pokémon', () => (S.stats.fished || 0) >= 50, 'Mestre Pescador'],
+    ['w50', '⚔️', 'Batalhador', 'Vença 50 batalhas', () => S.stats.wins >= 50, 'Batalhador'],
+    ['w500', '🛡️', 'Veterano', 'Vença 500 batalhas', () => S.stats.wins >= 500, 'Veterano'],
+    ['b8', '🎖️', 'Oito insígnias', 'Ganhe as 8 insígnias de Kanto', () => S.badges.length >= 8, 'Desafiante'],
+    ['champ', '👑', 'Campeão', 'Vença a Liga de Kanto', () => !!S.champion, 'Campeão'],
+    ['jchamp', '🌸', 'Campeão de Johto', 'Vença a Liga de Johto', () => !!S.jchampion, 'Lenda de Johto'],
+    ['nat', '🌈', 'Fã de Eevee', 'Vença a Nat', () => !!(S.nat && S.nat.wins), 'Mestre Eevee'],
+    ['egg5', '🥚', 'Criador', 'Choque 5 ovos', () => (S.stats.hatched || 0) >= 5, 'Criador'],
+    ['q10', '📜', 'Dedicado', 'Resgate 10 missões', () => (S.stats.questsDone || 0) >= 10, 'Dedicado'],
+    ['quiz20', '👁️', 'Olho de águia', 'Acerte 20 no "Quem é esse Pokémon?"', () => (S.stats.quizRight || 0) >= 20, 'Olho de Águia'],
+    ['mega', '💎', 'Mega Evolução', 'Mega Evolua em batalha', () => (S.stats.megas || 0) >= 1, 'Mega Mestre'],
+    ['dmax', '⬣', 'Gigante', 'Dinamax em batalha', () => (S.stats.dmaxes || 0) >= 1, 'Gigante'],
+    ['tower10', '🗼', 'Escalador', 'Chegue ao andar 10 da Torre', () => S.tower.best >= 10, 'Escalador'],
+    ['rich', '💰', 'Magnata', 'Tenha ₽1.000.000', () => S.money >= 1e6, 'Magnata'],
+    ['play10', '⏳', 'Viciado', 'Jogue 10 horas', () => S.stats.playMs >= 36e6, 'Viciado'],
+  ];
+  function checkAch() {
+    if (!S || !S.trainer) return; S.ach = S.ach || {}; const first = !S.achInit, nw = [];
+    for (const a of ACH) if (!S.ach[a[0]]) { let ok = false; try { ok = a[4](); } catch (e) {} if (ok) { S.ach[a[0]] = Date.now(); nw.push(a); } }
+    if (first) { S.achInit = 1; if (nw.length) setTimeout(() => toast(`🏆 ${nw.length} conquista(s) desbloqueada(s)! Veja em Mais → Conquistas.`, 'good'), 1500); return; }
+    nw.forEach((a, i) => setTimeout(() => { SFX.lvl(); toast(`🏆 Conquista: <b>${a[2]}</b> • título “${a[5]}”`, 'good'); }, 400 + i * 900));
+  }
+  A.checkAch = checkAch;
+  const titleOf = () => { const a = ACH.find(x => x[0] === S.title); return a && S.ach && S.ach[a[0]] ? a[5] : null; };
+  function vAch() {
+    S.ach = S.ach || {}; const n = ACH.filter(a => S.ach[a[0]]).length;
+    return `<div class="card"><div class="row between"><h3>🏆 Conquistas</h3><b>${n}/${ACH.length}</b></div><div class="progress gold"><i style="width:${n / ACH.length * 100}%"></i></div><p class="mut small">Toque numa conquista desbloqueada para usar o título no seu Cartão de Treinador.${titleOf() ? ` Título atual: <b>${titleOf()}</b>` : ''}</p></div>
+      <div class="achgrid">${ACH.map(a => { const got = S.ach[a[0]]; return `<button class="ach ${got ? 'got' : ''} ${S.title === a[0] ? 'sel' : ''}" ${got ? `data-a="settitle" data-k="${a[0]}"` : ''}><span class="ae">${got ? a[1] : '🔒'}</span><b>${a[2]}</b><small>${a[3]}</small><i>“${a[5]}”</i></button>`; }).join('')}</div>`;
+  }
+  ACT.settitle = d => { S.title = S.title === d.k ? null : d.k; save(); SFX.click2(); toast(S.title ? `Título: ${titleOf()}` : 'Título removido'); render(); };
+
+  // ---------- música chiptune procedural ----------
+  const MUS = (() => {
+    const mid = n => 440 * 2 ** ((n - 69) / 12);
+    const SC = { maj: [0, 2, 4, 7, 9, 12, 14, 16], min: [0, 2, 3, 5, 7, 8, 10, 12] };
+    function build(name, cfg) {
+      const r = srng(hseed('pkl-' + name)), lead = [], bass = [], drum = [], steps = cfg.bars * 16;
+      for (let s = 0; s < steps; s++) { const ch = cfg.prog[Math.floor(s / 16) % cfg.prog.length], sc = SC[cfg.scale];
+        // baixo
+        bass.push(s % cfg.bstep === 0 ? cfg.root - 12 + ch + (s % 8 === 4 && cfg.bstep < 4 ? 7 : 0) : null);
+        // melodia (motivo repetido a cada 2 compassos com variação)
+        const ms = s % 32; let note = null;
+        if (s < 32 || r() < 0.3) { if (r() < cfg.dens) note = cfg.root + 12 + ch + sc[Math.floor(r() * 5)]; lead[s] = note; } else lead[s] = lead[ms] != null ? lead[ms] + (s >= steps - 16 && ms % 8 === 0 ? 0 : 0) : null;
+        drum.push(cfg.drums ? (s % 8 === 0 ? 'k' : s % 8 === 4 ? 's' : s % 2 === 0 ? 'h' : null) : null);
+      }
+      return { ...cfg, lead, bass, drum, steps };
+    }
+    const THEMES = {
+      map: build('map', { bpm: 108, bars: 8, prog: [0, -3, -7, -5], scale: 'maj', root: 60, dens: 0.45, bstep: 4, drums: true, wave: 'square', loop: true }),
+      night: build('night', { bpm: 84, bars: 8, prog: [0, -4, -2, -5], scale: 'min', root: 57, dens: 0.3, bstep: 8, drums: false, wave: 'triangle', loop: true }),
+      battle: build('battle', { bpm: 156, bars: 8, prog: [0, 0, -4, -2, 0, 0, 1, -1], scale: 'min', root: 57, dens: 0.7, bstep: 2, drums: true, wave: 'square', loop: true }),
+    };
+    const VIC = [[72, 2], [72, 1], [72, 1], [76, 4], [74, 2], [74, 1], [74, 1], [77, 4], [79, 2], [77, 1], [76, 1], [74, 2], [72, 1], [74, 1], [76, 8], [null, 4]];
+    THEMES.victory = { bpm: 140, loop: false, wave: 'square', steps: VIC.reduce((a, b) => a + b[1], 0), lead: [], bass: [], drum: [] };
+    { let s = 0; for (const [n, l] of VIC) { THEMES.victory.lead[s] = n; THEMES.victory.bass[s] = n ? n - 24 : null; s += l; } }
+    let cur = null, want = null, step = 0, nextT = 0, timer = null, gain = null, endAt = 0;
+    const on = () => S && S.settings.music !== false;
+    function vol() { return on() ? (S.settings.mvol ?? 0.35) * 0.5 : 0; }
+    function voice(c, f, t, d, type, v) { const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(g).connect(gain); o.start(t); o.stop(t + d + 0.02); }
+    function drumHit(c, k, t) { if (k === 'k') { const o = c.createOscillator(), g = c.createGain(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.12); g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14); o.connect(g).connect(gain); o.start(t); o.stop(t + 0.16); return; }
+      const len = k === 's' ? 0.1 : 0.03, b = c.createBuffer(1, Math.ceil(c.sampleRate * len), c.sampleRate), x = b.getChannelData(0); for (let i = 0; i < x.length; i++) x[i] = (Math.random() * 2 - 1) * (1 - i / x.length);
+      const s = c.createBufferSource(), g = c.createGain(); s.buffer = b; g.gain.value = k === 's' ? 0.25 : 0.08; s.connect(g).connect(gain); s.start(t); }
+    function tick() {
+      const c = ac; if (!c || !cur || c.state !== 'running') return; const th = THEMES[cur], sd = 60 / th.bpm / 4;
+      if (nextT < c.currentTime) nextT = c.currentTime + 0.05;
+      while (nextT < c.currentTime + 0.2) { const s = step % th.steps;
+        if (!th.loop && step >= th.steps) { const w = want; cur = null; if (w && w !== 'victory') setTimeout(() => play(w), 300); return; }
+        if (th.lead[s] != null) { let l = 1; while (l < 8 && th.lead[s + l] === undefined && !th.loop) l++; voice(c, mid(th.lead[s]), nextT, th.loop ? sd * 1.6 : sd * l * 0.95, th.wave, 0.09); }
+        if (th.bass[s] != null) voice(c, mid(th.bass[s]), nextT, th.loop ? sd * 1.8 : sd * 4, 'triangle', 0.16);
+        if (th.drum[s]) drumHit(c, th.drum[s], nextT);
+        step++; nextT += sd; }
+    }
+    function play(name) {
+      want = name === 'victory' ? want : name; const c = ac; if (!c) return; if (!gain) { gain = c.createGain(); gain.connect(c.destination); }
+      gain.gain.setTargetAtTime(vol(), c.currentTime, 0.05); if (!on()) { cur = null; return; }
+      if (cur === name) return; if (cur === 'victory' && name !== 'victory') { want = name; return; }
+      cur = name; step = 0; nextT = c.currentTime + 0.08; if (!timer) timer = setInterval(tick, 60); tick();
+    }
+    return { want(name) { want = name; if (ac && ac.state === 'running') play(name); }, kick() { if (want && ac) play(want); }, victory() { const w = want; play('victory'); want = w; },
+      stop() { cur = null; }, refresh() { if (gain && ac) gain.gain.setTargetAtTime(vol(), ac.currentTime, 0.05); if (!on()) cur = null; else if (want) play(want); }, get cur() { return cur; }, THEMES };
+  })();
+  A.MUS = MUS;
+  A.debug.closeBattle = () => closeBattle();
+  const mapTheme = () => period() === 'night' ? 'night' : 'map';
+  document.addEventListener('click', () => { if (S && S.trainer) { if (!MUS.cur) MUS.want(B ? 'battle' : mapTheme()); MUS.kick(); } }, true);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) MUS.stop(); });
+  ACT.setvol = d => { S.settings[d.k] = +d.v; save(); MUS.refresh(); render(); };
+  ACT.setmus = d => { S.settings.music = d.v === 'true'; save(); MUS.refresh(); if (S.settings.music) MUS.want(mapTheme()); render(); };
+  function audioSettings() {
+    const vs = [[0, '0'], [0.15, 'Baixo'], [0.35, 'Médio'], [0.6, 'Alto']];
+    return `<div class="setrow"><span>🎵 Música</span><div class="seg">${[[true, 'Ligada'], [false, 'Desligada']].map(([v, l]) => `<button class="${(S.settings.music !== false) === v ? 'on' : ''}" data-a="setmus" data-v="${v}">${l}</button>`).join('')}</div></div>
+      <div class="setrow"><span>Volume da música</span><div class="seg">${vs.slice(1).map(([v, l]) => `<button class="${(S.settings.mvol ?? 0.35) === v ? 'on' : ''}" data-a="setvol" data-k="mvol" data-v="${v}">${l}</button>`).join('')}</div></div>
+      <div class="setrow"><span>Volume dos efeitos</span><div class="seg">${[[0.4, 'Baixo'], [0.8, 'Médio'], [1.2, 'Alto']].map(([v, l]) => `<button class="${(S.settings.svol ?? 0.8) === v ? 'on' : ''}" data-a="setvol" data-k="svol" data-v="${v}">${l}</button>`).join('')}</div></div>`;
+  }
 
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
