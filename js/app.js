@@ -222,7 +222,7 @@
   const dexCount = () => [Object.keys(S.dex.seen).length, Object.keys(S.dex.caught).length];
   function trainerCard(big) {
     const [se, ca] = dexCount(); const h = Math.floor(S.stats.playMs / 36e5), mi = Math.floor(S.stats.playMs / 6e4) % 60;
-    return `<div class="tcard ${big ? 'big' : ''}"><div class="tcl ${auraOf() ? 'au-' + auraOf() : ''}">${trImg()}</div><div class="tcr"><small>CARTÃO DE TREINADOR</small>${titleOf() ? `<span class="ttitle">🏆 ${titleOf()}</span>` : S.nat && S.nat.wins ? '<span class="ttitle">🌈 Mestre Eevee</span>' : ''}<h2>${esc(S.trainer)}${S.champion ? ' 👑' : ''}</h2>
+    return `<div class="tcard ${big ? 'big' : ''}"><div class="tcl ${auraOf() ? 'au-' + auraOf() : ''} ${poseCls()}">${trImg()}</div><div class="tcr"><small>CARTÃO DE TREINADOR</small>${titleOf() ? `<span class="ttitle">🏆 ${titleOf()}</span>` : S.nat && S.nat.wins ? '<span class="ttitle">🌈 Mestre Eevee</span>' : ''}<h2>${esc(S.trainer)}${S.champion ? ' 👑' : ''}</h2>
       <div class="badges">${C.BADGES.map((_, i) => badgeHtml(i, S.badges.includes(i))).join('')}</div>${S.nat && S.nat.wins ? '<span class="badge natb on" title="Insígnia Nat">🌈</span>' : ''}${S.champion && FEAT.johto ? `<div class="badges j">${C.JBADGES.map((_, i) => jbadgeHtml(i, S.jbadges.includes(i))).join('')}</div>` : ''}
       <div class="tstats"><span><b>${ca}</b> capturados</span><span><b>${se}</b> vistos</span><span><b>${Object.keys(S.dex.shiny).length}</b> ✨</span>${big ? `<span><b>${S.stats.wins}</b> vitórias</span><span><b>${h}h${String(mi).padStart(2, '0')}</b> jogadas</span><span><b>${S.tower.best}</b> torre</span>` : ''}</div></div></div>`;
   }
@@ -758,7 +758,7 @@
   function dmgNum(side, d, crit, eff) { const [x, y] = center(side); const n = document.createElement('div'); n.className = 'dmg' + (crit ? ' crit' : '') + (eff > 1 ? ' sup' : eff < 1 ? ' weak' : ''); n.textContent = '-' + d + (crit ? '!' : ''); n.style.cssText = `left:${x}px;top:${y - 30}px`; $('#fxl').appendChild(n); setTimeout(() => n.remove(), 1100); }
   async function throwBall(ball) {
     const fx = $('#fxl'), [x1, y1] = center(1), sc = bq('.bscene').getBoundingClientRect(); const b = document.createElement('img'); b.id = 'cball'; b.className = 'cball'; b.src = `img/items/${ball}.png`;
-    b.style.cssText = `--sx:${sc.width * 0.15}px;--sy:${sc.height * 0.95}px;--tx:${x1}px;--ty:${y1}px`; fx.appendChild(b); SFX.throw(); await wait(650);
+    b.style.cssText = `--sx:${sc.width * 0.15}px;--sy:${sc.height * 0.95}px;--tx:${x1}px;--ty:${y1}px;${ballFx()}`; fx.appendChild(b); SFX.throw(); await wait(650);
     b.classList.add('landed'); popFx(1); const el = bq('.emon'); el.classList.add('caught'); tone(1000, 0.3, 'sine', 0.05, 0, -700); await wait(600);
     b.classList.add('drop'); await wait(450);
   }
@@ -1014,7 +1014,7 @@
     nw.forEach((a, i) => setTimeout(() => { SFX.lvl(); toast(`🏆 Conquista: <b>${a[2]}</b> • título “${a[5]}”`, 'good'); }, 400 + i * 900));
   }
   A.checkAch = checkAch;
-  const titleOf = () => { const a = ACH.find(x => x[0] === S.title); return a && S.ach && S.ach[a[0]] ? a[5] : null; };
+  const titleOf = () => { if (S.title && S.title.startsWith('ps-')) return (S.passTitles || {})[S.title] ? passTitle(S.title) : null; const a = ACH.find(x => x[0] === S.title); return a && S.ach && S.ach[a[0]] ? a[5] : null; };
   function vAch() {
     S.ach = S.ach || {}; const n = ACH.filter(a => S.ach[a[0]]).length;
     return `<div class="card"><div class="row between"><h3>🏆 Conquistas</h3><b>${n}/${ACH.length}</b></div><div class="progress gold"><i style="width:${n / ACH.length * 100}%"></i></div><p class="mut small">Toque numa conquista desbloqueada para usar o título no seu Cartão de Treinador.${titleOf() ? ` Título atual: <b>${titleOf()}</b>` : ''}</p></div>
@@ -1361,12 +1361,12 @@
   const auraOf = () => (STYLE.auras.find(x => x[0] === sty().aura) || [])[2] || '';
   function meHtml() { const h = hatOf(); return `<img class="me" src="img/tr/${S.avatar}.png" style="${meFilter()}" alt="">${h ? `<span class="mehat ${sty().hat}">${h}</span>` : ''}${auraOf() ? `<span class="meaura au-${auraOf()}"></span>` : ''}`; }
   function vStyle() { const s = sty();
-    const sec = (k, t, list, prev) => `<div class="card"><h3>${t}</h3><div class="stygrid">${list.map(([id, n, v, pr]) => { const own = s.owned[id], on = s[k] === id; return `<button class="sty ${on ? 'on' : ''} ${own ? 'own' : ''}" data-a="stybuy" data-k="${k}" data-id="${id}">${prev(v, id)}<b>${n}</b><small>${on ? '✅ Usando' : own ? 'Usar' : pr < 0 ? '🎰 Cápsula' : fmt(pr)}</small></button>`; }).join('')}</div></div>`;
+    const sec = (k, t, list, prev) => `<div class="card"><h3>${t}</h3><div class="stygrid">${list.map(([id, n, v, pr]) => { const own = s.owned[id], on = s[k] === id; return `<button class="sty ${on ? 'on' : ''} ${own ? 'own' : ''}" data-a="stybuy" data-k="${k}" data-id="${id}">${prev(v, id)}<b>${n}</b><small>${on ? '✅ Usando' : own ? 'Usar' : pr === -2 ? '🎟️ Passe' : pr < 0 ? '🎰 Cápsula' : fmt(pr)}</small></button>`; }).join('')}</div></div>`;
     return `<div class="card stylehead"><div class="stypreview theme-grass"><div class="tcl styc">${trImg()}</div></div><div><h3>👕 Boutique do Treinador</h3><p class="mut small">Compre cores, chapéus e auras. Aparecem no mapa e no seu Cartão de Treinador.</p><span class="chip money">${fmt(S.money)}</span></div></div>
       ${sec('color', '🎨 Cores da roupa', STYLE.colors, v => `<img src="img/tr/${S.avatar}.png" style="${!v ? '' : v === -1 ? 'filter:brightness(.55) contrast(1.3)' : `filter:hue-rotate(${v}deg) saturate(1.2)`}" alt="">`)}
       ${sec('hat', '🧢 Chapéus e acessórios', STYLE.hats, v => `<span class="sem">${v || '∅'}</span>`)}${sec('aura', '✨ Auras', STYLE.auras, v => `<span class="sem aura-prev au-${v}">${v ? '' : '∅'}</span>`)}`; }
   ACT.stybuy = d => { const s = sty(), list = STYLE[d.k + 's'], it = list.find(x => x[0] === d.id); if (!it) return;
-    if (!s.owned[d.id]) { if (it[3] < 0) return toast('Só na Máquina de Cápsulas!'); if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; s.owned[d.id] = 1; SFX.coin(); toast(`Comprou ${it[1]}!`, 'good'); }
+    if (!s.owned[d.id]) { if (it[3] < 0) return toast(it[3] === -2 ? 'Recompensa do Passe de Temporada!' : 'Só na Máquina de Cápsulas!'); if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; s.owned[d.id] = 1; SFX.coin(); toast(`Comprou ${it[1]}!`, 'good'); }
     s[d.k] = d.id; save(); render(); };
   const trImg = () => { const h = hatOf(); return `<img src="img/tr/${S.avatar}.png" style="${meFilter()}" alt="">${h ? `<span class="tchat ${sty().hat}">${h}</span>` : ''}`; };
 
@@ -1591,9 +1591,64 @@
   HOME_X.push(() => { const l = liveEv(); if (l.length) return `<button class="card span2 evbanner live" data-a="tab" data-t="events"><img src="${sprId(l[0].id)}" alt=""><div><small>${l[0].kind === 'cd' ? '🎉 DIA DA COMUNIDADE AO VIVO' : '🔦 HORA DO HOLOFOTE AO VIVO'}</small><b>${D.mons[l[0].id].n} por todo lado!</b><span class="small">${evCount(l[0])}</span></div><span class="arrow">›</span></button>`;
     const t = nowT(), nx = [nextCDs(1)[0], spOf(t)].sort((a, b) => a.start - b.start)[0]; if (nx.start - t < 864e5) return `<button class="card span2 evbanner" data-a="tab" data-t="events"><img src="${sprId(nx.id)}" alt=""><div><small>${nx.kind === 'cd' ? '🎉 DIA DA COMUNIDADE' : '🔦 HORA DO HOLOFOTE'} EM BREVE</small><b>${D.mons[nx.id].n}</b><span class="small">${evCount(nx)}</span></div><span class="arrow">›</span></button>`; return ''; });
   { const ea = evolveAnim; evolveAnim = async (m, to, f) => { const r = await ea(m, to, f); const c = cdLive(); if (r !== false && c && baseOf(to) === baseOf(c.id) && D.moves[c.move] && !m.moves.some(x => x.n === c.move)) { toast(`🎉 Golpe exclusivo do Dia da Comunidade!`, 'good'); await learnMove(m, c.move); S.stats.cdMoves = (S.stats.cdMoves || 0) + 1; save(); } return r; }; }
+  // ---------- v6 G3: Passe de Temporada (grátis) ----------
+  const SEASONS = [ // [nome, emoji, hue, Pokémon exclusivo, chapéu, aura, cor do tema]
+    ['Brisa das Flores', '🌸', 310, 182, '🌸', 'sparkle', '#f472b6'], ['Ondas de Verão', '🌊', 190, 131, '🏖️', 'rainbow', '#38bdf8'],
+    ['Chamas do Outono', '🍁', 20, 59, '🍂', 'fire', '#fb923c'], ['Noite Assombrada', '🎃', 270, 94, '🎃', 'cosmic', '#a855f7'],
+    ['Neve Cintilante', '❄️', 180, 144, '🎄', 'volt', '#7dd3fc'], ['Tempestade Elétrica', '⚡', 50, 25, '⚡', 'volt', '#facc15']];
+  const SEA_LEN = 35 * 864e5, SEA_EPOCH = Date.UTC(2026, 0, 5, 3), PASS_XP = 100, PASS_MAX = 50;
+  const seasonAt = t => { const i = Math.floor((t - SEA_EPOCH) / SEA_LEN); return { i, th: ((i % SEASONS.length) + SEASONS.length) % SEASONS.length, start: SEA_EPOCH + i * SEA_LEN, end: SEA_EPOCH + (i + 1) * SEA_LEN }; };
+  const POSES = [['p0', 'Parado', '', 0], ['p1', 'Pulinho', 'jump', -2], ['p2', 'Giro', 'spin', -2], ['p3', 'Aceno', 'wave', -2], ['p4', 'Pose Heroica', 'hero', -2], ['p5', 'Dancinha', 'dance', -2]];
+  const BALLS = [['b0', 'Padrão', 0, 0], ['b1', 'Bola Rosa', 300, -2], ['b2', 'Bola Ciano', 170, -2], ['b3', 'Bola Dourada', 45, -2], ['b4', 'Bola Roxa', 250, -2], ['b5', 'Bola Verde', 100, -2]];
+  STYLE.poses = POSES; STYLE.balls = BALLS;
+  SEASONS.forEach((s, i) => { STYLE.colors.push([`sc${i}`, `Traje ${s[0]}`, s[2], -2]); STYLE.hats.push([`sh${i}`, `Enfeite ${s[0]}`, s[4], -2]); if (!STYLE.auras.some(a => a[2] === s[5] && a[0].startsWith('sa'))) STYLE.auras.push([`sa${i}`, `Aura ${s[0]}`, s[5], -2]); });
+  const seaAura = th => { const s = SEASONS[th]; return (STYLE.auras.find(a => a[0].startsWith('sa') && a[2] === s[5]) || [])[0]; };
+  const passTitle = k => { const th = +k.slice(3); return SEASONS[th] ? `${SEASONS[th][1]} Mestre ${SEASONS[th][0]}` : null; };
+  function passReward(L, th) { const s = SEASONS[th];
+    if (L === 50) return ['mon', s[3]]; if (L === 10) return ['title', `ps-${th}`]; if (L === 20) return ['style', 'colors', `sc${th}`]; if (L === 30) return ['style', 'hats', `sh${th}`]; if (L === 40) return ['style', 'auras', seaAura(th)];
+    if ([5, 25, 45].includes(L)) return ['style', 'poses', POSES[1 + ((th + [5, 25, 45].indexOf(L) * 2) % 5)][0]]; if ([15, 35].includes(L)) return ['style', 'balls', BALLS[1 + ((th + (L === 35 ? 2 : 0)) % 5)][0]];
+    const k = L % 4; return k === 0 ? ['item', 'capsule-token', 1] : k === 1 ? ['money', 800 + L * 60] : k === 2 ? ['item', L > 25 ? 'ultra-ball' : 'great-ball', 5] : ['item', L % 3 ? 'rare-candy' : 'egg-token', L % 3 ? 1 : 2]; }
+  function pass() { const se = seasonAt(nowT()); let p = S.pass; if (!p || p.sid !== se.i) { const old = p; p = S.pass = { sid: se.i, xp: 0, got: {}, hist: (old && old.hist) || [] }; if (old && old.xp) p.hist.push({ sid: old.sid, lvl: passLvl(old) }); } return p; }
+  const passLvl = p => Math.min(PASS_MAX, Math.floor(p.xp / PASS_XP));
+  function seasonXP(n, src) { if (!S || !n) return; const p = pass(), b = passLvl(p); p.xp += Math.round(n); const a = passLvl(p); if (a > b) toast(`🎟️ Passe: nível ${a}! Resgate a recompensa (Mais → Passe)`, 'good'); }
+  const ownedReward = r => r[0] === 'style' ? !!sty().owned[r[2]] : r[0] === 'title' ? !!(S.passTitles || {})[r[1]] : false;
+  function giveReward2(r, th) { if (r[0] === 'mon') { const m = PE.makeMon(r[1], 30, st, { ot: S.trainer, caughtAt: `Passe: ${SEASONS[th][0]}`, shiny: true }); m.ribbons = ['season']; m.seasonal = th; addCaught(m); S.stats.caught++; S.stats.shinies++; if (S.party.length < 6) S.party.push(m); else S.box.push(m); return { ico: `<img src="${sprId(r[1], true)}" alt="">`, t: `${D.mons[r[1]].n} brilhante exclusivo!` }; }
+    if (r[0] === 'title') { S.passTitles = S.passTitles || {}; S.passTitles[r[1]] = 1; return { ico: '🏆', t: `Título: ${passTitle(r[1])}` }; }
+    if (r[0] === 'style' && (r[1] === 'poses' || r[1] === 'balls')) { const it = STYLE[r[1]].find(x => x[0] === r[2]); sty().owned[r[2]] = 1; return { ico: r[1] === 'poses' ? '🕺' : ballIco(it[2]), t: `${r[1] === 'poses' ? 'Pose' : 'Pokébola'}: ${it[1]}` }; }
+    return capGive(r); }
+  const ballIco = h => `<img class="bskin" src="img/items/poke-ball.png" style="filter:hue-rotate(${h}deg) saturate(1.4)" alt="">`;
+  const rwPrev = (r, th) => r[0] === 'mon' ? `<img src="${sprId(r[1], true)}" alt="">` : r[0] === 'title' ? '🏆' : r[0] === 'money' ? '💰' : r[0] === 'item' ? itemImg(r[1]) : r[1] === 'balls' ? ballIco(STYLE.balls.find(x => x[0] === r[2])[2]) : r[1] === 'poses' ? '🕺' : r[1] === 'hats' ? STYLE.hats.find(x => x[0] === r[2])[2] : r[1] === 'auras' ? '✨' : '🎨';
+  const rwName = r => r[0] === 'mon' ? D.mons[r[1]].n + ' ★' : r[0] === 'title' ? 'Título' : r[0] === 'money' ? fmt(r[1]) : r[0] === 'item' ? `${r[2]}x ${C.ITEM_NAME[r[1]] || r[1]}` : (STYLE[r[1]].find(x => x[0] === r[2]) || [])[1];
+  function poseCls() { const p = POSES.find(x => x[0] === sty().pose); return p && p[2] ? 'pose-' + p[2] : ''; }
+  function ballFx() { const b = BALLS.find(x => x[0] === sty().ball); return b && b[2] ? `filter:hue-rotate(${b[2]}deg) saturate(1.4)` : ''; }
+  // loja de temporadas passadas: cosméticos de temas já vividos voltam por moedas
+  function pastShop() { const se = seasonAt(nowT()), seen = new Set(); for (let i = se.i - 1; i >= se.i - 6 && i >= 0; i--) seen.add(((i % 6) + 6) % 6); seen.delete(se.th);
+    const out = []; for (const th of seen) { out.push(['style', 'colors', `sc${th}`, 6000, th], ['style', 'hats', `sh${th}`, 5000, th]); const a = seaAura(th); if (a) out.push(['style', 'auras', a, 12000, th]); out.push(['title', `ps-${th}`, null, 15000, th]); } return out; }
+  ACT.passclaim = d => { const p = pass(), se = seasonAt(nowT()), Ls = d.lv === 'all' ? Array.from({ length: passLvl(p) }, (_, i) => i + 1).filter(L => !p.got[L]) : [+d.lv]; const got = [];
+    for (const L of Ls) { if (L > passLvl(p) || p.got[L]) continue; p.got[L] = 1; got.push(giveReward2(passReward(L, se.th), se.th)); }
+    if (!got.length) return; SFX.win(); save(); modal(`<div class="center"><h3>🎟️ Recompensas do Passe</h3><div class="capres">${got.map(g => `<div class="cr"><span class="ci">${g.ico}</span><b>${g.t}</b></div>`).join('')}</div><div class="mbtns"><button class="btn primary" data-a="close">Oba!</button></div></div>`); render(); };
+  ACT.passbuy = d => { const it = pastShop()[+d.i]; if (!it || ownedReward(it)) return; if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; const g = giveReward2(it, it[4]); SFX.coin(); toast(`Comprou ${g.t}!`, 'good'); save(); render(); };
+  ACT.passeq = d => { const s = sty(); if (!s.owned[d.id]) return; s[d.k] = s[d.k] === d.id ? (d.k === 'pose' ? 'p0' : 'b0') : d.id; save(); SFX.click2(); render(); };
+  function vPass() { const p = pass(), se = seasonAt(nowT()), s = SEASONS[se.th], L = passLvl(p), into = L >= PASS_MAX ? PASS_XP : p.xp % PASS_XP, unc = Array.from({ length: L }, (_, i) => i + 1).filter(x => !p.got[x]).length, sy = sty();
+    const row = Array.from({ length: PASS_MAX }, (_, i) => { const n = i + 1, r = passReward(n, se.th), got = p.got[n], can = n <= L && !got; return `<button class="pslot ${got ? 'got' : can ? 'can' : ''} ${n % 10 === 0 ? 'big' : ''}" ${can ? `data-a="passclaim" data-lv="${n}"` : ''}><small>${n}</small><span class="pi">${rwPrev(r, se.th)}</span><em>${got ? '✅' : can ? 'Pegar!' : rwName(r)}</em></button>`; }).join('');
+    const shop = pastShop();
+    return `<div class="card pshead" style="--pc:${s[6]}"><small>TEMPORADA ${se.i + 1} • GRÁTIS</small><h2>${s[1]} ${s[0]}</h2><p class="mut small">Termina em <b class="cdn" data-t="${se.end}">${cdn(se.end - nowT())}</b> • ${fmtBR(se.start)} → ${fmtBR(se.end)}</p>
+      <div class="pslv"><b>Nv ${L}</b><div class="bar"><i style="width:${into}%"></i></div><small>${L >= PASS_MAX ? 'MÁXIMO!' : `${into}/${PASS_XP} XP`}</small></div>
+      <p class="small">Ganhe XP do Passe: ⚔️ batalhas (+10 selvagem, +20 treinador) • 📜 missões (+60) • 🎁 bônus diário (+150) • ♾️ Lago Infinito (+15/onda)</p>
+      ${unc ? `<button class="btn primary" data-a="passclaim" data-lv="all">Resgatar ${unc} recompensa(s)</button>` : ''}<div class="psmon"><img src="${sprId(s[3], true)}" alt=""><span>Nível 50: <b>${D.mons[s[3]].n} brilhante exclusivo</b> com Fita da Temporada</span></div></div>
+      <div class="card"><h3>🎁 Trilha de recompensas</h3><div class="pstrack">${row}</div></div>
+      <div class="card"><h3>🕺 Poses e Pokébolas</h3><p class="mut small">Poses aparecem no Cartão de Treinador; a cor da Pokébola aparece ao arremessar.</p><div class="stygrid">${[...POSES.slice(1).map(x => ['pose', x]), ...BALLS.slice(1).map(x => ['ball', x])].map(([k, x]) => { const own = sy.owned[x[0]], on = sy[k] === x[0]; return `<button class="sty ${on ? 'on' : ''} ${own ? 'own' : ''}" ${own ? `data-a="passeq" data-k="${k}" data-id="${x[0]}"` : ''}>${k === 'ball' ? ballIco(x[2]) : '<span class="sem">🕺</span>'}<b>${x[1]}</b><small>${on ? '✅ Usando' : own ? 'Usar' : '🎟️ Passe'}</small></button>`; }).join('')}</div></div>
+      <div class="card"><h3>🏆 Títulos</h3><div class="stygrid">${SEASONS.map((x, i) => { const k = `ps-${i}`, own = (S.passTitles || {})[k]; return `<button class="sty ${S.title === k ? 'on' : ''} ${own ? 'own' : ''}" ${own ? `data-a="settitle" data-k="${k}"` : ''}><span class="sem">${x[1]}</span><b>${passTitle(k)}</b><small>${S.title === k ? '✅ Usando' : own ? 'Usar' : '🔒'}</small></button>`; }).join('')}</div></div>
+      <div class="card"><h3>🛍️ Loja de Temporadas Passadas</h3><p class="mut small">Perdeu uma temporada? Os visuais voltam aqui por moedas — e cada tema volta a cada 6 temporadas.</p>${shop.length ? `<div class="stygrid">${shop.map((r, i) => { const own = ownedReward(r); return `<button class="sty ${own ? 'own' : ''}" ${own ? '' : `data-a="passbuy" data-i="${i}"`}><span class="sem">${r[0] === 'title' ? '🏆' : rwPrev(r)}</span><b>${r[0] === 'title' ? passTitle(r[1]) : rwName(r)}</b><small>${own ? '✅ Seu' : fmt(r[3])}</small></button>`; }).join('')}</div>` : '<p class="mut">Volte na próxima temporada!</p>'}</div>`; }
+  XV.pass = vPass; MORE_TABS.push('pass');
+  MORE_X.unshift(() => { const p = pass(); return ['pass', '🎟️', 'Passe de Temporada', `${SEASONS[seasonAt(nowT()).th][0]} • Nv ${passLvl(p)}/50`]; });
+  HOME_X.push(() => { const p = pass(), se = seasonAt(nowT()), s = SEASONS[se.th], L = passLvl(p), unc = Array.from({ length: L }, (_, i) => i + 1).filter(x => !p.got[x]).length; return `<button class="card span2 psbanner" style="--pc:${s[6]}" data-a="tab" data-t="pass"><span class="pse">${s[1]}</span><div><small>PASSE DE TEMPORADA</small><b>${s[0]} • Nv ${L}</b><div class="bar"><i style="width:${L >= 50 ? 100 : p.xp % PASS_XP}%"></i></div>${unc ? `<span class="small">🎁 ${unc} para resgatar!</span>` : ''}</div><span class="arrow">›</span></button>`; });
+  { const aw = award; award = async (...a) => { const before = B && B.awarded ? B.awarded.length : 0; const r = await aw(...a); try { if (B && !B.o.rogue && B.awarded && B.awarded.length > before) seasonXP(B.s.kind === 'trainer' ? 20 : 10); } catch (e) {} return r; }; }
+  { const qc = ACT.qclaim; ACT.qclaim = d => { const n = S.stats.questsDone || 0; qc(d); if ((S.stats.questsDone || 0) > n) { seasonXP(60); save(); } }; }
+  { const qb = ACT.qbonus; ACT.qbonus = () => { const q = ensureQuests(), had = q.bonus; qb(); if (!had && q.bonus) { seasonXP(150); save(); } }; }
+  A.pass = { pass, seasonAt, seasonXP, passReward, pastShop };
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
-  A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   if (localStorage.getItem(UNLOCK_KEY) !== PASS_HASH) gate();

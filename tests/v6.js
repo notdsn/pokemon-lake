@@ -56,4 +56,16 @@ let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m
     const sp = await ev(() => { const s = PokeApp.events.spOf(Date.now()); PokeApp.evShift = s.start + 600e3 - Date.now(); return PokeApp.events.liveEv().some(e => e.kind === 'sp'); }); ok(sp, `${tag} Hora do Holofote ao vivo (terça 18h)`);
     await ev(() => PokeApp.debug.go('home')); await shot('home-sp', 400); await ev(() => PokeApp.debug.go('events')); await shot('events-sp', 400); await ev(() => { PokeApp.evShift = 0; });
   }
+  if (GR.includes(3)) { await clr();
+    await ev(() => PokeApp.debug.go('home')); await shot('home-pass', 400); ok(await ev(() => !!document.querySelector('.psbanner')), `${tag} banner do Passe no Início`);
+    const x0 = await ev(() => PokeApp.pass.pass().xp); await ev(() => { PokeApp.rogue.new(false); PokeApp.debug.S.rogue.run.wave = 4; PokeApp.rogue.over(); }); await clr(); ok(await ev(() => PokeApp.pass.pass().xp) > x0, `${tag} Lago Infinito dá XP do Passe`);
+    await ev(() => PokeApp.debug.go('pass')); await shot('pass', 400); ok(await ev(() => document.querySelectorAll('.pslot').length === 50), `${tag} 50 níveis`);
+    await ev(() => { PokeApp.pass.seasonXP(5000); PokeApp.debug.render(); }); await shot('pass-max', 300); await click('[data-a="passclaim"][data-lv="all"]'); await shot('pass-claim', 500); await clr();
+    const r = await ev(() => { const S = PokeApp.debug.S, th = PokeApp.pass.seasonAt(Date.now()).th, id = PokeApp.pass.passReward(50, th)[1]; const m = [...S.party, ...S.box].find(m => m.id === id && m.ribbons && m.ribbons.includes('season')); return { mon: !!m && m.shiny, got: Object.keys(PokeApp.pass.pass().got).length, title: !!(S.passTitles || {})['ps-' + th], th }; });
+    ok(r.mon && r.got === 50 && r.title, `${tag} 50 recompensas + Pokémon exclusivo shiny + título ${JSON.stringify(r)}`);
+    await ev(() => PokeApp.debug.render()); await click(`[data-a="settitle"][data-k="ps-${r.th}"]`); const pz = await ev(() => { const b = document.querySelector('[data-a="passeq"][data-k="pose"]'); b && b.click(); return !!b; }); await click('[data-a="passeq"][data-k="ball"]');
+    await ev(() => PokeApp.debug.go('home')); await shot('home-pose', 600); ok(pz && await ev(() => /pose-/.test(document.querySelector('.tcl').className) && /Mestre/.test(document.querySelector('.tcard').textContent)), `${tag} pose + título no cartão`);
+    const sh = await ev(() => { PokeApp.evShift = 3 * 35 * 864e5; PokeApp.debug.S.money = 99999; return PokeApp.pass.pastShop().length; }); await ev(() => PokeApp.debug.go('pass')); await shot('pass-shop', 300);
+    ok(sh > 0 && await ev(() => PokeApp.pass.pass().xp === 0), `${tag} nova temporada reinicia + loja de passadas (${sh})`); await ev(() => { document.querySelector('[data-a="passbuy"]').click(); }); ok(await ev(() => PokeApp.debug.S.money < 99999), `${tag} compra na loja de passadas`); await ev(() => { PokeApp.evShift = 0; });
+  }
   ok(!errs.length, `${tag} sem erros JS ${JSON.stringify(errs)}`); await b.close(); console.log(fail ? 'FALHAS: ' + fail : 'TUDO OK'); process.exit(fail ? 1 : 0); })();

@@ -542,3 +542,22 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .ecd.dot{background:#ffcc33}.esp.dot{background:#5ec8ff}
 .evrot{display:flex;flex-wrap:wrap;gap:4px}.evrot img{width:40px;height:40px;image-rendering:pixelated}
 .evbanner>div{flex:1;min-width:0}.evbanner small,.evbanner b,.evbanner .small{display:block}.evbanner small{font-size:11px;letter-spacing:.5px;color:#ffd75e}.evbanner b{font-size:17px;margin:2px 0}
+/* ===== v6 G3 passe ===== */
+.pshead{background:linear-gradient(135deg,color-mix(in srgb,var(--pc) 35%,#141a2b),#141a2b 70%);border:1px solid var(--pc)}
+.pshead small{letter-spacing:1px;color:var(--pc);font-weight:700}.pshead h2{margin:4px 0}
+.pslv{display:flex;align-items:center;gap:8px;margin:10px 0}.pslv b{font-size:20px;color:var(--pc)}.pslv .bar,.psbanner .bar{flex:1;height:10px;border-radius:6px;background:#0008;overflow:hidden}
+.pslv .bar i,.psbanner .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pc),#fff);border-radius:6px;transition:width .4s}
+.psmon{display:flex;align-items:center;gap:8px;margin-top:10px;background:#0004;border-radius:10px;padding:6px}.psmon img{width:56px;height:56px;image-rendering:pixelated;filter:drop-shadow(0 0 6px gold)}
+.pstrack{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.pslot{flex:0 0 74px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 3px;border-radius:10px;background:#1a2133;border:1px solid #2a3350;color:inherit;font:inherit;opacity:.7}
+.pslot.big{border-color:#ffcc33;background:#2a2412}.pslot.can{opacity:1;border-color:#4ade80;box-shadow:0 0 10px #4ade8066;animation:evpulse 1.6s infinite}.pslot.got{opacity:.45}
+.pslot small{font-weight:700}.pslot .pi{font-size:26px;height:40px;display:flex;align-items:center}.pslot .pi img{width:40px;height:40px;image-rendering:pixelated}
+.pslot em{font-style:normal;font-size:10px;line-height:1.1;text-align:center;max-height:2.3em;overflow:hidden}
+.psbanner{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--pc);background:linear-gradient(120deg,#151b2e,color-mix(in srgb,var(--pc) 25%,#151b2e))}
+.psbanner>div{flex:1;min-width:0}.psbanner small{display:block;font-size:11px;color:var(--pc);letter-spacing:.5px}.psbanner b{display:block;margin:2px 0 5px}.psbanner .pse{font-size:34px}
+.bskin{width:36px;height:36px}
+.pose-jump img:first-child{animation:pjump 1.2s ease-in-out infinite}@keyframes pjump{50%{transform:translateY(-10px)}}
+.pose-spin img:first-child{animation:pspin 3s linear infinite}@keyframes pspin{to{transform:rotateY(360deg)}}
+.pose-wave img:first-child{animation:pwave 1.4s ease-in-out infinite;transform-origin:50% 90%}@keyframes pwave{25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+.pose-hero img:first-child{transform:scale(1.12);filter:drop-shadow(0 0 8px #ffcc33)!important}
+.pose-dance img:first-child{animation:pdance .8s steps(2) infinite}@keyframes pdance{50%{transform:scaleX(-1)}}
