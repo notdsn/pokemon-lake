@@ -111,7 +111,7 @@
   }
   function dealDamage(s, ti, dmg, ev, extra) {
     const m = s.sides[ti].b.m; if (m.shield > 0 && dmg > 0) { dmg *= 0.25; m.shield--; ev.push({ e: 'msg', side: ti, text: m.shield ? `🛡️ A barreira absorveu o golpe! (${m.shield} restante${m.shield > 1 ? 's' : ''})` : '💥 A barreira do chefe se partiu!' }); }
-    dmg = Math.max(0, Math.min(m.hp, Math.floor(dmg))); m.hp -= dmg;
+    dmg = Math.max(0, Math.min(m.hp, Math.floor(dmg))); if (ti === 0 && dmg > 0 && dmg >= m.hp && m.hp > 1 && (m.aff || 0) >= 200 && rnd(s) < (m.aff >= 250 ? 0.25 : 0.15)) { dmg = m.hp - 1; ev.push({ e: 'msg', side: ti, text: `💕 ${pname(s, ti)} aguentou firme para não te decepcionar!` }); } m.hp -= dmg;
     ev.push(Object.assign({ e: 'hp', side: ti, hp: m.hp, max: maxhp(m), dmg }, extra || {}));
     if (m.hp <= 0) { m.status = null; if (m.dmax) delete m.dmax; ev.push({ e: 'faint', side: ti, text: `${pname(s, ti)} desmaiou!` }); }
     return dmg;
