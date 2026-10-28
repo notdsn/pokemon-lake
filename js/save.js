@@ -19,7 +19,7 @@
       bag: { 'poke-ball': 5, potion: 3 }, badges: [], elite: 0, champion: false, champs: 0, dex: { seen: {}, caught: {}, shiny: {} },
       trainersBeaten: {}, stats: { battles: 0, wins: 0, caught: 0, shinies: 0, steps: 0, playMs: 0, fished: 0, hatched: 0, quizRight: 0, questsDone: 0, megas: 0, dmaxes: 0 }, daily: { last: null, streak: 0 },
       tower: { best: 0, cur: 0 }, settings: { sound: true, speed: 1, music: true, mvol: 0.35, svol: 0.8, follow: true }, lastMap: null,
-      gifts: {}, jbadges: [], jelite: 0, jchampion: false, jchamps: 0, region: 'kanto', elmGift: false, rewards: {}, bp: 0, eggs: [], daycare: { slots: [], since: 0, lastEgg: 0 },
+      gifts: {}, rg: {}, jbadges: [], jelite: 0, jchampion: false, jchamps: 0, region: 'kanto', elmGift: false, rewards: {}, bp: 0, eggs: [], daycare: { slots: [], since: 0, lastEgg: 0 },
       quests: {}, dexm: {}, ach: {}, achInit: 0, title: null, mini: {},
       safari: null, raids: {}, legq: {}, tour: {}, rematch: {}, trophies: 0, style: { color: 'c0', hat: 'h0', aura: 'a0', owned: { c0: 1, h0: 1, a0: 1 } }, house: { slots: [null, null, null, null, null, null, null, null], owned: {}, wall: 'w0', walls: { w0: 1 } } };
   }

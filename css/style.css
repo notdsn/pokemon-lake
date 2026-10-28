@@ -665,3 +665,8 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .fprev{height:56px;display:flex;align-items:flex-end;justify-content:center}.fprev .fa{max-height:56px;max-width:70px}.fprev .fpk{width:52px}
 .room.v2 .me{z-index:5;bottom:24%}.room.v2 .follow{z-index:5;bottom:23%}.room.v2 .mehat{bottom:calc(24% + 52px)}.room.v2 .meaura{bottom:22%}
 .clock .pend,.fa .pend{transform-origin:20px 38px}
+/* Regiões */
+.seg.region{overflow-x:auto;flex-wrap:nowrap;max-width:100%;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.seg.region::-webkit-scrollbar{display:none}
+.seg.region button{white-space:nowrap;flex:0 0 auto}
+.badges.r{margin-top:4px}
