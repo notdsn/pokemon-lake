@@ -7,7 +7,7 @@ const SH = '/workspace/pokemon-lake/prints/';
 (async () => {
   const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--autoplay-policy=no-user-gesture-required'] });
   for (const [tag, vp, mobile] of [['375x667', { width: 375, height: 667 }, true], ['1280x800', { width: 1280, height: 800 }, false]]) {
-    const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: mobile ? 2 : 1, isMobile: mobile, hasTouch: mobile });
+    const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: mobile ? 2 : 1, isMobile: mobile, hasTouch: mobile }); await ctx.addInitScript(() => { window.__pkFace = 1; });
     const page = await ctx.newPage(); const errs = [];
     page.on('pageerror', e => errs.push('pageerror ' + e.message)); page.on('console', m => m.type() === 'error' && errs.push('console ' + m.text()));
     const shot = async n => { await page.screenshot({ path: `${SH}${tag}-${n}.png` }); const sw = await page.evaluate(() => document.documentElement.scrollWidth); if (sw > vp.width) errs.push(`hscroll ${n} ${sw}`); };

@@ -3,7 +3,7 @@ const fs = require('fs'); const HASH = fs.readFileSync('/workspace/pokemon-lake/
 const URL = process.argv[2] || 'http://127.0.0.1:18473/', OUT = '/workspace/pokemon-lake/prints/v2/';
 (async () => { const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
   for (const [tag, vp] of [['375x667', { width: 375, height: 667 }], ['1280x800', { width: 1280, height: 800 }]]) {
-    const ctx = await b.newContext({ viewport: vp }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+    const ctx = await b.newContext({ viewport: vp }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); await ctx.addInitScript(() => { window.__pkFace = 1; }); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
     const shot = n => p.screenshot({ path: `${OUT}${tag}-gmax-${n}.png` }); const clr = () => p.evaluate(() => document.querySelector('#modal-root').innerHTML = '');
     const info = () => p.evaluate(() => { const b = document.querySelector('#pinfo .bnm'); const r = document.querySelector('#psp').getBoundingClientRect(), sc = document.querySelector('#battle .scene') || document.querySelector('#battle'); const q = sc.getBoundingClientRect();
       return { name: b.textContent, cut: b.scrollWidth > b.clientWidth + 1, spr: [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)], scene: [Math.round(q.left), Math.round(q.top), Math.round(q.right), Math.round(q.bottom)], dmax: JSON.stringify(PokeApp.debug.S.party[0].dmax || null), hp: PokeApp.debug.S.party[0].hp + '/' + PE.maxhp(PokeApp.debug.S.party[0]) }; });

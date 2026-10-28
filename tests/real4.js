@@ -9,7 +9,7 @@ const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-real4-${LIVE}${n}-${
 const at = (mo, h) => new Date(2026, mo, 15, Math.floor(h), Math.round((h % 1) * 60));
 (async () => {
   const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
-  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const errs = [];
+  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); await ctx.addInitScript(() => { window.__pkFace = 1; }); const p = await ctx.newPage(); const errs = [];
   p.on('pageerror', e => errs.push(e.message)); const ev = (f, a) => p.evaluate(f, a);
   await p.clock.setFixedTime(at(9, 12));
   await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');

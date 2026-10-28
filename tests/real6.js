@@ -1,0 +1,37 @@
+// REALISMO 6: som ambiente
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
+const fs = require('fs');
+const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
+const URL = process.argv[2] || 'http://127.0.0.1:18473/';
+const LIVE = URL.includes('github.io') ? 'live-' : '';
+let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
+const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-real6-${LIVE}${n}-depois.png`;
+const at = h => new Date(2026, 9, 27, Math.floor(h), Math.round((h % 1) * 60));
+(async () => {
+  const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const errs = [];
+  p.on('pageerror', e => errs.push(e.message)); const ev = (f, a) => p.evaluate(f, a);
+  await p.clock.setFixedTime(at(12));
+  await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
+  await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="4"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
+  const A = () => ev(() => PokeApp.amb.state());
+  const L = (c) => ev(c => PokeApp.amb.layersFor(c), c);
+  ok((await L({ biome: 'forest', night: false, w: 'clear' })).includes('birds'), 'floresta de dia: pássaros');
+  ok((await L({ biome: 'forest', night: true, w: 'clear' })).includes('crickets'), 'noite: grilos');
+  ok((await L({ biome: 'cave', night: false, w: 'rain' })).join() === 'drips,rumble', 'caverna: gotas (sem chuva)');
+  ok((await L({ biome: 'water', night: false, w: 'clear' })).includes('waves'), 'água: ondas');
+  ok((await L({ biome: 'mountain', night: false, w: 'clear' })).includes('wind'), 'montanha: vento');
+  const st = await L({ biome: 'forest', night: false, w: 'storm' }); ok(st.includes('rain') && st.includes('thunder'), 'tempestade: chuva + trovão');
+  await ev(() => PokeApp.debug.go('explore', 'floresta')); await p.waitForTimeout(400); await p.mouse.click(5, 300); await p.waitForTimeout(1200);
+  let s = await A(); ok(s.armed && s.running, 'áudio ativo após toque: ' + JSON.stringify(s));
+  ok(s.layers.includes('birds'), 'camadas tocando na floresta: ' + s.layers);
+  await ev(() => PokeApp.debug.go('settings')); await p.waitForTimeout(400);
+  ok(await ev(() => !!document.querySelector('#ambvol') && !!document.querySelector('[data-a="ambmute"]')), 'Configurações: slider + mudo');
+  await p.locator('#ambvol').scrollIntoViewIfNeeded(); await p.screenshot({ path: OUT('config') });
+  await p.fill('#ambvol', '80'); ok(await ev(() => PokeApp.debug.S.settings.avol === 0.8), 'slider muda volume para 80%');
+  await p.click('[data-a="ambmute"]'); await p.waitForTimeout(300); s = await A(); ok(s.vol === 0 && s.layers.length === 0, 'mudo para tudo');
+  await p.click('[data-a="ambmute"]'); await p.waitForTimeout(300);
+  await ev(() => PokeApp.debug.go('explore', 'floresta')); await p.waitForTimeout(400); await p.screenshot({ path: OUT('explore') });
+  ok(errs.length === 0, 'sem erros: ' + errs.join(' | '));
+  console.log(fail ? 'FALHOU ' + fail : 'TUDO OK'); await b.close(); process.exit(fail ? 1 : 0);
+})();

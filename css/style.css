@@ -818,3 +818,9 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 @media (prefers-reduced-motion:reduce){.wander{animation:none}.wander .follow img{animation:none}}
 .petyard .follow{width:64px!important;height:64px!important}.petyard .follow img{width:64px!important;height:64px!important;max-width:none}
 .wildpeek .hab{top:auto;bottom:100%;margin:0 0 14px}
+/* REALISMO 6: som ambiente */
+.ambctl{display:flex;align-items:center;gap:6px;flex:1;justify-content:flex-end}
+.ambctl input[type=range]{width:110px;accent-color:#3a8f5c}
+.ambctl b{font-size:12px;min-width:34px;text-align:right}
+.ambctl button{border:0;border-radius:8px;padding:4px 8px;background:#eee}
+.ambctl button.on{background:#d9534f;color:#fff}

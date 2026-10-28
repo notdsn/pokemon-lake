@@ -4,7 +4,7 @@ const fs = require('fs'); const HASH = fs.readFileSync('/workspace/pokemon-lake/
 const URL = process.argv[2] || 'http://127.0.0.1:18473/', GR = (process.argv[3] || '1,2,3,4,5,6').split(',').map(Number), TAGN = URL.includes('github.io') ? 'v6live' : 'v6', OUT = '/workspace/pokemon-lake/prints/v2/';
 let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
 (async () => { const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--autoplay-policy=no-user-gesture-required'] });
-  const tag = '375x667', ctx = await b.newContext({ viewport: { width: 375, height: 667 }, timezoneId: 'America/Sao_Paulo' }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH);
+  const tag = '375x667', ctx = await b.newContext({ viewport: { width: 375, height: 667 }, timezoneId: 'America/Sao_Paulo' }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); await ctx.addInitScript(() => { window.__pkFace = 1; });
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => { errs.push(e.message); console.log('ERR', e.stack); });
   const shot = async (n, w = 700) => { await p.waitForTimeout(w); return p.screenshot({ path: `${OUT}${tag}-${TAGN}-${n}.png` }); }; const clr = () => p.evaluate(() => document.querySelector('#modal-root').innerHTML = ''); const ev = (f, a) => p.evaluate(f, a);
   const busy = async () => { for (let w = 0; w < 60 && await ev(() => PokeApp.debug.B && PokeApp.debug.B.busy); w++) await p.waitForTimeout(300); };

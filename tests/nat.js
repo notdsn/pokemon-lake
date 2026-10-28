@@ -5,7 +5,7 @@ const URL = process.argv[2] || 'http://127.0.0.1:18473/', OUT = '/workspace/poke
 (async () => {
   const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
   for (const [tag, vp] of [['375x667', { width: 375, height: 667 }], ['1280x800', { width: 1280, height: 800 }]]) {
-    const ctx = await b.newContext({ viewport: vp }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const errs = [];
+    const ctx = await b.newContext({ viewport: vp }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); await ctx.addInitScript(() => { window.__pkFace = 1; }); const p = await ctx.newPage(); const errs = [];
     p.on('pageerror', e => errs.push(e.message));
     await p.goto(URL);
     await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');

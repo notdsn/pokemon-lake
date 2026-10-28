@@ -2078,7 +2078,7 @@
     if (t.includes('fire')) return `${N} procura pedras quentes`; if (t.includes('psychic')) return `${N} percebe você antes de você vê-lo`;
     if (t.includes('rock') || t.includes('ground')) return `${N} cava buracos no chão`; if (t.includes('ice')) return `${N} adora o frio`;
     return `${N} é curioso e às vezes se aproxima`; }
-  function moodOf(m, mp, legend) { if (A.live.force) return A.live.force; if (legend || m.evt || m.shiny) return 'face';
+  function moodOf(m, mp, legend) { if (A.live.force) return A.live.force; if (window.__pkFace) return 'face'; if (legend || m.evt || m.shiny) return 'face';
     const t = D.mons[m.id].t, e = mp.enc.find(x => x[0] === m.id), noct = (e && e[4] && e[4].night) || t.includes('ghost') || t.includes('dark');
     if (dayLight().night && !noct && R() < 0.35) return 'sleep'; if (SHY.has(+m.id) && R() < 0.45) return 'flee'; if (AGG.has(+m.id) && R() < 0.6) return 'charge';
     return R() < 0.06 ? 'flee' : 'face'; }
@@ -2106,6 +2106,79 @@
     document.querySelectorAll('.wander.sleep .emo').forEach(e => e.textContent = '💤'); }
   { const _render = render; render = function () { const r = _render.apply(this, arguments); try { addHabits(); addWander(); } catch (e) {} return r; }; }
   { const _pet = ACT.pet; ACT.pet = d => { _pet(d); const f = $('.follow'); if (!f) return; const h = document.createElement('i'); h.className = 'pheart'; h.textContent = '❤️'; f.appendChild(h); setTimeout(() => h.remove(), 1100); const w = f.closest('.wander.sleep'); if (w) { w.classList.remove('sleep'); setTimeout(() => w.classList.add('sleep'), 4000); } }; }
+
+  // =====================================================================
+  // REALISMO 6: som ambiente por bioma (100% sintetizado no navegador, CC0 — ver sounds/CREDITS.md)
+  // =====================================================================
+  const AMB = (() => {
+    let armed = false, master = null, nbuf = null, loops = {}, timer = null, key = '';
+    const vol = () => (S && S.settings.amute) ? 0 : ((S && S.settings.avol) ?? 0.5);
+    function ctxInfo() {
+      const bt = document.querySelector('#battle .battle, #battle'), sc = document.querySelector('#scene.explore');
+      let th = null, w = 'clear';
+      if (bt && B && B.o && B.o.map) { th = B.o.map.theme; w = weatherOf(B.o.map); }
+      else if (sc) { th = (sc.className.match(/\btheme-(\w+)/) || [])[1]; w = (sc.className.match(/\bw-(\w+)/) || [])[1] || 'clear'; }
+      const home = !th && !!document.querySelector('.petyard');
+      const biome = th ? biomeOf(th) : (home ? 'forest' : null), night = period() === 'night';
+      return { biome, night, w, home };
+    }
+    function layersFor(c) {
+      const L = []; if (!c.biome) return L;
+      const b = c.biome;
+      if (b === 'cave') L.push('drips', 'rumble');
+      else if (b === 'water') L.push('waves', c.night ? 'crickets' : 'gulls');
+      else if (b === 'mountain' || b === 'snow') L.push('wind');
+      else if (b === 'desert') L.push('wind', c.night ? 'crickets' : 'birds');
+      else L.push(c.night ? 'crickets' : 'birds');
+      if (b !== 'cave' && /rain|storm/.test(c.w)) L.push('rain');
+      if (b !== 'cave' && c.w === 'storm') L.push('thunder');
+      return [...new Set(L)];
+    }
+    function ensure() { const c = ac; if (!c) return null; if (!master) { master = c.createGain(); master.gain.value = 0; master.connect(c.destination);
+      nbuf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate); const d = nbuf.getChannelData(0); let br = 0; for (let i = 0; i < d.length; i++) { const wn = Math.random() * 2 - 1; br = (br + 0.02 * wn) / 1.02; d[i] = wn * 0.5 + br * 3; } } return c; }
+    function noiseLoop(type, f, q, g0, lfo) { const c = ac, s = c.createBufferSource(); s.buffer = nbuf; s.loop = true; const fl = c.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q;
+      const g = c.createGain(); g.gain.value = g0; s.connect(fl).connect(g).connect(master); s.start();
+      let o = null; if (lfo) { o = c.createOscillator(); o.frequency.value = lfo[0]; const og = c.createGain(); og.gain.value = lfo[1]; o.connect(og).connect(g.gain); o.start(); }
+      return { stop: () => { try { s.stop(); o && o.stop(); } catch (e) {} g.disconnect(); } }; }
+    function blip(f0, f1, d, v, type = 'sine', at = 0) { const c = ac, t = c.currentTime + at, o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + d);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + d * 0.15); g.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(g).connect(master); o.start(t); o.stop(t + d + 0.02); }
+    const EV = {
+      birds: () => { const n = 2 + (Math.random() * 4 | 0), base = 2200 + Math.random() * 2200; for (let i = 0; i < n; i++) blip(base * (1 + Math.random() * 0.3), base * (0.7 + Math.random() * 0.6), 0.07 + Math.random() * 0.08, 0.05, 'sine', i * 0.11); },
+      gulls: () => blip(1400, 900, 0.35, 0.03, 'triangle'),
+      crickets: () => { const f = 4300 + Math.random() * 500; for (let i = 0; i < 3; i++) blip(f, f * 0.98, 0.04, 0.025, 'sine', i * 0.06); },
+      drips: () => blip(1500 + Math.random() * 900, 500, 0.12, 0.08)
+    };
+    const RATE = { birds: 0.35, gulls: 0.06, crickets: 0.9, drips: 0.22 };
+    function startLoop(n) { switch (n) {
+      case 'waves': return noiseLoop('lowpass', 500, 0.7, 0.18, [0.11, 0.15]);
+      case 'wind': return noiseLoop('bandpass', 380, 0.6, 0.12, [0.07, 0.09]);
+      case 'rain': return noiseLoop('highpass', 1200, 0.5, 0.05 + 0.1 * wxIntensity(ctxInfo().w));
+      case 'rumble': return noiseLoop('lowpass', 120, 0.8, 0.12);
+      default: return null; } }
+    function apply() {
+      const c = ensure(); if (!c) return; const want = (armed && !document.hidden && vol() > 0) ? layersFor(ctxInfo()) : [], k = want.join(',');
+      master.gain.setTargetAtTime(vol() * 0.6, c.currentTime, 0.4);
+      if (k === key) return; key = k;
+      Object.keys(loops).forEach(n => { if (!want.includes(n)) { loops[n] && loops[n].stop(); delete loops[n]; } });
+      want.forEach(n => { if (!(n in loops)) loops[n] = startLoop(n); });
+    }
+    function tick() { apply(); if (!ac || ac.state !== 'running') return; Object.keys(loops).forEach(n => { if (EV[n] && Math.random() < RATE[n] * 0.5) EV[n](); }); }
+    function arm() { if (armed) return; armed = true; actx(); ensure(); clearInterval(timer); timer = setInterval(tick, 500); apply(); }
+    ['pointerdown', 'touchend', 'click', 'keydown'].forEach(t => document.addEventListener(t, () => { if (S && S.trainer) arm(); }, { capture: true, passive: true }));
+    document.addEventListener('visibilitychange', () => { key = '__'; apply(); });
+    const step = () => { if (!armed || !master || vol() === 0) return; const c = ac, t = c.currentTime, s = c.createBufferSource(); s.buffer = nbuf; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 260; const g = c.createGain();
+      g.gain.setValueAtTime(0.35, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12); s.connect(f).connect(g).connect(master); s.start(t, Math.random()); s.stop(t + 0.14); };
+    const rustle = () => { if (!armed || !master || vol() === 0) return; const c = ac, t = c.currentTime, s = c.createBufferSource(); s.buffer = nbuf; const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 3200; f.Q.value = 0.8; const g = c.createGain();
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.25, t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3); s.connect(f).connect(g).connect(master); s.start(t, Math.random()); s.stop(t + 0.32); };
+    return { arm, apply, ctxInfo, layersFor, state: () => ({ armed, running: !!ac && ac.state === 'running', layers: Object.keys(loops), vol: vol() }), step, rustle };
+  })();
+  A.amb = AMB;
+  { const _r = SFX.rustle; SFX.rustle = function () { _r.apply(this, arguments); AMB.step(); setTimeout(AMB.step, 260); if (AMB.ctxInfo().biome === 'forest') AMB.rustle(); }; }
+  { const _render = render; render = function () { const r = _render.apply(this, arguments); try { AMB.apply(); } catch (e) {} return r; }; }
+  ACT.ambmute = () => { S.settings.amute = !S.settings.amute; save(); AMB.apply(); render(); };
+  document.addEventListener('input', e => { if (e.target.id === 'ambvol') { S.settings.avol = +e.target.value / 100; S.settings.amute = false; save(); AMB.apply(); const l = document.querySelector('#ambvolv'); if (l) l.textContent = e.target.value + '%'; } });
+  { const _as = audioSettings; audioSettings = function () { const v = Math.round(((S.settings.avol ?? 0.5)) * 100);
+    return _as.apply(this, arguments) + `<div class="setrow ambrow"><span>🌿 Som ambiente</span><div class="ambctl"><input type="range" id="ambvol" min="0" max="100" step="5" value="${v}" aria-label="Volume do som ambiente"${S.settings.amute ? ' disabled' : ''}><b id="ambvolv">${v}%</b><button class="${S.settings.amute ? 'on' : ''}" data-a="ambmute">${S.settings.amute ? '🔇 Mudo' : '🔊'}</button></div></div>`; }; }
 
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 

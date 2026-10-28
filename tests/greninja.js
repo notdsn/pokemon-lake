@@ -4,7 +4,7 @@ const fs = require('fs'); const HASH = fs.readFileSync('/workspace/pokemon-lake/
 const URL = process.argv[2] || 'http://127.0.0.1:18473/', T = URL.includes('github.io') ? 'v6live' : 'v6', OUT = '/workspace/pokemon-lake/prints/v2/375x667-' + T + '-';
 let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
 (async () => { const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' }); const ctx = await b.newContext({ viewport: { width: 375, height: 667 } });
-  await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); const ev = (f, a) => p.evaluate(f, a);
+  await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); await ctx.addInitScript(() => { window.__pkFace = 1; }); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); const ev = (f, a) => p.evaluate(f, a);
   await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
   await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="7"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
   await p.waitForTimeout(500); await ev(() => document.querySelector('#modal-root').innerHTML = ''); await ev(() => PokeApp.debug.go('settings')); await p.waitForTimeout(300);
