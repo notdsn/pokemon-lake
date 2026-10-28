@@ -2064,6 +2064,49 @@
   { const _tf = typeFx; typeFx = function (side, type) { _tf.apply(this, arguments); const ov = $('#battle'); if (type === 'fire' && ov && ov.classList.contains('w-rain')) { const fx = $('#fxl'), [x, y] = center(side);
       for (let i = 0; i < 4; i++) { const p = document.createElement('i'); p.className = 'pfx p-steam'; p.style.cssText = `left:${x + (i - 1.5) * 14}px;top:${y}px;--tx:${(i - 1.5) * 10}px;--ty:-${50 + i * 8}px;--rot:0deg;animation-delay:${120 + i * 60}ms`; fx.appendChild(p); setTimeout(() => p.remove(), 1400); } } }; A.typeFx = typeFx; }
 
+  // ===== REALISMO 5: Pokémon vivos (reação antes do encontro, hábitos, líder passeando) =====
+  const SHY = new Set([63, 133, 147, 148, 172, 173, 174, 175, 183, 216, 113, 132, 104, 280, 349, 427, 570, 661, 731, 734, 446, 440, 298, 263, 161, 50, 46, 10, 13]);
+  const AGG = new Set([19, 20, 21, 22, 23, 24, 56, 57, 58, 111, 112, 127, 128, 214, 228, 229, 261, 262, 302, 509, 41, 42, 66, 74, 95, 207, 215, 285, 296, 303, 371, 403, 447, 551, 559, 667, 744]);
+  const BIO_PT = { forest: 'florestas', cave: 'cavernas', water: 'lagos e praias', mountain: 'montanhas', city: 'cidades', snow: 'lugares gelados', desert: 'lugares secos' };
+  function habitOf(id, mp) { const m = D.mons[id]; if (!m) return ''; const N = m.n, t = m.t, e = mp.enc.find(x => x[0] === id), o = (e && e[4]) || {}, bio = biomeOf(mp.theme), onde = BIO_PT[bio];
+    if (o.night || ((t.includes('poison') && t.includes('flying')) && bio === 'cave')) return `${N} só aparece à noite em ${onde}`;
+    if (o.day) return `${N} só sai de dia, quando o sol está alto`;
+    if (t.includes('flying')) { const prey = mp.enc.find(x => x[0] !== id && D.mons[x[0]].t.includes('bug')); if (prey) return `${N} está caçando ${D.mons[prey[0]].n}`; return `${N} plana procurando comida`; }
+    if (SHY.has(+id)) return `${N} é tímido e foge ao menor barulho`; if (AGG.has(+id)) return `${N} é territorial e avança em quem chega perto`;
+    if (t.includes('water')) return `${N} gosta de nadar perto da margem`; if (t.includes('ghost')) return `${N} assombra os cantos mais escuros`;
+    if (t.includes('bug')) return `${N} se esconde no capim alto`; if (t.includes('grass')) return `${N} toma sol parado entre as folhas`;
+    if (t.includes('fire')) return `${N} procura pedras quentes`; if (t.includes('psychic')) return `${N} percebe você antes de você vê-lo`;
+    if (t.includes('rock') || t.includes('ground')) return `${N} cava buracos no chão`; if (t.includes('ice')) return `${N} adora o frio`;
+    return `${N} é curioso e às vezes se aproxima`; }
+  function moodOf(m, mp, legend) { if (A.live.force) return A.live.force; if (legend || m.evt || m.shiny) return 'face';
+    const t = D.mons[m.id].t, e = mp.enc.find(x => x[0] === m.id), noct = (e && e[4] && e[4].night) || t.includes('ghost') || t.includes('dark');
+    if (dayLight().night && !noct && R() < 0.35) return 'sleep'; if (SHY.has(+m.id) && R() < 0.45) return 'flee'; if (AGG.has(+m.id) && R() < 0.6) return 'charge';
+    return R() < 0.06 ? 'flee' : 'face'; }
+  A.live = { force: null, habitOf, moodOf };
+  const MOOD_TXT = { flee: m => `${pn(m)} se assustou e fugiu!`, sleep: m => `${pn(m)} está dormindo… chance de captura maior!`, charge: m => `${pn(m)} avançou em você! (Ataque +1)`, face: m => `${pn(m)} te encarou!` };
+  async function preEncounter(o, real) { const sc = $('#scene'), m = o.enemy[0], mood = moodOf(m, o.map, o.legend);
+    const pk = document.createElement('div'); pk.className = 'wildpeek mood-' + mood; pk.innerHTML = `<img src="${spr(m)}" alt=""><span class="bub">${mood === 'sleep' ? 'Zzz' : mood === 'charge' ? '💢' : '!'}</span><small class="hab">${esc(habitOf(m.id, o.map))}</small>`; sc.appendChild(pk);
+    sc.classList.remove('alert'); if (mood !== 'sleep') sc.classList.add('alert'); cry(m.id);
+    await sleep(RMOT() ? 500 : 1000); pk.classList.add('go');
+    if (mood === 'flee') { toast('💨 ' + MOOD_TXT.flee(m)); see(m.id); save(); await sleep(600); pk.remove(); sc.classList.remove('alert'); const sb = $('#searchBtn'); if (sb) sb.disabled = false; return; }
+    await sleep(350); pk.remove();
+    if (mood === 'sleep') m.status = 'slp';
+    real(o); if (!B) return;
+    if (mood === 'sleep') B.s.sides[1].b.sleep = 3; if (mood === 'charge') B.s.sides[1].b.st.atk = 1;
+    if (mood !== 'face') toast((mood === 'sleep' ? '💤 ' : '💢 ') + MOOD_TXT[mood](m)); }
+  { const _sb = startBattle; startBattle = function (o) { if (o && o.kind === 'wild' && o.map && !o.raid && !o.pre && document.querySelector('#scene.explore') && o.enemy && o.enemy.length === 1) { o.pre = 1; preEncounter(o, x => _sb.call(this, x)); return; } return _sb.apply(this, arguments); }; A.debug.startBattle = startBattle; }
+  // hábitos no card da área
+  function addHabits() { const sc = $('#scene.explore'); if (!sc) return; const mp = C.MAPS.find(m => m.id === sub); if (!mp) return; const h3 = [...document.querySelectorAll('.card h3')].find(x => x.textContent === 'Pokémon desta área'); if (!h3 || h3.parentNode.querySelector('.habits')) return;
+    const ls = mp.enc.filter(e => !e[4]?.legend && S.dex.seen[e[0]]).slice(0, 4).map(e => `<li>${esc(habitOf(e[0], mp))}</li>`).join('');
+    if (ls) h3.parentNode.insertAdjacentHTML('beforeend', `<ul class="habits">${ls}</ul>`); }
+  // líder passeando (casa e início), dorme à noite, reage ao toque
+  function addWander() { const night = dayLight().night;
+    const room = $('.room'); if (room) { const f = $('.follow', room); if (f && !f.parentNode.classList.contains('wander')) { const w = document.createElement('div'); w.className = 'wander' + (night ? ' sleep' : ''); f.replaceWith(w); w.appendChild(f); } }
+    if (tab === 'home' && !$('.petyard')) { const hero = $('.card.hero'); const fh = followerHtml(); if (hero && fh) hero.insertAdjacentHTML('afterend', `<div class="card span2 petyard ${night ? 'per-night' : ''}"><div class="wander ${night ? 'sleep' : ''}">${fh}</div><small class="pyhint">${night ? '🌙 Seu parceiro está dormindo' : '👆 Toque no seu parceiro'}</small></div>`); }
+    document.querySelectorAll('.wander.sleep .emo').forEach(e => e.textContent = '💤'); }
+  { const _render = render; render = function () { const r = _render.apply(this, arguments); try { addHabits(); addWander(); } catch (e) {} return r; }; }
+  { const _pet = ACT.pet; ACT.pet = d => { _pet(d); const f = $('.follow'); if (!f) return; const h = document.createElement('i'); h.className = 'pheart'; h.textContent = '❤️'; f.appendChild(h); setTimeout(() => h.remove(), 1100); const w = f.closest('.wander.sleep'); if (w) { w.classList.remove('sleep'); setTimeout(() => w.classList.add('sleep'), 4000); } }; }
+
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------

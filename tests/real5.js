@@ -1,0 +1,38 @@
+// REALISMO 5: reação antes do encontro (fugir/encarar/dormir/avançar), hábitos, líder passeando
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
+const fs = require('fs');
+const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
+const URL = process.argv[2] || 'http://127.0.0.1:18473/';
+const LIVE = URL.includes('github.io') ? 'live-' : '';
+let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
+const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-real5-${LIVE}${n}-depois.png`;
+const at = h => new Date(2026, 9, 27, Math.floor(h), Math.round((h % 1) * 60));
+(async () => {
+  const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const errs = [];
+  p.on('pageerror', e => errs.push(e.message)); const ev = (f, a) => p.evaluate(f, a);
+  await p.clock.setFixedTime(at(12));
+  await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
+  await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="4"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
+  await p.waitForTimeout(500); await ev(() => document.querySelector('#modal-root').innerHTML = '');
+  const mp = 'floresta';
+  ok(await ev(() => /só aparece à noite em cavernas/.test(PokeApp.live.habitOf(41, { theme: 'cave', enc: [[41, 1, 1, 1]] }))), "hábito: 'Zubat só aparece à noite em cavernas'");
+  ok(await ev(() => /Pidgey está caçando Caterpie/.test(PokeApp.live.habitOf(16, { theme: 'forest', enc: [[16, 1, 1, 1], [10, 1, 1, 1]] }))), "hábito: 'Pidgey está caçando Caterpie'");
+  const run = async mood => { await ev(([mood, mp]) => { document.querySelector('#battle')?.remove(); PokeApp.live.force = mood; PokeApp.debug.go('explore', mp); }, [mood, mp]); await p.waitForTimeout(300);
+    await p.click('#searchBtn'); await p.waitForSelector('.wildpeek', { timeout: 5000 }); await p.waitForTimeout(600); await p.screenshot({ path: OUT('encontro-' + mood) }); await p.waitForTimeout(1800); };
+  await run('flee'); ok(await ev(() => !document.querySelector('#battle') && !document.querySelector('#searchBtn').disabled), 'tímido foge: sem batalha, pode procurar de novo');
+  await run('sleep'); await p.waitForTimeout(1500); ok(await ev(() => { const B = PokeApp.debug.B; return B && B.s.sides[1].b.m.status === 'slp' && B.s.sides[1].b.sleep >= 1; }), 'dormindo: batalha começa com o selvagem dormindo');
+  await run('charge'); await p.waitForTimeout(1500); ok(await ev(() => PokeApp.debug.B?.s.sides[1].b.st.atk === 1), 'agressivo avança: Ataque +1');
+  await run('face'); await p.waitForTimeout(1500); ok(await ev(() => !!PokeApp.debug.B && !PokeApp.debug.B.s.sides[1].b.m.status), 'encara: batalha normal');
+  await ev(() => { document.querySelector('#battle')?.remove(); PokeApp.live.force = null; PokeApp.debug.S.dex.seen[16] = 1; PokeApp.debug.S.dex.seen[10] = 1; PokeApp.debug.go('explore', 'floresta'); }); await p.waitForTimeout(400);
+  ok(await ev(() => document.querySelectorAll('.habits li').length > 0), 'hábitos listados na área');
+  await ev(() => PokeApp.debug.go('home')); await p.waitForTimeout(800);
+  ok(await ev(() => !!document.querySelector('.petyard .wander .follow') && !document.querySelector('.wander.sleep')), 'líder passeia no início (dia)');
+  await p.click('.petyard .follow'); await p.waitForTimeout(250); ok(await ev(() => !!document.querySelector('.pheart')), 'toque: coração');
+  await p.screenshot({ path: OUT('inicio-dia') });
+  await p.clock.setFixedTime(at(23)); await ev(() => PokeApp.debug.go('home')); await p.waitForTimeout(500);
+  ok(await ev(() => !!document.querySelector('.petyard .wander.sleep')), 'líder dorme à noite'); await p.screenshot({ path: OUT('inicio-noite') });
+  await ev(() => PokeApp.debug.go('house')); await p.waitForTimeout(500); ok(await ev(() => !!document.querySelector('.room .wander.sleep .follow')), 'líder na casa dorme à noite');
+  await p.clock.setFixedTime(at(12)); await ev(() => PokeApp.debug.go('house')); await p.waitForTimeout(800); ok(await ev(() => !!document.querySelector('.room .wander:not(.sleep) .follow')), 'líder anda pela casa de dia');
+  await p.screenshot({ path: OUT('casa-dia') });
+  ok(!errs.length, 'sem erros JS ' + JSON.stringify(errs)); console.log(fail ? 'FALHAS: ' + fail : 'TUDO OK'); await b.close(); process.exit(fail ? 1 : 0); })();

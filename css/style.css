@@ -789,3 +789,32 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 [data-season=summer] :is(.bio-forest,.bio-mountain,.bio-water) :is(.hills,.fg){filter:saturate(1.15) brightness(1.04)}
 [data-season=spring] .bio-forest .fg:after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,#f9a8d4 2px,transparent 2.5px),radial-gradient(circle,#fde047 1.6px,transparent 2px);background-size:46px 22px,64px 28px;background-position:5px 8px,30px 14px;opacity:.9}
 @media (prefers-reduced-motion:reduce){.wxramp{transition:none}.snowedge,.snowedge:after{animation-duration:1ms}}
+/* ===== REALISMO 5: Pokémon vivos ===== */
+.wildpeek{position:absolute;left:58%;bottom:150px;width:84px;height:84px;z-index:4;pointer-events:none;animation:peekin .45s cubic-bezier(.2,1.4,.4,1)}
+.wildpeek img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.wildpeek:before{content:"";position:absolute;left:20%;right:20%;bottom:2%;height:12%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,var(--shop,.35)),transparent);z-index:-1}
+.wildpeek .bub{position:absolute;right:-6px;top:-10px;background:#fff;color:#dc2626;font-weight:900;border-radius:12px;padding:0 7px;box-shadow:0 2px 6px #0005;animation:bubpop .3s .15s both}
+.wildpeek .hab{position:absolute;left:50%;top:100%;transform:translateX(-50%);width:190px;text-align:center;font-size:.68rem;background:rgba(15,23,42,.75);color:#fff;border-radius:8px;padding:2px 6px;margin-top:2px}
+.wildpeek.mood-sleep img{filter:brightness(.9);animation:breath 2s ease-in-out infinite}.wildpeek.mood-sleep .bub{color:#2563eb}
+.wildpeek.mood-flee.go{transition:transform .5s ease-in,opacity .5s;transform:translateX(220px) scaleX(-1);opacity:0}
+.wildpeek.mood-charge.go{transition:transform .3s ease-in;transform:translate(-90px,20px) scale(1.25)}
+.wildpeek.mood-face.go,.wildpeek.mood-sleep.go{transition:opacity .3s;opacity:0}
+@keyframes peekin{0%{transform:translateY(40px) scale(.6);opacity:0}100%{transform:none;opacity:1}}
+@keyframes bubpop{0%{transform:scale(0)}100%{transform:scale(1)}}
+@keyframes breath{50%{transform:scaleY(.94)}}
+.habits{margin:6px 0 0;padding-left:18px;font-size:.78rem;color:var(--mut,#94a3b8)}
+.petyard{position:relative;height:120px;overflow:hidden;background:linear-gradient(#a7f3d0,#6ee7b7 55%,#34d399);padding:0}
+.petyard.per-night{background:linear-gradient(#1e3a8a,#1e293b 55%,#14532d)}
+.petyard .follow{left:12%!important;bottom:14px!important;margin-left:0!important}
+.petyard .pyhint{position:absolute;right:10px;top:8px;font-size:.72rem;color:#064e3b;font-weight:700}.petyard.per-night .pyhint{color:#e2e8f0}
+.wander{position:absolute;inset:0;pointer-events:none;animation:wander 26s ease-in-out infinite}
+.wander .follow{pointer-events:auto}
+.wander .follow img{animation:fidle 1.3s ease-in-out infinite,wface 26s steps(1) infinite}
+@keyframes wander{0%,8%{translate:0 0}25%,32%{translate:110px -4px}50%,58%{translate:190px 2px}78%,85%{translate:60px -2px}100%{translate:0 0}}
+@keyframes wface{0%{scale:-1 1}50%{scale:1 1}}
+.wander.sleep{animation:none}.wander.sleep .follow img{animation:breath 2.4s ease-in-out infinite;filter:brightness(.85)}.wander.sleep .emo{opacity:1;animation:none}
+.pheart{position:absolute;left:50%;top:-6px;font-style:normal;font-size:20px;animation:pheart 1.1s ease-out forwards;pointer-events:none}
+@keyframes pheart{0%{transform:translate(-50%,0) scale(.4);opacity:0}25%{opacity:1;transform:translate(-50%,-10px) scale(1.1)}100%{transform:translate(-50%,-44px) scale(1);opacity:0}}
+@media (prefers-reduced-motion:reduce){.wander{animation:none}.wander .follow img{animation:none}}
+.petyard .follow{width:64px!important;height:64px!important}.petyard .follow img{width:64px!important;height:64px!important;max-width:none}
+.wildpeek .hab{top:auto;bottom:100%;margin:0 0 14px}

@@ -18,9 +18,10 @@ let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m
         PokeApp.debug.startBattle({ kind: 'wild', map: PC.MAPS.find(m => m.id === 'floresta'), enemy: [PokeApp.PE.makeMon(eid, 60, { seed: 5 }, { shiny: false })] }); }, [pid, eid]);
       await p.waitForTimeout(3800);
       if (pid === 384 && MODE !== 'x') await p.screenshot({ path: `/workspace/pokemon-lake/prints/v2/${w}x${h}-infobox-${LIVE}rayquaza-${MODE}.png` });
-      for (const st of ['normal', 'cam-p', 'cam-e', 'dmax']) {
+      for (const st of ['normal', 'cam-p', 'cam-e', 'dmax', 'mega']) {
+        if (st === 'mega') { await ev(() => { document.querySelector('#psp').src = 'img/mega/back/rayquaza-mega.gif'; document.querySelector('#esp').src = 'img/mega/front/charizard-mega-x.gif'; }); await p.waitForTimeout(800); }
         const r = await ev(async st => { const sc = document.querySelector('.bscene'); sc.classList.remove('cam-p', 'cam-e'); document.querySelectorAll('.bmon').forEach(x => x.classList.remove('dmax'));
-          if (st.startsWith('cam')) sc.classList.add(st); if (st === 'dmax') document.querySelectorAll('.bmon').forEach(x => x.classList.add('dmax'));
+          if (st.startsWith('cam')) sc.classList.add(st); if (st === 'dmax' || st === 'mega') document.querySelectorAll('.bmon').forEach(x => x.classList.add('dmax'));
           await new Promise(r => setTimeout(r, 650));
           const box = el => { const r = el.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom]; };
           const drawn = img => { const r = img.getBoundingClientRect(), nw = img.naturalWidth || 1, nh = img.naturalHeight || 1, s = Math.min(r.width / nw, r.height / nh), dw = nw * s, dh = nh * s; // object-fit contain, ancorado embaixo
