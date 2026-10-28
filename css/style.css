@@ -925,3 +925,34 @@ h1{font-size:1.6rem;font-weight:800;letter-spacing:-.02em}h2{font-size:1.3rem;fo
 @keyframes mglowhit{0%{opacity:.95;scale:.4}100%{opacity:0;scale:1.25}}@keyframes mglowlunge{0%{opacity:0}40%{opacity:.55;scale:.8}100%{opacity:0;scale:1}}
 .bmon.lunge img{filter:drop-shadow(0 0 10px var(--mglow,#fff)) drop-shadow(0 6px 4px rgba(0,0,0,.35))}
 @media (prefers-reduced-motion:reduce){#app.scr-in>*{animation:none}.bmon::after{display:none}}
+/* ===== v48 BATALHA ESTILO S/V + TERASTAL ===== */
+.bmoves{gap:10px}
+.mvb{min-height:64px;border-radius:16px 6px 16px 6px;transform:skewX(-6deg);padding:8px 12px 12px;text-align:left;box-shadow:0 6px 16px color-mix(in srgb,var(--tc) 35%,transparent),inset 0 1px 0 rgba(255,255,255,.35);overflow:hidden;transition:transform .15s var(--ease),box-shadow .2s}
+.mvb>*{transform:skewX(6deg);display:block}.mvb b{font-size:1rem;font-weight:800;letter-spacing:-.01em}
+.mvb::before{content:'';position:absolute;left:10px;right:10px;bottom:5px;height:4px;border-radius:9px;background:rgba(0,0,0,.28)}
+.mvb::after{content:'';position:absolute;left:10px;bottom:5px;height:4px;border-radius:9px;width:calc((100% - 20px) * var(--pp,1));background:rgba(255,255,255,.9)}
+.mvb:active{transform:skewX(-6deg) scale(.96)}
+.mvb.efup{box-shadow:0 0 0 2px #fde047,0 6px 18px rgba(253,224,71,.45)}.mvb.efdn{opacity:.88}
+.mvb .ef{position:absolute;top:6px;right:8px;font-style:normal;font-size:.62rem;font-weight:800;padding:1px 6px;border-radius:99px;background:rgba(0,0,0,.35)}
+.mvb .ef.up{background:#fde047;color:#422006}
+.hpbar{position:relative}.hpbar .hpghost{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:#f87171;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.hpbar i{position:relative;transition:width .55s cubic-bezier(.2,.8,.2,1),background .3s}
+.bb.teratog{background:linear-gradient(135deg,color-mix(in srgb,var(--tc) 65%,#fff),#7dd3fc 55%,#e879f9);color:#0b1220;border:1px solid #fff;font-weight:800}
+.bb.teratog.on{box-shadow:0 0 0 2px #fff,0 0 18px #a5f3fc}
+.terachip{display:inline-grid;place-items:center;width:18px;height:18px;margin-right:4px;border-radius:5px;background:linear-gradient(135deg,var(--tc),#fff);font-size:.7rem;vertical-align:-3px}
+.bmon.tera img{filter:drop-shadow(0 0 6px var(--tt,#7dd3fc)) drop-shadow(0 0 2px #fff) saturate(1.25) brightness(1.08)}
+.bmon.tera::before{content:'';position:absolute;left:12%;right:12%;top:8%;bottom:6%;z-index:2;pointer-events:none;mix-blend-mode:screen;opacity:.85;
+ background:conic-gradient(from 30deg,transparent 0 8%,rgba(255,255,255,.55) 9% 11%,transparent 12% 33%,rgba(255,255,255,.4) 34% 36%,transparent 37% 60%,rgba(255,255,255,.5) 61% 63%,transparent 64%),linear-gradient(160deg,color-mix(in srgb,var(--tt,#7dd3fc) 60%,transparent),transparent 70%);
+ clip-path:polygon(50% 0,88% 18%,100% 55%,78% 100%,22% 100%,0 55%,12% 18%);animation:terashine 3s linear infinite}
+.bmon.tera>img{position:relative}
+.bmon.tera .tcrown{display:block}
+@keyframes terashine{0%{filter:hue-rotate(0)}100%{filter:hue-rotate(40deg)}}
+.bmon.teraburst img{animation:teraburst 1.1s ease-out}
+@keyframes teraburst{0%{filter:brightness(4) drop-shadow(0 0 30px #fff)}40%{transform:scale(1.15)}100%{}}
+.teragrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}.teragrid .tpick{border:0;padding:8px 4px;border-radius:10px;color:#fff;font-weight:700;text-align:center}
+.terarow .type{display:inline-block;padding:1px 8px;border-radius:99px;color:#fff;font-weight:700}
+@media (prefers-reduced-motion:reduce){.bmon.tera::before,.bmon.teraburst img{animation:none}.hpbar .hpghost{transition:none}}
+.tcrown{display:none;position:absolute;z-index:4;left:50%;top:calc(28% - 30px);width:44px;height:30px;translate:-50% 0;pointer-events:none;
+ background:linear-gradient(160deg,#fff,color-mix(in srgb,var(--tt,#7dd3fc) 70%,#fff) 45%,var(--tt,#7dd3fc));clip-path:polygon(0 100%,6% 30%,26% 62%,38% 8%,50% 50%,62% 8%,74% 62%,94% 30%,100% 100%);filter:drop-shadow(0 0 6px var(--tt,#7dd3fc));animation:tcrown 2.2s ease-in-out infinite}
+@keyframes tcrown{50%{translate:-50% -4px}}
+@media (prefers-reduced-motion:reduce){.tcrown{animation:none}}

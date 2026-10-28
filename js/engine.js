@@ -29,7 +29,9 @@
       case 'slow-then-very-fast': return Math.floor(n ** 3 * 0.9); case 'fast-then-very-slow': return Math.floor(n ** 3 * 1.1);
       default: return n ** 3; }
   }
-  const monTypes = m => (m.fz && !m.mega ? m.fz.t : m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].t : D.mons[m.id].t);
+  const baseTypes = m => (m.fz && !m.mega ? m.fz.t : m.mega && D.megas && D.megas[m.mega] ? D.megas[m.mega].t : D.mons[m.id].t);
+  const monTypes = m => (m.terastal ? [m.terastal] : baseTypes(m));
+  const teraTypeOf = m => m.teraT || D.mons[m.id].t[0];
   const SN = ['hp','atk','def','spa','spd','spe'];
   // 25 naturezas: [nome, stat+ , stat-] (1=Atk 2=Def 3=AtE 4=DfE 5=Vel); iguais = neutra
   const NATURES = [['Firme',1,1],['Solitária',1,2],['Corajosa',1,5],['Inflexível',1,3],['Travessa',1,4],['Ousada',2,1],['Dócil',2,2],['Relaxada',2,5],['Marota',2,3],['Frouxa',2,4],
@@ -74,7 +76,7 @@
   function createBattle(o) {
     // o: {kind:'wild'|'trainer'|'pvp', seed, sides:[{party,name},{party,name,ai}], weather, canRun}
     const s = { kind: o.kind, seed: o.seed | 0, turn: 0, weather: o.weather || null, over: false, winner: null, caught: null, ran: false,
-      sides: o.sides.map(sd => ({ name: sd.name, party: sd.party, active: Math.max(0, sd.party.findIndex(x => x.hp > 0)), b: null, ai: sd.ai || 0, trainer: sd.trainer || null, megaOk: !!sd.mega, megaUsed: false, dynaOk: !!sd.dyna, dynaUsed: false, participants: [] })) };
+      sides: o.sides.map(sd => ({ name: sd.name, party: sd.party, active: Math.max(0, sd.party.findIndex(x => x.hp > 0)), b: null, ai: sd.ai || 0, trainer: sd.trainer || null, megaOk: !!sd.mega, megaUsed: false, dynaOk: !!sd.dyna, dynaUsed: false, teraOk: !!sd.tera, teraUsed: false, participants: [] })) };
     s.sides.forEach(sd => { sd.b = bm(sd.party[sd.active]); sd.participants = [sd.active]; });
     return s;
   }
@@ -176,12 +178,16 @@
     const phys = mv.c === 'p'; const crit = useRng && rnd(s) < [1 / 24, 1 / 8, 1 / 2, 1][Math.min(3, (mv.cr || 0) + (a.critB || 0))];
     let A = eStat(a, phys ? 'atk' : 'spa'), Df = eStat(t, phys ? 'def' : 'spd');
     if (crit) { A = Math.max(A, calcStats(a.m)[phys ? 1 : 3]); Df = Math.min(Df, calcStats(t.m)[phys ? 2 : 4]); }
-    let d = Math.floor(Math.floor(Math.floor(2 * a.m.lvl / 5 + 2) * mv.p * A / Df) / 50) + 2;
+    const pw = a.m.terastal && mv.t === a.m.terastal && mv.p > 0 && mv.p < 60 && !(mv.pr > 0) && !mv.mh ? 60 : mv.p;
+    let d = Math.floor(Math.floor(Math.floor(2 * a.m.lvl / 5 + 2) * pw * A / Df) / 50) + 2;
     if (s.weather === 'rain') d *= mv.t === 'water' ? 1.5 : mv.t === 'fire' ? 0.5 : 1;
     if (s.weather === 'sun') d *= mv.t === 'fire' ? 1.5 : mv.t === 'water' ? 0.5 : 1;
     if (crit) d *= 1.5; if (useRng) d *= (85 + Math.floor(rnd(s) * 16)) / 100;
     const aa = abilityOf(a.m), ta = abilityOf(t.m);
-    const at = monTypes(a.m); if (at.includes(mv.t) || (aa === 'protean' && mv.p > 0)) d *= aa === 'adaptability' ? 2 : 1.5;
+    const at = baseTypes(a.m), tt = a.m.terastal; let stab = 1;
+    if (at.includes(mv.t) || (aa === 'protean' && mv.p > 0 && !tt)) stab = aa === 'adaptability' ? 2 : 1.5;
+    if (tt && mv.t === tt) stab = at.includes(tt) ? (aa === 'adaptability' ? 2.25 : 2) : (aa === 'adaptability' ? 2 : 1.5);
+    d *= stab;
     let e = mv.t === '???' ? 1 : eff(mv.t, monTypes(t.m)); if (ta === 'levitate' && mv.t === 'ground') e = 0; d *= e;
     if (aa === 'tough-claws' && phys) d *= 1.3; if (aa === 'technician' && mv.p <= 60) d *= 1.5; if (aa === 'parental-bond') d *= 1.25;
     if ((aa === 'huge-power' || aa === 'pure-power') && phys) d *= 2; if (aa === 'mega-launcher' && /Pulse|Aura/.test(mv.en || '')) d *= 1.5;
@@ -236,6 +242,7 @@
   function step(s, acts) {
     const ev = []; if (s.over) return ev; s.turn++;
     // Mega Evolução acontece antes de tudo (mais rápido primeiro)
+    for (const i of speedOrder(s, acts)) if (acts[i] && acts[i].tera && acts[i].type === 'move' && canTera(s, i)) doTera(s, i, ev);
     for (const i of speedOrder(s, acts)) if (acts[i] && acts[i].dyna && acts[i].type === 'move' && canDyna(s, i)) doDyna(s, i, ev);
     for (const i of speedOrder(s, acts)) if (acts[i] && acts[i].mega && acts[i].type === 'move' && canMega(s, i)) doMega(s, i, ev);
     // ações não-golpe primeiro
@@ -263,7 +270,7 @@
     for (const f of fs) { const g = D.megas[f]; if (g.st ? (ignoreItem || m.item === g.st) : m.moves.some(x => x.n === 'dragon-ascent')) return f; }
     return null;
   }
-  function canMega(s, i) { const sd = s.sides[i]; return !!(sd.megaOk && !sd.megaUsed && !sd.dynaUsed && sd.b.m.hp > 0 && !sd.b.m.fz && megaFormFor(sd.b.m)); }
+  function canMega(s, i) { const sd = s.sides[i]; return !!(sd.megaOk && !sd.megaUsed && !sd.dynaUsed && !sd.teraUsed && sd.b.m.hp > 0 && !sd.b.m.fz && megaFormFor(sd.b.m)); }
   // ---------- Dynamax / Gigantamax (uma vez por batalha, não combina com Mega, 3 turnos) ----------
   const GMAX = {
     6: { k: 'charizard', n: 'Charizard Gigantamax', ty: 'fire', mv: 'Fogaréu G-Max', fx: 'res', rn: 'o Fogaréu G-Max' },
@@ -289,7 +296,11 @@
     const g = m.dmax && m.dmax.g ? GMAX[m.id] : null, ty = mv.t === '???' ? 'normal' : mv.t;
     if (g && g.ty === ty) return { n: g.mv, c: mv.c, t: ty, p: g.fx === 'res' ? 150 : maxPow(mv), gfx: g.fx, g };
     const x = MAXN[ty] || MAXN.normal; return { n: x[0], c: mv.c, t: ty, p: maxPow(mv), mfx: x[1] }; }
-  function canDyna(s, i) { const sd = s.sides[i], m = sd.b.m; return !!(sd.dynaOk && !sd.dynaUsed && !sd.megaUsed && !m.mega && !m.dmax && m.hp > 0); }
+  function canTera(s, i) { const sd = s.sides[i], m = sd.b && sd.b.m; return !!(m && sd.teraOk && !sd.teraUsed && !sd.megaUsed && !sd.dynaUsed && !m.mega && !m.dmax && !m.terastal && !m.fz && m.hp > 0 && !(D.mons[m.id] && D.mons[m.id].L)); }
+  function doTera(s, i, ev) { const sd = s.sides[i], m = sd.b.m; sd.teraUsed = true; m.terastal = teraTypeOf(m);
+    ev.push({ e: 'tera', side: i, t: m.terastal, text: `${pname(s, i)} Terastalizou! Agora é do tipo Tera ${m.terastal}!` }); }
+  function clearTera(party) { (party || []).forEach(m => { if (m) delete m.terastal; }); }
+  function canDyna(s, i) { const sd = s.sides[i], m = sd.b.m; return !!(sd.dynaOk && !sd.dynaUsed && !sd.megaUsed && !sd.teraUsed && !m.terastal && !m.mega && !m.dmax && m.hp > 0); }
   function doDyna(s, i, ev) { const sd = s.sides[i], m = sd.b.m; sd.dynaUsed = true; const g = gmaxOf(m), old = maxhp(m);
     m.dmax = { t: 3, g: g ? 1 : 0 }; m.hp = Math.min(maxhp(m), m.hp + (maxhp(m) - old));
     ev.push({ e: 'dyna', side: i, id: m.id, gmax: !!g, hp: m.hp, max: maxhp(m), name: g ? g.n : (m.nick || D.mons[m.id].n),
@@ -376,7 +387,7 @@
   function stoneEvo(m, item) { if (m.fz) return null; const e = (D.mons[m.id].e || []).find(x => x.item === item); return e ? e.to : null; }
   function evolve(m, to) { const oldMax = maxhp(m); m.id = to; m.hp = Math.max(1, m.hp + maxhp(m) - oldMax); return m; }
 
-  const API = { NATURES, natMul, movePower, TYPES, eff, rnd, ri, xpFor, calcStats, maxhp, makeMon, movesAt, createBattle, step, needSwitch, forceSwitch, aiAction, aiSwitchIdx,
-    monTypes, abilityOf, megaFormFor, canMega, revertMega, canDyna, gmaxOf, maxMoveOf, GMAX, MAXN, xpGain, addXP, levelEvo, stoneEvo, evolve, ballName, BALLS, HEAL, statusName };
+  const API = { calcDmg, NATURES, natMul, movePower, TYPES, eff, rnd, ri, xpFor, calcStats, maxhp, makeMon, movesAt, createBattle, step, needSwitch, forceSwitch, aiAction, aiSwitchIdx,
+    monTypes, baseTypes, teraTypeOf, canTera, doTera, clearTera, abilityOf, megaFormFor, canMega, revertMega, canDyna, gmaxOf, maxMoveOf, GMAX, MAXN, xpGain, addXP, levelEvo, stoneEvo, evolve, ballName, BALLS, HEAL, statusName };
   G.PE = API; if (typeof module !== 'undefined') module.exports = API;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -266,7 +266,7 @@
       <div class="hpbar"><i style="width:${hpPct(m)}%;background:${hpCol(hpPct(m))}"></i></div><small>${m.hp}/${s[0]} HP</small><div class="xpbar"><i style="width:${xp}%"></i></div><small class="mut">XP ${m.xp - x0}/${x1 - x0} p/ próximo nível</small></div></div>
       <div class="stats">${s.map((v, k) => `<div><small class="${PE.natMul(m, k) > 1 ? 'nup' : PE.natMul(m, k) < 1 ? 'ndn' : ''}">${SN[k]}</small><div class="sbar"><i style="width:${Math.min(100, d.s[k] / 1.6)}%"></i></div><b>${v}</b></div>`).join('')}</div>
       <p class="small natl">🧬 Natureza: <b>${natTxt(m)}</b> <button class="btn small ghost" data-k="judge">⚖️ Avaliação</button></p><p class="small abil">✨ Habilidade: <b>${abName(d.ab)}</b> <span class="mut">${D.abils && D.abils[d.ab] ? D.abils[d.ab].d : ''}</span></p>
-      <p class="small">🎒 Segurando: <b>${m.item ? C.ITEM_NAME[m.item] || m.item : 'nada'}</b>${megaHint(m)}</p>${bondHtml(m, w, i)}${ribbonHtml(m)}${condHtml(m)}
+      <p class="small">🎒 Segurando: <b>${m.item ? C.ITEM_NAME[m.item] || m.item : 'nada'}</b>${megaHint(m)}</p>${teraHtml(m)}${bondHtml(m, w, i)}${ribbonHtml(m)}${condHtml(m)}
       <h4>Golpes</h4><div class="moves">${m.moves.map(x => { const mv = D.moves[x.n]; return `<div class="mv" style="--tc:${C.TYPE_COLOR[mv.t]}"><b>${mv.n}</b><small>${C.TYPE_PT[mv.t]} • ${mv.c === 't' ? 'Status' : mv.c === 'p' ? 'Físico' : 'Especial'}${mv.p ? ' • Poder ' + mv.p : ''} • PP ${x.pp}/${mv.pp}</small>${mv.ds ? `<small class="mds">${mv.ds}</small>` : ''}</div>`; }).join('')}</div>
       ${evo ? `<p class="mut small">Evolui para: ${evo}</p>` : ''}<p class="mut small">Treinador original: ${esc(m.ot || '-')} • ${esc(m.caughtAt || '')}</p>
       <div class="mbtns wrap">${w === 'p' ? `${i > 0 ? `<button class="btn small" data-k="lead">⭐ Líder</button>` : ''}${S.party.length > 1 ? `<button class="btn small" data-k="tobox">💻 Mandar p/ PC</button>` : ''}` : `<button class="btn small" ${S.party.length >= 6 ? 'disabled' : ''} data-k="toparty">➕ Pôr no time</button><button class="btn small danger" data-k="release">Soltar</button>`}
@@ -294,7 +294,7 @@
       save(); closeModal(); monDetail(w, i); });
   }
   function pickItemFor(m) {
-    const usable = Object.entries(S.bag).filter(([k, v]) => v > 0 && !PE.BALLS[k] && C.ITEM_NAME[k] && !HOLDABLE(k) && k !== 'mega-bracelet' && k !== 'dynamax-band');
+    const usable = Object.entries(S.bag).filter(([k, v]) => v > 0 && !PE.BALLS[k] && C.ITEM_NAME[k] && !HOLDABLE(k) && k !== 'mega-bracelet' && k !== 'dynamax-band' && k !== 'tera-orb' && k !== 'tera-shard');
     const mm = modal(`<h3>Usar item em ${esc(pn(m))}</h3>${usable.length ? `<div class="ilist">${usable.map(([k, v]) => `<button class="irow" data-it="${k}">${itemImg(k)}<b>${C.ITEM_NAME[k]}</b><small>x${v}</small></button>`).join('')}</div>` : '<p class="mut">Nenhum item utilizável. Compre na Loja!</p>'}<div class="mbtns"><button class="btn" data-a="close">Fechar</button></div>`);
     $$('[data-it]', mm).forEach(b => b.onclick = () => useBagItem(b.dataset.it, m));
   }
@@ -458,7 +458,7 @@
     const it = Object.entries(S.bag).filter(([k, v]) => v > 0 && C.ITEM_NAME[k]);
     return `<div class="card"><h3>🎒 Mochila</h3>${it.length ? `<div class="ilist">${it.map(([k, v]) => `<button class="irow" data-a="bagitem" data-id="${k}">${itemImg(k)}<b>${C.ITEM_NAME[k]}</b><small>x${v}</small></button>`).join('')}</div>` : '<p class="mut">Vazia.</p>'}<p class="mut small">Toque num item para usar em um Pokémon do time.</p></div>`;
   }
-  ACT.buyrod = d => { const x = ROD_SHOP.find(r => r[0] === d.id); if (!x || S.bag[x[0]] || S.money < x[1] || S.badges.length < x[2]) return; S.money -= x[1]; S.bag[x[0]] = 1; SFX.coin(); toast(`Comprou ${C.ITEM_NAME[x[0]]}! 🎣`, 'good'); save(); render(); };
+  ACT.buyrod = d => { const x = ROD_SHOP.find(r => r[0] === d.id); if (!x || S.bag[x[0]] || S.money < x[1] || S.badges.length < x[2]) return; S.money -= x[1]; S.bag[x[0]] = 1; SFX.coin(); toast(`Comprou ${C.ITEM_NAME[x[0]]}! ${x[0] === 'tera-orb' ? '💎' : '🎣'}`, 'good'); save(); render(); };
   ACT.bagitem = d => { if (KEY_ITEMS[d.id]) return toast(`${C.ITEM_NAME[d.id]}: ${KEY_ITEMS[d.id]}`); if (PE.BALLS[d.id]) return toast('Bolas são usadas durante batalhas contra Pokémon selvagens.');
     const mm = modal(`<h3>Usar ${C.ITEM_NAME[d.id]} em...</h3><div class="mgrid">${S.party.map((m, i) => monCard(m, i, 'x')).join('')}</div><div class="mbtns"><button class="btn" data-a="close">Cancelar</button></div>`);
     $$('.mcard', mm).forEach(b => b.onclick = e => { e.stopPropagation(); useBagItem(d.id, S.party[+b.dataset.i]); }); };
@@ -590,9 +590,9 @@
   const wait = ms => sleep(ms * spd());
   const bq = q => $(q, $('#battle'));
   function startBattle(o) {
-    const enemyParty = o.enemy; enemyParty.forEach(m => see(m.id)); S.stats.battles++; MUS.want('battle');
+    const enemyParty = o.enemy; enemyParty.forEach(m => see(m.id)); PE.clearTera(S.party); PE.clearTera(enemyParty); if (B) B.teraOn = false; S.stats.battles++; MUS.want('battle');
     if (S.party[0].hp <= 0) { const i = S.party.findIndex(m => m.hp > 0); if (i > 0) S.party.unshift(S.party.splice(i, 1)[0]); }
-    const bs = PE.createBattle({ kind: o.kind, seed: o.seed ?? ((R() * 2 ** 31) | 0), weather: o.weather, sides: [{ party: o.party || S.party, name: S.trainer, mega: (S.bag['mega-bracelet'] || 0) > 0 && !o.raid, dyna: (S.bag['dynamax-band'] || 0) > 0 || !!o.raid }, { party: enemyParty, name: o.name || '', ai: o.ai || 0, mega: enemyParty.some(m => m.item), dyna: !!o.dyna }] });
+    const bs = PE.createBattle({ kind: o.kind, seed: o.seed ?? ((R() * 2 ** 31) | 0), weather: o.weather, sides: [{ party: o.party || S.party, name: S.trainer, mega: (S.bag['mega-bracelet'] || 0) > 0 && !o.raid, dyna: (S.bag['dynamax-band'] || 0) > 0 || !!o.raid, tera: (S.bag['tera-orb'] || 0) > 0 && !o.raid && !o.rogue }, { party: enemyParty, name: o.name || '', ai: o.ai || 0, mega: enemyParty.some(m => m.item), dyna: !!o.dyna }] });
     B = { o, s: bs, busy: true };
     const theme = o.map ? o.map.theme : o.tower ? 'psychic' : 'gym';
     const ov = document.createElement('div'); ov.id = 'battle'; ov.className = `battle theme-${theme} ${o.weather ? 'w-' + o.weather : ''} per-${o.map ? period() : 'day'} ${o.gym != null || o.elite != null || o.jgym != null || o.jelite != null ? 'boss' : ''}`;
@@ -611,8 +611,11 @@
   function drawInfo(side) {
     const m = B.s.sides[side].b.m, p = hpPct(m), el = $(side ? '#einfo' : '#pinfo');
     const x0 = PE.xpFor(D.mons[m.id].g, m.lvl), x1 = PE.xpFor(D.mons[m.id].g, m.lvl + 1);
-    el.innerHTML = `<div class="row between"><b class="bnm">${esc(bname(m))}${m.shiny ? ' ✨' : ''}${m.raidStars ? ` <span class="dmt">${'★'.repeat(m.raidStars)}</span>${m.shield ? ` <span class="dmt shd">🛡️${m.shield}</span>` : ''}` : m.dmax ? ` <span class="dmt">⬣${m.dmax.t}</span>` : ''}</b><small>Nv${m.lvl}</small></div><div class="row"><small class="hpl">HP</small><div class="hpbar"><i style="width:${p}%;background:${hpCol(p)}"></i></div></div>
+    const prevP = el._hp, prevId = el._uid; el._hp = p; el._uid = m.uid;
+    el.innerHTML = `<div class="row between"><b class="bnm">${m.terastal ? `<span class="terachip" style="--tc:${C.TYPE_COLOR[m.terastal]}" title="Tera ${C.TYPE_PT[m.terastal]}">💎</span>` : ''}${esc(bname(m))}${m.shiny ? ' ✨' : ''}${m.raidStars ? ` <span class="dmt">${'★'.repeat(m.raidStars)}</span>${m.shield ? ` <span class="dmt shd">🛡️${m.shield}</span>` : ''}` : m.dmax ? ` <span class="dmt">⬣${m.dmax.t}</span>` : ''}</b><small>Nv${m.lvl}</small></div><div class="row"><small class="hpl">HP</small><div class="hpbar"><b class="hpghost" style="width:${prevId === m.uid && prevP != null ? Math.max(p, prevP) : p}%"></b><i style="width:${prevId === m.uid && prevP != null ? prevP : p}%;background:${hpCol(p)}"></i></div></div>
       <div class="row between"><span>${stChip(m.status)}${B.o.kind === 'wild' && side === 1 && S.dex.caught[m.id] ? '<img class="caughtmark" src="img/items/poke-ball.png" alt="">' : ''}</span>${side ? '' : `<small class="hpn">${m.hp}/${PE.maxhp(m)}</small>`}</div>${side ? '' : `<div class="xpbar"><i style="width:${m.lvl >= 100 ? 100 : (m.xp - x0) / (x1 - x0) * 100}%"></i></div>`}`;
+    if (prevId === m.uid && prevP != null && prevP !== p) { const bar = el.querySelector('.hpbar i'), gh = el.querySelector('.hpghost'); requestAnimationFrame(() => requestAnimationFrame(() => { if (bar) bar.style.width = p + '%'; setTimeout(() => { if (gh) gh.style.width = p + '%'; }, 380); })); }
+    try { const bm = document.querySelector(side ? '.emon' : '.pmon'); if (bm) { bm.classList.toggle('tera', !!m.terastal); const cr = bm.querySelector('.tcrown'); if (m.terastal) { bm.style.setProperty('--tt', C.TYPE_COLOR[m.terastal]); if (!cr) bm.insertAdjacentHTML('beforeend', '<span class="tcrown"></span>'); } else if (cr) cr.remove(); } } catch (e) {}
   }
   function setHP(side, hp, max) { const el = $(side ? '#einfo' : '#pinfo'); const i = $('.hpbar i', el); const p = Math.max(0, hp / max * 100); i.style.width = p + '%'; i.style.background = hpCol(p);
     const n = $('.hpn', el); if (n) { const from = parseInt(n.textContent) || 0; const t0 = performance.now(), dur = 600 * spd(); const tick = t => { const k = Math.min(1, (t - t0) / dur); n.textContent = Math.round(from + (hp - from) * k) + '/' + max; if (k < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); } }
@@ -650,10 +653,11 @@
   }
   function showMoves() {
     const m = B.s.sides[0].b.m, e = B.s.sides[1].b.m; const known = S.dex.caught[e.id] || B.o.kind === 'trainer';
-    const cm = PE.canMega(B.s, 0), mf = cm ? D.megas[PE.megaFormFor(m)] : null, cd = PE.canDyna(B.s, 0), gx = PE.gmaxOf(m);
+    const cm = PE.canMega(B.s, 0), mf = cm ? D.megas[PE.megaFormFor(m)] : null, cd = PE.canDyna(B.s, 0), gx = PE.gmaxOf(m), ct = PE.canTera(B.s, 0), tt = PE.teraTypeOf(m);
+    if (B.teraOn && (B.megaOn || B.dynaOn)) B.teraOn = false;
     if (B.megaOn && B.dynaOn) B.dynaOn = false; const asMax = !!m.dmax || (cd && B.dynaOn), mm = asMax ? Object.assign({}, m, { dmax: m.dmax || { t: 3, g: gx ? 1 : 0 } }) : null;
-    $('#bctl').innerHTML = `${cm || cd ? `<div class="powrow">${cm ? `<button class="bb megatog ${B.megaOn ? 'on' : ''}" data-b="megatog"><span class="orb"></span>🧬 Mega Evoluir${B.megaOn ? ' ✔' : ''} <small>${mf.n}</small></button>` : ''}${cd ? `<button class="bb dynatog ${B.dynaOn ? 'on' : ''}" data-b="dynatog">${gx ? '🌋 Gigantamax' : '⬣ Dinamax'}${B.dynaOn ? ' ✔' : ''} <small>${gx ? gx.n : '3 turnos, HP x2'}</small></button>` : ''}</div>` : ''}<div class="bmoves">${m.moves.map(x => { const mv0 = D.moves[x.n], mv = asMax ? PE.maxMoveOf(mm, mv0) : mv0; const ef = mv.p ? PE.eff(mv.t, mtypes(e)) : 1;
-      return `<button class="mvb ${asMax ? 'maxmv' : ''}" style="--tc:${C.TYPE_COLOR[mv.t]}" data-b="mv" data-n="${x.n}" ${x.pp <= 0 ? 'disabled' : ''}><b>${mv.n}</b><small>${C.TYPE_PT[mv.t]} • ${mv.p ? 'Pod ' + mv.p : mv.guard ? 'Proteção' : 'Status'} • PP ${x.pp}/${mv0.pp}</small>${known ? (ef > 1 ? '<em class="ef up">Super!</em>' : ef < 1 ? `<em class="ef dn">${ef === 0 ? 'Imune' : 'Fraco'}</em>` : '') : ''}</button>`; }).join('')}</div><button class="bb back" data-b="back">← Voltar</button>`;
+    $('#bctl').innerHTML = `${cm || cd || ct ? `<div class="powrow">${ct ? `<button class="bb teratog ${B.teraOn ? 'on' : ''}" style="--tc:${C.TYPE_COLOR[tt]}" data-b="teratog">💎 Terastal${B.teraOn ? ' ✔' : ''} <small>Tera ${C.TYPE_PT[tt]}</small></button>` : ''}${cm ? `<button class="bb megatog ${B.megaOn ? 'on' : ''}" data-b="megatog"><span class="orb"></span>🧬 Mega Evoluir${B.megaOn ? ' ✔' : ''} <small>${mf.n}</small></button>` : ''}${cd ? `<button class="bb dynatog ${B.dynaOn ? 'on' : ''}" data-b="dynatog">${gx ? '🌋 Gigantamax' : '⬣ Dinamax'}${B.dynaOn ? ' ✔' : ''} <small>${gx ? gx.n : '3 turnos, HP x2'}</small></button>` : ''}</div>` : ''}<div class="bmoves">${m.moves.map(x => { const mv0 = D.moves[x.n], mv = asMax ? PE.maxMoveOf(mm, mv0) : mv0; const ef = mv.p ? PE.eff(mv.t, mtypes(e)) : 1;
+      return `<button class="mvb ${asMax ? 'maxmv' : ''} ${known && mv.p && ef > 1 ? 'efup' : known && mv.p && ef < 1 ? 'efdn' : ''}" style="--tc:${C.TYPE_COLOR[mv.t]};--pp:${Math.max(0, x.pp / mv0.pp)}" data-b="mv" data-n="${x.n}" ${x.pp <= 0 ? 'disabled' : ''}><b>${mv.n}</b><small>${C.TYPE_PT[mv.t]} • ${mv.p ? 'Pod ' + mv.p : mv.guard ? 'Proteção' : 'Status'} • PP ${x.pp}/${mv0.pp}</small>${known ? (ef > 1 ? '<em class="ef up">Super!</em>' : ef < 1 ? `<em class="ef dn">${ef === 0 ? 'Imune' : 'Fraco'}</em>` : '') : ''}</button>`; }).join('')}</div><button class="bb back" data-b="back">← Voltar</button>`;
     bindCtl();
   }
   function showBag() {
@@ -672,9 +676,10 @@
   function bindCtl() { $$('#bctl [data-b]').forEach(b => b.onclick = () => { if (!B || B.busy) return; SFX.click(); const k = b.dataset.b;
     if (k === 'fight') { const m = B.s.sides[0].b.m; if (m.moves.every(x => x.pp <= 0)) return act({ type: 'move', n: 'struggle' }); showMoves(); }
     else if (k === 'bag') showBag(); else if (k === 'poke') showParty(false); else if (k === 'back') showMain();
-    else if (k === 'run') act({ type: 'run' }); else if (k === 'mv') { const mg = !!B.megaOn, dy = !!B.dynaOn; B.megaOn = false; B.dynaOn = false; act({ type: 'move', n: b.dataset.n, mega: mg, dyna: dy }); }
-    else if (k === 'megatog') { B.megaOn = !B.megaOn; if (B.megaOn) B.dynaOn = false; showMoves(); }
-    else if (k === 'dynatog') { B.dynaOn = !B.dynaOn; if (B.dynaOn) B.megaOn = false; showMoves(); }
+    else if (k === 'run') act({ type: 'run' }); else if (k === 'mv') { const mg = !!B.megaOn, dy = !!B.dynaOn, te = !!B.teraOn; B.megaOn = false; B.dynaOn = false; B.teraOn = false; act({ type: 'move', n: b.dataset.n, mega: mg, dyna: dy, tera: te }); }
+    else if (k === 'teratog') { B.teraOn = !B.teraOn; if (B.teraOn) { B.megaOn = false; B.dynaOn = false; } showMoves(); }
+    else if (k === 'megatog') { B.megaOn = !B.megaOn; if (B.megaOn) { B.dynaOn = false; B.teraOn = false; } showMoves(); }
+    else if (k === 'dynatog') { B.dynaOn = !B.dynaOn; if (B.dynaOn) { B.megaOn = false; B.teraOn = false; } showMoves(); }
     else if (k === 'item') { const id = b.dataset.id; if (PE.BALLS[id]) { S.bag[id]--; act({ type: 'ball', ball: id }); } else showParty(false, id); }
     else if (k === 'useon') { const id = B.itemFor, m = B.s.sides[0].party[+b.dataset.i], mh = PE.maxhp(m);
       const ok = id === 'revive' ? m.hp <= 0 : PE.HEAL[id] ? m.hp > 0 && (m.hp < mh || (id === 'full-restore' && m.status)) : !!m.status;
@@ -730,6 +735,7 @@
         case 'caught': { $('#cball')?.classList.add('click'); SFX.click2(); await wait(350); starsFx(); SFX.caught(); log(`🎉 ${e.text}`); await wait(1700); break; }
         case 'escape': { $('#cball')?.remove(); const el = mon(1); el.classList.remove('caught'); el.classList.add('breakout'); popFx(1); SFX.escape(); log(e.text); await wait(900); el.classList.remove('breakout'); break; }
         case 'run': log(e.text); tone(600, 0.2, 'sine', 0.05, 0, 300); await wait(800); break;
+        case 'tera': if (e.side === 0) S.stats.teras = (S.stats.teras || 0) + 1; await teraAnim(e); break;
         case 'mega': if (e.side === 0) S.stats.megas = (S.stats.megas || 0) + 1; await megaAnim(e); break;
         case 'dyna': if (e.side === 0) S.stats.dmaxes = (S.stats.dmaxes || 0) + 1; await dynaAnim(e); break;
         case 'undyna': { const el = bq(e.side ? '.emon' : '.pmon'); if (e.text) log(e.text); el.classList.add('shrink'); await wait(450); el.classList.remove('dmax', 'gmax', 'shrink'); $(e.side ? '#esp' : '#psp').src = spr(B.s.sides[e.side].b.m, !e.side); drawInfo(e.side); setHP(e.side, e.hp, e.max); await wait(e.quiet ? 100 : 700); break; }
@@ -820,7 +826,7 @@
       healAll(); save(); closeBattle(); toast('Você correu para o Centro Pokémon. Seu time foi curado.', 'bad');
     }
   }
-  async function finishEvos() { PE.revertMega(S.party); for (const m of [...new Set(B.evos || [])]) { const to = PE.levelEvo(m, tod()); if (to) await evolveAnim(m, to); } B.evos = []; }
+  async function finishEvos() { PE.revertMega(S.party); PE.clearTera(S.party); for (const m of [...new Set(B.evos || [])]) { const to = PE.levelEvo(m, tod()); if (to) await evolveAnim(m, to); } B.evos = []; }
   function closeBattle() {
     PE.revertMega(S.party); S.party.forEach(m => { if (m.status === 'tox') m.status = 'psn'; });
     setTimeout(checkEggs, 700);
@@ -839,7 +845,7 @@
   const rewardText = r => Object.entries(r).map(([k, v]) => k === 'money' ? fmt(v) : `${v}x ${C.ITEM_NAME[k] || k}`).join(' + ');
   const rewardIcons = r => Object.entries(r).map(([k, v]) => k === 'money' ? `<span class="rw">💰${v >= 1000 ? (v / 1000) + 'k' : v}</span>` : `<span class="rw">${itemImg(k)}${v > 1 ? 'x' + v : ''}</span>`).join('');
   Object.assign(C.ITEM_NAME, { 'old-rod': 'Vara Velha', 'good-rod': 'Vara Boa', 'super-rod': 'Super Vara', 'shiny-charm': 'Amuleto Brilhante' });
-  const KEY_ITEMS = { 'old-rod': 'Use em mapas com água: botão 🎣 Pescar.', 'good-rod': 'Pesca Pokémon melhores em mapas com água.', 'super-rod': 'Pesca os Pokémon mais raros e fortes.', 'shiny-charm': 'Triplica a chance de encontrar Pokémon shiny (1/512 → 3/512).' };
+  const KEY_ITEMS = { 'old-rod': 'Use em mapas com água: botão 🎣 Pescar.', 'good-rod': 'Pesca Pokémon melhores em mapas com água.', 'super-rod': 'Pesca os Pokémon mais raros e fortes.', 'tera-orb': 'Terastal: 1x por batalha, toque em 💎 Terastal no menu de golpes. Recarrega sozinho.', 'shiny-charm': 'Triplica a chance de encontrar Pokémon shiny (1/512 → 3/512).' };
 
   // ---------- shiny ----------
   const shinyP = () => (S && S.bag['shiny-charm'] ? 3 : 1) / 512;
@@ -925,7 +931,7 @@
     'super-rod': { n: 'Super Vara', win: 650, pool: [[119, 12, 30, 42], [121, 8, 32, 42], [130, 8, 30, 40], [99, 10, 30, 42], [117, 10, 30, 42], [171, 10, 30, 42], [222, 8, 30, 42], [211, 8, 30, 42], [224, 8, 30, 42], [226, 6, 30, 42], [147, 5, 30, 38], [131, 3, 35, 45]] },
   };
   const ROD_ORDER = ['super-rod', 'good-rod', 'old-rod'];
-  const ROD_SHOP = [['good-rod', 8000, 3], ['super-rod', 30000, 6]];
+  const ROD_SHOP = [['good-rod', 8000, 3], ['tera-orb', 6000, 2], ['super-rod', 30000, 6]];
   const isWater = mp => mp && (mp.theme === 'water' || /lago|lake|rio|mar|praia|cabo|ilha/i.test(mp.name));
   A.isWater = isWater;
   ACT.fish = async d => {
@@ -2432,7 +2438,17 @@
       { t: 'hunt', id: 1025, lvl: 98, map: 'p_mirtilo', btn: '🍑 Seguir o cheiro de mochi', intro: 'Uma casca roxa rola até você… Pecharunt!' }] });
   // ===== v47: transição de telas + cor do brilho do golpe =====
   { let lastTab = null; const _render = render; render = function () { const r = _render.apply(this, arguments); try { const k = tab + '/' + (sub || ''); if (k !== lastTab) { lastTab = k; app.classList.remove('scr-in'); void app.offsetWidth; app.classList.add('scr-in'); clearTimeout(app._scr); app._scr = setTimeout(() => app.classList.remove('scr-in'), 600); } } catch (e) {} return r; }; }
-    A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
+    // ===== v48: Terastal =====
+  function teraHtml(m) { if (D.mons[m.id] && D.mons[m.id].L) return ''; const t = PE.teraTypeOf(m);
+    return `<p class="small terarow">💎 Tipo Tera: <span class="type" style="background:${C.TYPE_COLOR[t]}">${C.TYPE_PT[t]}</span> <button class="btn small ghost" data-tera="${m.uid}">Mudar <small>(1 Fragmento Tera • você tem ${S.bag['tera-shard'] || 0})</small></button></p>`; }
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-tera]'); if (!b) return; e.stopPropagation(); const m = [...S.party, ...S.box].find(x => x.uid == b.dataset.tera); if (!m) return;
+    if (!(S.bag['tera-shard'] > 0)) return toast('Você precisa de um Fragmento Tera (Loja Pokémon).', 'bad');
+    const cur = PE.teraTypeOf(m), mm = modal(`<h3>💎 Novo tipo Tera de ${esc(pn(m))}</h3><p class="mut small">Usa 1 Fragmento Tera. Ao Terastalizar, ele vira desse tipo e ganha bônus nos golpes dele.</p><div class="teragrid">${PE.TYPES.filter(t => t !== cur).map(t => `<button class="type tpick" style="background:${C.TYPE_COLOR[t]}" data-tp="${t}">${C.TYPE_PT[t]}</button>`).join('')}</div><div class="mbtns"><button class="btn" data-a="close">Cancelar</button></div>`);
+    $$('[data-tp]', mm).forEach(x => x.onclick = () => { S.bag['tera-shard']--; m.teraT = x.dataset.tp; save(); SFX.caught(); closeModal(); toast(`${esc(pn(m))} agora é Tera ${C.TYPE_PT[m.teraT]}! 💎`, 'good'); render(); }); }, true);
+  async function teraAnim(e) { const el = document.querySelector(e.side ? '.emon' : '.pmon'); log(e.text.replace(/Tera (\w+)!$/, (q, t) => 'Tera ' + (C.TYPE_PT[t] || t) + '!')); try { SFX.status(); } catch (x) {}
+    if (el) { el.style.setProperty('--tt', C.TYPE_COLOR[e.t]); el.classList.add('tera', 'teraburst'); await wait(RMOT() ? 200 : 1100); el.classList.remove('teraburst'); } drawInfo(e.side); }
+  A.teraHtml = teraHtml;
+  A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});

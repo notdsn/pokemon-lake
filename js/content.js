@@ -141,6 +141,7 @@
     { id:'great-ball', name:'Grande Bola', price:600, desc:'Captura 1,5x melhor.', req:1 },
     { id:'ultra-ball', name:'Ultra Bola', price:1200, desc:'Captura 2x melhor.', req:3 },
     { id:'master-ball', name:'Master Bola', price:50000, desc:'Captura garantida. Rara!', req:8 },
+    { id:'tera-shard', name:'Fragmento Tera', price:1500, desc:'Muda o tipo Tera de um Pokémon (na ficha dele).', req:2 },
     { id:'potion', name:'Poção', price:300, desc:'Recupera 20 HP.', req:0 },
     { id:'super-potion', name:'Super Poção', price:700, desc:'Recupera 60 HP.', req:1 },
     { id:'hyper-potion', name:'Hiper Poção', price:1200, desc:'Recupera 120 HP.', req:4 },
@@ -160,7 +161,7 @@
     { id:'dragon-scale', name:'Escama de Dragão', price:3000, desc:'Use em Seadra (evolução por troca).', req:3 },
     { id:'up-grade', name:'Melhoria', price:3000, desc:'Use em Porygon (evolução por troca).', req:3 },
   ];
-  const ITEM_NAME = Object.assign(Object.fromEntries(SHOP.map(x => [x.id, x.name])), MEGA_STONES, { 'mega-bracelet':'Mega Pulseira', 'dynamax-band':'Pulseira Dinamax' });
+  const ITEM_NAME = Object.assign(Object.fromEntries(SHOP.map(x => [x.id, x.name])), MEGA_STONES, { 'mega-bracelet':'Mega Pulseira', 'dynamax-band':'Pulseira Dinamax', 'tera-orb':'Orbe Tera' });
   MAPS.forEach(m => m.region = m.region || 'kanto'); MAPS.push(...JMAPS);
   const THEME_BG = { grass:['#4ade80','#166534'], forest:['#15803d','#052e16'], cave:['#57534e','#1c1917'], water:['#38bdf8','#0c4a6e'], ghost:['#7c3aed','#1e1b4b'],
     safari:['#a3e635','#3f6212'], electric:['#fde047','#713f12'], ice:['#bae6fd','#0e7490'], volcano:['#f97316','#450a0a'], psychic:['#e879f9','#3b0764'], sky:['#fcd34d','#1e3a8a'], gym:['#64748b','#0f172a'] };
