@@ -892,3 +892,9 @@ img.mini.mtap{animation:minitap .45s cubic-bezier(.2,1.6,.4,1)}
 .explore .follow.live img.mini{animation:breathe var(--bd,2.2s) ease-in-out var(--bp,0s) infinite}
 .explore.walking>.follow.live:not(.hop) img.mini{animation:bobwalk .42s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){img.mini,img.mini.mtap{animation:none!important}}
+/* v44 shiny minis */
+img.mini.minish{filter:drop-shadow(0 2px 2px rgba(0,0,0,.35)) drop-shadow(0 0 3px rgba(255,215,90,.85));animation:minihop var(--mbd,2s) ease-in-out var(--mbp,0s) infinite,minisparkle 2.4s ease-in-out infinite}
+@keyframes minisparkle{0%,100%{filter:drop-shadow(0 2px 2px rgba(0,0,0,.35)) drop-shadow(0 0 2px rgba(255,215,90,.6))}50%{filter:drop-shadow(0 2px 2px rgba(0,0,0,.35)) drop-shadow(0 0 6px rgba(255,240,150,1))}}
+.follow img.mini.minish{animation:minisparkle 2.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){img.mini.minish{animation:none!important}}
+.petyard .follow img.mini{width:104px;height:104px}

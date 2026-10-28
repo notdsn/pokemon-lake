@@ -2349,13 +2349,13 @@
     if (bot) { const pp = bot.querySelector('p'); if (pp) pp.title = pp.textContent; } }
   { const _render = render; render = function () { const r = _render.apply(this, arguments); try { tidyScene(); } catch (e) {} return r; }; }
   // ===== Miniaturas chibi fora da batalha (v42) =====
-  const MINI = (() => { const RX = /img\/(front|shiny)\/(\d+)\.(gif|png)(\?.*)?$/, SKIP = '#battle, .wildpeek, .bigspr, .evo, .evobox, .caughtm, .raidwin, .bmon, .hatchm, .eggm';
+  const MINI = (() => { const RX = /img\/(?:(mega|gmax)\/)?(front|shiny)\/([\w-]+)\.(gif|png)(\?.*)?$/, slug = t => String(t || '').toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, ''), NAMEID = {}, nameId = k => { if (!NAMEID._ok) { for (const i in D.mons) NAMEID[slug(D.mons[i].n)] = +i; try { for (const i in PE.GMAX) NAMEID['g:' + PE.GMAX[i].k] = +i; } catch (e) {} NAMEID._ok = 1; } return NAMEID['g:' + k] || NAMEID[slug(k.replace(/-(mega|gmax).*$/, ''))] || NAMEID[slug(k.split('-')[0])] || 0; }, SKIP = '#battle, .wildpeek, .bigspr, .evo, .evobox, .caughtm, .raidwin, .bmon, .hatchm, .eggm';
     const isLeg = id => !!(D.mons[id] && D.mons[id].L);
     function fix(img) { if (!img || img.dataset.miniDone === img.getAttribute('src')) return; const src = img.getAttribute('src') || '', m = src.match(RX); if (!m) return;
-      if (img.closest(SKIP) || img.classList.contains('me')) return; const id = +m[2];
-      if (isLeg(id) || m[1] === 'shiny') { img.classList.add('minileg'); img.dataset.miniDone = src; return; }
-      const mini = 'img/mini/' + id + '.png'; img.dataset.full = src; img.classList.add('mini');
-      img.onerror = () => { img.onerror = null; img.classList.remove('mini'); img.classList.add('minileg'); img.src = img.dataset.full; img.dataset.miniDone = img.dataset.full; };
+      if (img.closest(SKIP) || img.classList.contains('me')) return; const id = /^\d+$/.test(m[3]) ? +m[3] : nameId(m[3]), sh = m[2] === 'shiny';
+      if (!id || isLeg(id)) { img.classList.add('minileg'); img.dataset.miniDone = src; return; }
+      const mini = 'img/' + (sh ? 'minishiny/' : 'mini/') + id + '.png'; img.classList.toggle('minish', sh); img.dataset.full = src; img.classList.add('mini');
+      img.onerror = () => { img.onerror = null; img.classList.remove('mini', 'minish'); img.classList.add('minileg'); img.src = img.dataset.full; img.dataset.miniDone = img.dataset.full; };
       img.dataset.miniDone = mini; img.src = mini;
       const h = (id * 2654435761 >>> 0) % 1000 / 1000; img.style.setProperty('--mbd', (1.6 + h * 0.9).toFixed(2) + 's'); img.style.setProperty('--mbp', (-h * 2).toFixed(2) + 's'); }
     function scan(root) { (root || document).querySelectorAll('img').forEach(fix); }
@@ -2396,6 +2396,13 @@
       { t: 'hunt', id: 894, lvl: 94, map: 'g_tundra', btn: '⚡ Acender o templo elétrico', intro: 'Faíscas por todo lado… Regieleki desperta!' },
       { t: 'hunt', id: 895, lvl: 94, map: 'g_tundra', btn: '🐉 Abrir o templo dragão', intro: 'Uma cabeça de dragão de pedra se ilumina… Regidrago!' },
       { t: 'hunt', id: 898, lvl: 96, map: 'g_tundra', btn: '👑 Visitar o Rei', intro: 'Uma voz ecoa na sua mente… “Eu sou Calyrex.”' }] });
+  // ===== v44: restaura Raides Dinamax afetadas pelo travamento (corrigido na v39) — roda 1 vez por save =====
+  function raidRestore() { try { if (!S || !S.trainer) return 0; S.fixes = S.fixes || {}; if (S.fixes.raid44) return 0;
+    const r = raidState(), had = { used: r.used || 0, done: Object.keys(r.done || {}).length };
+    r.used = 0; r.done = {}; r.extra = (r.extra || 0) + RAID_PER_DAY; S.fixes.raid44 = Date.now(); save();
+    setTimeout(() => { try { toast('⬣ Evento Dinamax restaurado! +' + RAID_PER_DAY + ' raides extras hoje 🎁'); } catch (e) {} }, 1200); return had; } catch (e) { return 0; } }
+  A.raidRestore = raidRestore;
+  { const _render = render; render = function () { const r = _render.apply(this, arguments); try { raidRestore(); } catch (e) {} return r; }; }
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------
