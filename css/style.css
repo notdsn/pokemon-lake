@@ -830,3 +830,6 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .room3d .r3hint{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.45);color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;pointer-events:none}
 .room3d .r3edit{position:absolute;right:8px;bottom:8px}
 .r3d .room.v2{position:absolute!important;left:-9999px;width:340px;visibility:hidden}
+/* roupas em pixel art */
+.accprev{width:56px;height:56px;object-fit:cover;object-position:50% 0;image-rendering:pixelated}
+.accs h4{margin:10px 0 4px}

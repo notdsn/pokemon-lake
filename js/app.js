@@ -602,8 +602,8 @@
       <div class="bmon emon hidden"><img id="esp" src="${spr(e)}" alt=""></div><div class="bmon pmon hidden"><img id="psp" src="${spr(p, true)}" alt=""></div>
       <div class="info einfo" id="einfo"></div><div class="info pinfo" id="pinfo"></div>
       <div class="ebs" id="ebs"></div>${o.weather ? `<div class="wchip">${o.weather === 'rain' ? '🌧️ Chuva: Água +50%, Fogo −50%' : '☀️ Sol: Fogo +50%, Água −50%'}</div>` : ''}<div class="fxl" id="fxl"></div>
-      ${o.kind === 'trainer' ? `<img class="foe" id="foe" src="img/tr/${o.sprite}.png" alt="">` : ''}<img class="metr" id="metr" src="img/tr/${S.avatar}.png" alt="">
-      <div class="intro ${o.kind} ${o.nat ? 'nat' : ''}" id="intro">${o.nat ? `<div class="natrays"></div><div class="vs"><img src="img/tr/${S.avatar}.png" alt=""><b>VS</b><img class="natvsimg" src="img/tr/nat.png" alt="Nat"></div><div class="vsname natname"><small>DESAFIO FINAL</small><br><b>NAT</b><br><span>Mestra das Eeveelutions</span></div>` : o.kind === 'trainer' ? `<div class="vs"><img src="img/tr/${S.avatar}.png" alt=""><b>VS</b><img src="img/tr/${o.sprite}.png" alt=""></div><div class="vsname">${esc(o.intro || '')}<br><b>${esc(o.name)}</b></div>` : '<i class="bar1"></i><i class="bar2"></i>'}</div></div>
+      ${o.kind === 'trainer' ? `<img class="foe" id="foe" src="img/tr/${o.sprite}.png" alt="">` : ''}<img class="metr" id="metr" data-me="${meKey()}" src="${meSrc()}" alt="">
+      <div class="intro ${o.kind} ${o.nat ? 'nat' : ''}" id="intro">${o.nat ? `<div class="natrays"></div><div class="vs"><img data-me="${meKey()}" src="${meSrc()}" alt=""><b>VS</b><img class="natvsimg" src="img/tr/nat.png" alt="Nat"></div><div class="vsname natname"><small>DESAFIO FINAL</small><br><b>NAT</b><br><span>Mestra das Eeveelutions</span></div>` : o.kind === 'trainer' ? `<div class="vs"><img src="img/tr/${S.avatar}.png" alt=""><b>VS</b><img src="img/tr/${o.sprite}.png" alt=""></div><div class="vsname">${esc(o.intro || '')}<br><b>${esc(o.name)}</b></div>` : '<i class="bar1"></i><i class="bar2"></i>'}</div></div>
       <div class="bpanel"><div class="blog" id="blog"></div><div class="bctl" id="bctl"></div></div></div>`;
     document.body.appendChild(ov); document.body.classList.add('in-battle');
     drawInfo(0); drawInfo(1); drawBalls(); runIntro();
@@ -1377,7 +1377,7 @@
   ACT.stybuy = d => { const s = sty(), list = STYLE[d.k + 's'], it = list.find(x => x[0] === d.id); if (!it) return;
     if (!s.owned[d.id]) { if (it[3] < 0) return toast(it[3] === -2 ? 'Recompensa do Passe de Temporada!' : 'Só na Máquina de Cápsulas!'); if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; s.owned[d.id] = 1; SFX.coin(); toast(`Comprou ${it[1]}!`, 'good'); }
     s[d.k] = d.id; save(); render(); };
-  const trImg = () => { const h = hatOf(); return `<img src="img/tr/${S.avatar}.png" style="${meFilter()}" alt="">${h ? `<span class="tchat ${sty().hat}">${h}</span>` : ''}`; };
+  const trImg = () => `<img data-me="${meKey()}" src="${meSrc()}" style="${meFilter2()}" alt="">`;
 
   // ---------- Casa / base ----------
   const FURN = [['bed', 'Cama Pokébola', '🛏️', 2000], ['sofa', 'Sofá', '🛋️', 3000], ['plant', 'Planta', '🪴', 800], ['tv', 'TV', '📺', 4000], ['game', 'Videogame', '🎮', 5000], ['books', 'Estante', '📚', 2500], ['aqua', 'Aquário', '🐠', 6000],
@@ -2243,6 +2243,87 @@
   ACT.setg3d = d => { S.settings.g3d = d.v === 'auto' ? undefined : d.v === 'true'; save(); render(); };
   { const _as = audioSettings; audioSettings = function () { const g = S.settings.g3d, cur = g === undefined ? 'auto' : String(g);
     return _as.apply(this, arguments) + `<div class="setrow"><span>🧊 Gráficos 3D</span><div class="seg">${[['auto', 'Auto'], ['true', 'Ligado'], ['false', 'Desligado']].map(([v, l]) => `<button class="${cur === v ? 'on' : ''}" data-a="setg3d" data-v="${v}">${l}</button>`).join('')}</div></div>`; }; }
+
+  // =====================================================================
+  // ROUPAS EM PIXEL ART: acessórios desenhados no estilo do sprite, por encaixe (cabeça/orelhas/rosto/costas)
+  // =====================================================================
+  const ANCH = { red: [37, 8, 17, 9, 20, '#3a2618'], leaf: [40, 13, 21, 8, 24, '#6b4226'], ethan: [40, 12, 19, 8, 22, '#262626'], lyra: [40, 10, 19, 9, 21, '#6b3e1e'],
+    brendan: [40, 9, 15, 8, 19, '#3b3b4b'], may: [38, 10, 14, 8, 21, '#8b5a2b'], lucas: [36, 13, 21, 9, 24, '#2e3f6e'], dawn: [40, 14, 23, 9, 26, '#1e2a50'] };
+  const SLOT_OF = { h5: 'face', ge: 'face', hg2: 'ears', hp: 'ears', bk: 'back', bc: 'back' };
+  const slotOf = id => SLOT_OF[id] || 'head';
+  const SLOT_PT = { head: 'Cabeça', ears: 'Orelhas', face: 'Rosto', back: 'Costas' };
+  STYLE.hats.push(['hb', 'Gorro', '🧶', 1500], ['hp', 'Fones de Ouvido', '🎧', 2500], ['ge', 'Óculos Redondos', '👓', 1200], ['bk', 'Mochila', '🎒', 2000], ['bc', 'Capa de Herói', '🦸', 6000]);
+  function accOf() { const s = sty(); if (!s.acc) { s.acc = { head: null, ears: null, face: null, back: null }; if (s.hat && s.hat !== 'h0') s.acc[slotOf(s.hat)] = s.hat; } return s.acc; }
+  // --- desenho ---
+  function layer() { const c = document.createElement('canvas'); c.width = c.height = 80; return c; }
+  function outline(c, col = '#181018') { const g = c.getContext('2d'), d = g.getImageData(0, 0, 80, 80), a = d.data, o = new Uint8ClampedArray(a); const op = (x, y) => x >= 0 && y >= 0 && x < 80 && y < 80 && a[(y * 80 + x) * 4 + 3] > 0;
+    const [r, gg, b] = [1, 3, 5].map(i => parseInt(col.slice(i, i + 2), 16)); for (let y = 0; y < 80; y++) for (let x = 0; x < 80; x++) { const i = (y * 80 + x) * 4; if (a[i + 3]) continue; if (op(x - 1, y) || op(x + 1, y) || op(x, y - 1) || op(x, y + 1)) { o[i] = r; o[i + 1] = gg; o[i + 2] = b; o[i + 3] = 255; } }
+    g.putImageData(new ImageData(o, 80, 80), 0, 0); return c; }
+  const mkP = g => (x, y, c, w = 1, h = 1) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), w, h); };
+  function dome(P, cx, by, hw, h, col, hi) { for (let r = 0; r < h; r++) { const t = (r + .5) / h, w = Math.max(1, Math.round(hw * Math.sqrt(1 - t * t))); P(cx - w, by - r, col, w * 2 + 1, 1); if (hi && r > h * .35 && r < h * .8) P(cx - w + 2, by - r, hi, 2, 1); } }
+  const DRAW = {
+    h1: (P, a) => { dome(P, a.cx, a.by - 1, a.hw, a.H, '#e23b3b', '#ff8a8a'); dome(P, a.cx, a.by - 2, 3, 4, '#f4f4f4'); P(a.cx - 1, a.by - 4, '#e23b3b', 3, 1); P(a.cx - a.hw - 1, a.by, '#9e1e1e', a.hw * 2 + 3, 1); P(a.cx - a.hw + 1, a.by + 1, '#9e1e1e', a.hw * 2 - 1, 1); },
+    hb: (P, a) => { dome(P, a.cx, a.by - 1, a.hw, a.H, '#2f9e5b', '#6fe39a'); for (let y = a.by - a.H + 2; y < a.by - 1; y += 3) P(a.cx - a.hw + 1, y, '#f2f2f2', a.hw * 2 - 1, 1); P(a.cx - a.hw, a.by, '#1d6b3c', a.hw * 2 + 1, 1); P(a.cx - a.hw, a.by - 1, '#1d6b3c', a.hw * 2 + 1, 1); dome(P, a.cx, a.by - a.H - 1, 2, 3, '#f2f2f2'); },
+    h2: (P, a) => { dome(P, a.cx, a.by - 2, a.hw - 2, a.H - 2, '#e9c46a', '#fbe7a6'); P(a.cx - a.hw + 2, a.by - 3, '#c0392b', a.hw * 2 - 3, 2); P(a.cx - a.hw - 4, a.by - 1, '#d4a84a', a.hw * 2 + 9, 2); P(a.cx - a.hw - 2, a.by + 1, '#b88a2f', a.hw * 2 + 5, 1); },
+    sh1: (P, a) => { dome(P, a.cx, a.by - 2, a.hw - 2, a.H - 2, '#5ec8e6', '#b7ecfa'); P(a.cx - a.hw + 2, a.by - 3, '#ffffff', a.hw * 2 - 3, 2); P(a.cx - a.hw - 4, a.by - 1, '#3aa7c9', a.hw * 2 + 9, 2); P(a.cx - a.hw - 2, a.by + 1, '#2a86a3', a.hw * 2 + 5, 1); },
+    h3: (P, a) => { const w = a.hw - 2; P(a.cx - w, a.by - 12, '#262626', w * 2 + 1, 11); P(a.cx - w + 1, a.by - 11, '#444', 1, 9); P(a.cx - w, a.by - 4, '#c0392b', w * 2 + 1, 2); P(a.cx - a.hw - 2, a.by - 1, '#1a1a1a', a.hw * 2 + 5, 2); },
+    h4: (P, a) => { hairCap(P, a); const x = a.cx + a.hw - 3, y = a.by - a.H + 2; P(x - 4, y, '#f472b6', 3, 4); P(x + 2, y, '#f472b6', 3, 4); P(x - 1, y + 1, '#be185d', 3, 2); P(x - 3, y + 1, '#fbcfe8', 1, 1); },
+    h6: (P, a) => { hairCap(P, a); const w = a.hw - 2, b = a.by - a.H + 3; P(a.cx - w, b - 3, '#f5c518', w * 2 + 1, 4); for (let i = -w; i <= w; i += Math.max(2, Math.round(w / 2))) P(a.cx + i, b - 6, '#f5c518', 1, 3); P(a.cx - w + 1, b - 2, '#fff3a0', w * 2 - 1, 1); P(a.cx, b - 2, '#e11d48', 1, 1); P(a.cx - 3, b - 2, '#2563eb', 1, 1); P(a.cx + 3, b - 2, '#2563eb', 1, 1); },
+    h7: (P, a) => { hairCap(P, a); const b = a.by - a.H + 3; for (let r = 0; r < 11; r++) { const w = Math.round(5 * (1 - r / 11)); P(a.cx - w, b - r, r % 3 === 0 ? '#facc15' : '#a855f7', w * 2 + 1, 1); } P(a.cx - 1, b - 13, '#f472b6', 3, 2); },
+    hg1: (P, a) => { const b = a.by - 1; for (let r = 0; r < 15; r++) { const w = Math.round((a.hw - 2) * (1 - r / 15)); P(a.cx - w + Math.round(r * r / 60), b - r, '#5b21b6', w * 2 + 1, 1); } P(a.cx + 2, b - 8, '#fde047', 1, 1); P(a.cx - 2, b - 4, '#fde047', 1, 1); P(a.cx - a.hw - 3, a.by, '#3b0f80', a.hw * 2 + 7, 2); },
+    hg3: (P, a) => { hairCap(P, a); const y = a.by - a.H - 3; P(a.cx - 5, y, '#fde047', 11, 1); P(a.cx - 6, y + 1, '#fde047', 1, 1); P(a.cx + 6, y + 1, '#fde047', 1, 1); P(a.cx - 5, y + 2, '#fde047', 11, 1); P(a.cx - 3, y, '#fff9c4', 3, 1); },
+    sh0: (P, a) => { hairCap(P, a); flower(P, a.cx + a.hw - 3, a.by - a.H + 3, '#f472b6', '#fde047'); },
+    sh2: (P, a) => { hairCap(P, a); for (let i = -a.hw + 1; i <= a.hw - 1; i += 3) { P(a.cx + i, a.by - a.H + 2, i % 2 ? '#ea580c' : '#f59e0b', 2, 2); P(a.cx + i + 1, a.by - a.H + 1, '#b45309', 1, 1); } },
+    sh3: (P, a) => { dome(P, a.cx, a.by - 1, a.hw, a.H, '#f97316', '#fdba74'); for (let i = -a.hw + 3; i < a.hw; i += 4) P(a.cx + i, a.by - a.H + 2, '#c2410c', 1, a.H - 2); P(a.cx - 1, a.by - a.H - 2, '#4d7c0f', 2, 3); P(a.cx - 1, a.by - 4, '#3a1d0a', 1, 1); P(a.cx + 2, a.by - 4, '#3a1d0a', 1, 1); },
+    sh4: (P, a) => { const b = a.by - 1; for (let r = 0; r < a.H + 3; r++) { const w = Math.round(a.hw * (1 - r / (a.H + 5))); P(a.cx - w + Math.round(r / 3), b - r, '#dc2626', w * 2 + 1, 1); } P(a.cx - a.hw - 1, a.by - 1, '#f8fafc', a.hw * 2 + 3, 2); dome(P, a.cx + Math.round((a.H + 3) / 3) + 1, a.by - a.H - 3, 2, 3, '#f8fafc'); },
+    sh5: (P, a) => { hairCap(P, a); P(a.cx - a.hw, a.by - 2, '#facc15', a.hw * 2 + 1, 2); P(a.cx, a.by - 6, '#facc15', 2, 2); P(a.cx - 1, a.by - 4, '#facc15', 2, 2); P(a.cx - 2, a.by - 8, '#facc15', 2, 2); },
+    h5: (P, a) => { const y = a.eye - 1, w = a.hw - 1; P(a.cx - w, y, '#111', w * 2 + 1, 1); P(a.cx - w, y + 1, '#111', w - 1, 2); P(a.cx + 2, y + 1, '#111', w - 1, 2); P(a.cx - w + 1, y + 1, '#7dd3fc', 1, 1); P(a.cx + 3, y + 1, '#7dd3fc', 1, 1); },
+    ge: (P, a) => { const y = a.eye - 1, w = a.hw - 1; [a.cx - w, a.cx + 2].forEach(x => { P(x, y, '#7c5a2b', w - 1, 1); P(x, y + 3, '#7c5a2b', w - 1, 1); P(x - 1, y + 1, '#7c5a2b', 1, 2); P(x + w - 1, y + 1, '#7c5a2b', 1, 2); P(x, y + 1, 'rgba(200,235,255,.55)', w - 1, 2); }); P(a.cx, y + 1, '#7c5a2b', 2, 1); },
+    hg2: (P, a) => phones(P, a, '#16a34a', '#86efac'), hp: (P, a) => phones(P, a, '#ef4444', '#fecaca'),
+    bk: (P, a) => { const y = a.eye + 7; P(a.cx - a.hw - 4, y, '#b45309', a.hw * 2 + 9, 14); P(a.cx - a.hw - 3, y + 1, '#d97706', 2, 12); P(a.cx - a.hw - 4, y + 6, '#78350f', a.hw * 2 + 9, 1); },
+    bc: (P, a) => { const y = a.eye + 6; for (let r = 0; r < 70 - y; r++) { const w = a.hw + 2 + Math.round(r / 3.5); P(a.cx - w, y + r, r % 9 === 0 ? '#991b1b' : '#dc2626', w * 2 + 1, 1); } }
+  };
+  function hairCap(P, a) { dome(P, a.cx, a.by, a.hw - 1, a.H - 1, a.hair); }
+  function flower(P, x, y, c, m) { P(x - 1, y - 2, c, 3, 1); P(x - 2, y - 1, c, 5, 3); P(x - 1, y + 2, c, 3, 1); P(x, y, m, 1, 1); }
+  function phones(P, a, c, hi) { const t = a.top - 1; for (let i = -a.hw - 1; i <= a.hw + 1; i++) { const dy = Math.round(Math.pow(Math.abs(i) / (a.hw + 1), 2) * 5); P(a.cx + i, t + dy, '#2b2b2b', 1, 2); } [a.cx - a.hw - 3, a.cx + a.hw + 1].forEach(x => { P(x, a.eye - 2, c, 3, 6); P(x + 1, a.eye - 1, hi, 1, 2); }); }
+  // cor da roupa assada no próprio sprite (igual ao filtro CSS hue-rotate/saturate)
+  function tint(d, deg) { if (!deg) return; const a = d.data;
+    if (deg === -1) { for (let i = 0; i < a.length; i += 4) for (let k = 0; k < 3; k++) a[i + k] = Math.max(0, Math.min(255, ((a[i + k] * .55) - 128) * 1.3 + 128)); return; }
+    const t = deg * Math.PI / 180, c = Math.cos(t), s = Math.sin(t), M = [.213 + c * .787 - s * .213, .715 - c * .715 - s * .715, .072 - c * .072 + s * .928, .213 - c * .213 + s * .143, .715 + c * .285 + s * .140, .072 - c * .072 - s * .283, .213 - c * .213 - s * .787, .715 - c * .715 + s * .715, .072 + c * .928 + s * .072];
+    for (let i = 0; i < a.length; i += 4) { if (!a[i + 3]) continue; const r = a[i], g = a[i + 1], b = a[i + 2]; let o = [M[0] * r + M[1] * g + M[2] * b, M[3] * r + M[4] * g + M[5] * b, M[6] * r + M[7] * g + M[8] * b]; const l = .2126 * o[0] + .7152 * o[1] + .0722 * o[2]; o = o.map(v => l + (v - l) * 1.2); a[i] = o[0]; a[i + 1] = o[1]; a[i + 2] = o[2]; } }
+  const isSkin = (r, g, b) => r > 190 && g > 120 && b > 80 && r > g && g > b && r - b > 40;
+  const MECACHE = {}, MEWAIT = {}, RAW = {};
+  function meKey() { const s = sty(), ac = accOf(), c = STYLE.colors.find(x => x[0] === s.color); return [S.avatar, c ? c[2] : 0, ac.head, ac.ears, ac.face, ac.back].join('|'); }
+  function compose(key) { const [av, deg0, head, ears, face, back] = key.split('|'), deg = +deg0, an = ANCH[av];
+    const go = im => { const base = layer(), g = base.getContext('2d'); g.drawImage(im, 0, 0, 80, 80); const d = g.getImageData(0, 0, 80, 80); tint(d, deg);
+      const a = an ? { cx: an[0], top: an[1], by: an[2], hw: an[3], eye: an[4], hair: an[5], H: Math.max(6, an[2] - an[1]) } : null;
+      if (a && head && head !== 'null' && DRAW[head]) { const x0 = a.cx - a.hw - 3, x1 = a.cx + a.hw + 4; for (let y = Math.max(0, a.top - 2); y <= a.by; y++) for (let x = x0; x <= x1; x++) { const i = (y * 80 + x) * 4; if (!isSkin(d.data[i], d.data[i + 1], d.data[i + 2]) || y < a.by - 2) d.data[i + 3] = 0; } }
+      g.putImageData(d, 0, 0);
+      const out = layer(), og = out.getContext('2d'), item = id => { const L = layer(); DRAW[id](mkP(L.getContext('2d')), a); return outline(L); };
+      if (a && back && back !== 'null' && DRAW[back]) og.drawImage(item(back), 0, 0);
+      og.drawImage(base, 0, 0);
+      if (a) [head, face, ears].forEach(id => { if (id && id !== 'null' && DRAW[id]) og.drawImage(item(id), 0, 0); });
+      MECACHE[key] = out.toDataURL(); delete MEWAIT[key];
+      document.querySelectorAll('img[data-me]').forEach(el => { if (el.dataset.me === key) el.src = MECACHE[key]; }); };
+    if (RAW[av]) return go(RAW[av]); const im = new Image(); im.onload = () => { RAW[av] = im; go(im); }; im.src = `img/tr/${av}.png`; }
+  function meSrc() { if (!S || !S.avatar) return ''; const k = meKey(); if (MECACHE[k]) return MECACHE[k]; if (!MEWAIT[k]) { MEWAIT[k] = 1; setTimeout(() => compose(k)); } return `img/tr/${S.avatar}.png`; }
+  const meTag = (cls = '') => `<img ${cls ? `class="${cls}"` : ''} data-me="${meKey()}" src="${meSrc()}" style="${meFilter2()}" alt="">`;
+  const meFilter2 = () => { const c = STYLE.colors.find(x => x[0] === sty().color); return c && c[2] === -1 ? 'filter:drop-shadow(0 0 6px #a855f7)' : ''; };
+  meHtml = function () { return `${meTag('me')}${auraOf() ? `<span class="meaura au-${auraOf()}"></span>` : ''}`; };
+  A.outfit = { ANCH, DRAW, accOf, slotOf, meKey, meSrc, compose, MECACHE };
+  // Boutique: acessórios por encaixe, cada item mostra o desenho de verdade
+  function accPrev(id) { const a = accOf(), s = sty(); const k = [S.avatar, 0, slotOf(id) === 'head' ? id : null, slotOf(id) === 'ears' ? id : null, slotOf(id) === 'face' ? id : null, slotOf(id) === 'back' ? id : null].join('|');
+    if (!MECACHE[k] && !MEWAIT[k]) { MEWAIT[k] = 1; setTimeout(() => compose(k)); } return `<img class="accprev" data-me="${k}" src="${MECACHE[k] || `img/tr/${S.avatar}.png`}" alt="">`; }
+  { const _vs = vStyle; vStyle = function () { const html = _vs.apply(this, arguments), s = sty(), ac = accOf();
+      const list = STYLE.hats.filter(h => h[0] !== 'h0' && (h[3] >= 0 || s.owned[h[0]]));
+      const sec = ['head', 'ears', 'face', 'back'].map(sl => { const its = list.filter(h => slotOf(h[0]) === sl); if (!its.length) return '';
+        return `<h4>${SLOT_PT[sl]}</h4><div class="stygrid">${its.map(([id, n, , pr]) => { const own = s.owned[id], on = ac[sl] === id; return `<button class="sty ${on ? 'on' : ''} ${own ? 'own' : ''}" data-a="accbuy" data-id="${id}">${accPrev(id)}<b>${n}</b><small>${on ? '✅ Usando (toque p/ tirar)' : own ? 'Usar' : pr === -2 ? '🎟️ Passe' : pr < 0 ? '🎰 Cápsula' : fmt(pr)}</small></button>`; }).join('')}</div>`; }).join('');
+      return html.replace(/<div class="card"><h3>🧢 Chapéus e acessórios<\/h3><div class="stygrid">[\s\S]*?<\/div><\/div>(?=<div class="card"><h3>✨)/, `<div class="card accs"><h3>🧢 Acessórios</h3><p class="mut small">Um item por encaixe. O da cabeça substitui o boné do treinador.</p>${sec}</div>`); }; }
+  ACT.accbuy = d => { const s = sty(), it = STYLE.hats.find(x => x[0] === d.id); if (!it) return; const ac = accOf(), sl = slotOf(d.id);
+    if (!s.owned[d.id]) { if (it[3] < 0) return toast(it[3] === -2 ? 'Recompensa do Passe de Temporada!' : 'Só na Máquina de Cápsulas!'); if (S.money < it[3]) return toast('Moedas insuficientes!', 'bad'); S.money -= it[3]; s.owned[d.id] = 1; SFX.coin(); toast(`Comprou ${it[1]}!`, 'good'); ac[sl] = d.id; }
+    else ac[sl] = ac[sl] === d.id ? null : d.id;
+    s.hat = ac.head || 'h0'; save(); render(); };
+  { const _sb = ACT.stybuy; ACT.stybuy = d => { if (d.k === 'hat') return ACT.accbuy(d); return _sb(d); }; }
 
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
