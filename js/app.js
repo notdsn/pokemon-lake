@@ -2086,7 +2086,7 @@
     if (t.includes('fire')) return `${N} procura pedras quentes`; if (t.includes('psychic')) return `${N} percebe você antes de você vê-lo`;
     if (t.includes('rock') || t.includes('ground')) return `${N} cava buracos no chão`; if (t.includes('ice')) return `${N} adora o frio`;
     return `${N} é curioso e às vezes se aproxima`; }
-  function moodOf(m, mp, legend) { if (A.live.force) return A.live.force; if (window.__pkFace) return 'face'; if (legend || m.evt || m.shiny) return 'face';
+  function moodOf(m, mp, legend) { if (A.live.force) return A.live.force; if (A._tapped) { A._tapped = 0; return dayLight().night && R() < 0.35 ? 'sleep' : 'face'; } if (window.__pkFace) return 'face'; if (legend || m.evt || m.shiny) return 'face';
     const t = D.mons[m.id].t, e = mp.enc.find(x => x[0] === m.id), noct = (e && e[4] && e[4].night) || t.includes('ghost') || t.includes('dark');
     if (dayLight().night && !noct && R() < 0.35) return 'sleep'; if (SHY.has(+m.id) && R() < 0.45) return 'flee'; if (AGG.has(+m.id) && R() < 0.6) return 'charge';
     return R() < 0.06 ? 'flee' : 'face'; }
@@ -2518,8 +2518,62 @@
       const left = [[4, 18], [66, 18], [22, 10]][i][0] + R() * [[4, 18], [66, 18], [22, 10]][i][1], dur = 7 + R() * 6;
       lay.insertAdjacentHTML('beforeend', `<button class="wildw ${fl ? 'wfly' : ''}" data-a="wildtap" data-k="${c[1]}" aria-label="Encontrar ${esc(D.mons[id].n)}" style="left:${left.toFixed(1)}%;bottom:${(fl ? 120 : 58) + Math.round(R() * 26)}px;--wd:${dur.toFixed(1)}s;--wx:${(14 + R() * 26).toFixed(0)}px;animation-delay:-${(R() * dur).toFixed(1)}s"><img src="img/mini/${id}.png" onerror="this.onerror=null;this.src='${sprId(id)}'" alt=""></button>`); }
     sc.appendChild(lay); }
-  ACT.wildtap = d => { if (searching) return; const b = document.querySelector(`.wildw[data-k="${d.k}"]`); if (b) b.classList.add('spot'); A.forceK = +d.k; ACT.search(); };
+  ACT.wildtap = d => { if (searching) return; A._tapped = 1; const b = document.querySelector(`.wildw[data-k="${d.k}"]`); if (b) b.classList.add('spot'); A.forceK = +d.k; ACT.search(); };
   { const _render = render; render = function () { const r = _render.apply(this, arguments); try { liveMap(); } catch (e) {} return r; }; }
+
+  // ===== v53 CARA DE APP: novidades do dia, carrossel de missões, aviso de raide, cartão compartilhável =====
+  function newsItems() { const out = [], t = nowT();
+    try { const lv = liveEv(); const c = nextCDs(1)[0], sp = spOf(t); const evs = lv.length ? lv : [c, sp].filter(Boolean).sort((a, b) => a.start - b.start).slice(0, 1);
+      evs.forEach(e => out.push({ ic: e.kind === 'cd' ? '🎉' : '🔦', k: e.kind === 'cd' ? 'DIA DA COMUNIDADE' : 'HORA DO HOLOFOTE', h: D.mons[e.id].n, p: (t >= e.start ? '<span class="livep">AO VIVO</span> • ' : '') + evCount(e), img: sprId(e.id), go: 'events' })); } catch (e) {}
+    try { const n = raidsLeft(); if (FEAT.raid !== false) out.push({ ic: '⬣', k: 'RAIDES DINAMAX', h: n > 0 ? `${n} raide${n > 1 ? 's' : ''} disponíve${n > 1 ? 'is' : 'l'} hoje` : 'Raides de hoje concluídas', p: n > 0 ? 'Enfrente um Pokémon gigante com seu time!' : 'Novas raides amanhã 🌅', go: 'raid' }); } catch (e) {}
+    try { const lm = C.MAPS.find(m => m.id === S.lastMap) || C.MAPS[0], w = weatherOf(lm); out.push({ ic: WEATHER[w][1], k: 'CLIMA AGORA', h: `${WEATHER[w][0]} em ${lm.name}`, p: w !== 'clear' ? 'O clima favorece alguns tipos — bom para caçar!' : 'Clima estável para explorar.', go: 'maps' }); } catch (e) {}
+    try { out.push({ ic: '🎁', k: 'AMANHÃ', h: dailyText(DAILY[S.daily.streak % 7]), p: `Sequência de ${S.daily.streak} dia(s) 🔥`, go: 'home' }); } catch (e) {}
+    return out; }
+  function newsHtml() { const it = newsItems(); if (!it.length) return '';
+    return `<div class="card span2 news53"><div class="nw-h"><b>📰 Novidades do dia</b><span class="nw-dots">${it.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</span></div><div class="nw-track">${it.map(x => `<button class="nw-s" data-a="tab" data-t="${x.go}"><span class="nw-ic">${x.img ? `<img src="${x.img}" alt="">` : x.ic}</span><span class="nw-tx"><small>${x.ic} ${x.k}</small><b>${x.h}</b><em>${x.p}</em></span><span class="arrow">›</span></button>`).join('')}</div></div>`; }
+  function questCarHtml() { try { const q = ensureQuests(), list = [...q.d.map((x, i) => [x, i, 'd']), ...q.w.map((x, i) => [x, i, 'w'])].sort((a, b) => (a[0].c - b[0].c) || ((b[0].p >= b[0].n) - (a[0].p >= a[0].n)));
+    return `<div class="card span2 qcar53"><div class="row between"><h3>📜 Missões</h3><button class="btn small" data-a="tab" data-t="quests">Ver todas</button></div><div class="qc-track">${list.map(([x, i, w]) => `<div class="qc-s ${x.c ? 'done' : x.p >= x.n ? 'ready' : ''}"><div class="qc-top"><span class="qi">${qIcon(x)}</span><small>${w === 'd' ? '☀️ HOJE' : '📅 SEMANA'}</small></div><b>${qText(x)}</b><div class="progress"><i style="width:${x.p / x.n * 100}%"></i></div><div class="qc-bot"><small class="mut">${x.p}/${x.n} • ${rewardIcons(x.r)}</small>${x.c ? '<span class="qok">✅</span>' : x.p >= x.n ? `<button class="btn small primary" data-a="qclaim" data-w="${w}" data-i="${i}">Resgatar</button>` : ''}</div></div>`).join('')}</div></div>`; } catch (e) { return ''; } }
+  function raidNew() { try { return raidsLeft() > 0 && (S.seen53 || {}).raid !== dayKey(); } catch (e) { return false; } }
+  function homeApp() { const ap = document.getElementById('app'); if (!ap) return;
+    const nb = document.querySelector('.nav [data-t="more"]'); if (nb) nb.classList.toggle('ndot53', raidNew());
+    if (tab === 'raid') { S.seen53 = Object.assign(S.seen53 || {}, { raid: dayKey() }); save(); if (nb) nb.classList.remove('ndot53'); }
+    if (tab !== 'home') return; const hero = ap.querySelector('.card.hero'); if (!hero || ap.querySelector('.news53')) return;
+    hero.insertAdjacentHTML('afterend', newsHtml() + questCarHtml());
+    const tc = hero.querySelector('.tcard2'); if (tc && !tc.querySelector('.tc2-share')) tc.insertAdjacentHTML('beforeend', '<button class="tc2-share" data-a="sharecard" aria-label="Compartilhar cartão">📤</button>');
+    const tr = ap.querySelector('.nw-track'), dots = ap.querySelectorAll('.nw-dots i');
+    if (tr) { tr.addEventListener('scroll', () => { const i = Math.round(tr.scrollLeft / Math.max(1, tr.clientWidth)); dots.forEach((d, k) => d.classList.toggle('on', k === i)); }, { passive: true });
+      clearInterval(A._nw); if (!RMOT()) A._nw = setInterval(() => { if (!document.body.contains(tr)) return clearInterval(A._nw); if (tr.matches(':hover') || tr._touch) return; const n = tr.children.length, i = (Math.round(tr.scrollLeft / tr.clientWidth) + 1) % n; tr.scrollTo({ left: i * tr.clientWidth, behavior: 'smooth' }); }, 5000);
+      tr.addEventListener('touchstart', () => { tr._touch = 1; }, { passive: true }); }
+    if (raidNew() && A._raidT !== dayKey()) { A._raidT = dayKey(); setTimeout(() => { try { toast('⬣ Raide nova disponível! Veja em Mais → Raides.', 'good'); } catch (e) {} }, 900); } }
+  { const _render = render; render = function () { const r = _render.apply(this, arguments); try { homeApp(); } catch (e) {} return r; }; }
+  // cartão compartilhável (canvas PNG)
+  const ldImg = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; });
+  async function cardPng() { const Wd = 1080, Ht = 1350, c = document.createElement('canvas'); c.width = Wd; c.height = Ht; const x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, Wd, Ht); g.addColorStop(0, '#1e3a8a'); g.addColorStop(.55, '#4c1d95'); g.addColorStop(1, '#0f172a'); x.fillStyle = g; x.fillRect(0, 0, Wd, Ht);
+    const h = x.createLinearGradient(0, 0, Wd, 0); ['rgba(255,0,128,.18)', 'rgba(0,255,255,.16)', 'rgba(255,255,0,.14)', 'rgba(255,0,255,.16)'].forEach((cl, i) => h.addColorStop(i / 3, cl)); x.fillStyle = h; x.fillRect(0, 0, Wd, Ht);
+    const rr = (X, Y, w, hh, r, fill) => { x.beginPath(); x.roundRect ? x.roundRect(X, Y, w, hh, r) : x.rect(X, Y, w, hh); x.fillStyle = fill; x.fill(); };
+    x.fillStyle = '#93c5fd'; x.font = '700 34px Inter, system-ui, sans-serif'; x.fillText('CARTÃO DE TREINADOR • POKÉMON LAKE', 70, 100);
+    x.fillStyle = '#fff'; x.font = '800 96px Inter, system-ui, sans-serif'; x.fillText(S.trainer + (S.champion ? ' 👑' : ''), 400, 230);
+    const t = (titleOf && titleOf()) || ''; if (t) { x.font = '700 38px Inter, system-ui, sans-serif'; x.fillStyle = '#fde68a'; x.fillText('🏆 ' + t, 404, 290); }
+    const sp = x.createRadialGradient(220, 470, 10, 220, 470, 200); sp.addColorStop(0, 'rgba(147,197,253,.55)'); sp.addColorStop(1, 'rgba(147,197,253,0)'); x.fillStyle = sp; x.fillRect(20, 250, 400, 300);
+    const tri = await ldImg(`img/tr/${S.avatar}.png`); x.imageSmoothingEnabled = false; if (tri) { const s = Math.min(300 / tri.height, 260 / tri.width); x.drawImage(tri, 220 - tri.width * s / 2, 470 - tri.height * s, tri.width * s, tri.height * s); }
+    const [se, ca] = dexCount(), shn = Object.keys(S.dex.shiny).length, bd = S.badges.length + (S.jbadges || []).length + REG_ORDER.reduce((a, k) => a + ((S.regions && S.regions[k] && S.regions[k].b) || []).length, 0);
+    [[ca, 'capturados'], [se, 'vistos'], [shn, 'shinies ✨'], [bd, 'insígnias']].forEach(([v, l], i) => { const X = 404 + (i % 2) * 300, Y = 330 + Math.floor(i / 2) * 110; rr(X, Y, 280, 92, 46, 'rgba(255,255,255,.12)'); x.fillStyle = '#fff'; x.font = '800 44px Inter, system-ui, sans-serif'; x.fillText(String(v), X + 28, Y + 60); x.font = '500 30px Inter, system-ui, sans-serif'; x.fillStyle = '#cbd5e1'; x.fillText(l, X + 28 + x.measureText(String(v)).width * 1.5 + 12, Y + 58); });
+    x.fillStyle = '#fff'; x.font = '800 44px Inter, system-ui, sans-serif'; x.fillText('Meu time', 70, 640);
+    x.imageSmoothingEnabled = true;
+    for (let i = 0; i < 6; i++) { const X = 70 + (i % 3) * 320, Y = 670 + Math.floor(i / 3) * 250; rr(X, Y, 300, 230, 32, 'rgba(15,23,42,.55)'); const m = S.party[i]; if (!m) continue;
+      const im = await ldImg(spr(m)); if (im) { const s = Math.min(160 / im.height, 200 / im.width) * 1; x.drawImage(im, X + 150 - im.width * s / 2, Y + 175 - im.height * s, im.width * s, im.height * s); }
+      x.fillStyle = '#fff'; x.font = '700 30px Inter, system-ui, sans-serif'; const nm = (m.shiny ? '✨' : '') + pn(m); x.fillText(nm.length > 14 ? nm.slice(0, 13) + '…' : nm, X + 20, Y + 214); x.fillStyle = '#93c5fd'; x.font = '600 26px Inter, system-ui, sans-serif'; x.fillText('Nv ' + m.lvl, X + 220, Y + 214); }
+    const fav = [...S.party, ...S.box].filter(m => m.shiny).sort((a, b) => b.lvl - a.lvl)[0];
+    rr(70, 1180, 940, 120, 60, 'rgba(250,204,21,.16)'); x.fillStyle = '#fde68a'; x.font = '700 34px Inter, system-ui, sans-serif';
+    if (fav) { const im = await ldImg(spr(fav)); if (im) { const s = Math.min(110 / im.height, 130 / im.width); x.drawImage(im, 110, 1295 - im.height * s, im.width * s, im.height * s); } x.fillText('Shiny favorito: ' + pn(fav) + ' ✨  Nv ' + fav.lvl, 260, 1252); }
+    else x.fillText('Ainda caçando o primeiro shiny ✨', 110, 1252);
+    return await new Promise(r => c.toBlob(r, 'image/png')); }
+  ACT.sharecard = async () => { let bl; try { bl = await cardPng(); } catch (e) { return toast('Não consegui gerar o cartão 😕', 'bad'); } if (!bl) return;
+    const f = new File([bl], `cartao-${String(S.trainer).replace(/\W+/g, '') || 'treinador'}.png`, { type: 'image/png' }); A._lastCard = bl;
+    try { if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: 'Meu cartão de treinador', text: 'Meu time no Pokémon Lake!' }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+    const u = URL.createObjectURL(bl), a = document.createElement('a'); a.href = u; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); toast('📥 Cartão salvo como imagem!', 'good'); };
+  A.card53 = { cardPng, newsItems, raidNew };
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------
