@@ -730,10 +730,10 @@
         case 'miss': log(e.text); tone(200, 0.15, 'sine', 0.04); await wait(800); break;
         case 'recall': { log(e.text); const el = mon(e.side); el.classList.add('recall'); await wait(500); el.classList.add('hidden'); el.classList.remove('recall'); break; }
         case 'send': log(e.text); await sendOut(e.side, B.s.sides[e.side].b.m); break;
-        case 'throw': log(e.text); await throwBall(e.ball); break;
-        case 'shake': log('...'); for (let i = 0; i < e.n; i++) { await wait(450); const b = $('#cball'); if (b) { b.classList.remove('wob'); void b.offsetWidth; b.classList.add('wob'); } SFX.shake(); log('.'.repeat(i + 1) + ' <b>tremeu!</b>'); await wait(500); } await wait(300); break;
-        case 'caught': { $('#cball')?.classList.add('click'); SFX.click2(); await wait(350); starsFx(); SFX.caught(); log(`🎉 ${e.text}`); await wait(1700); break; }
-        case 'escape': { $('#cball')?.remove(); const el = mon(1); el.classList.remove('caught'); el.classList.add('breakout'); popFx(1); SFX.escape(); log(e.text); await wait(900); el.classList.remove('breakout'); break; }
+        case 'throw': log(e.text); await throwBall(e.ball); cineStart(); break;
+        case 'shake': { const cin = cineOn(); log('...'); for (let i = 0; i < e.n; i++) { await cw(cin ? 450 + i * 250 : 450); const b = $('#cball'); if (b) { b.classList.remove('wob', 'wobslow'); void b.offsetWidth; b.classList.add(cin && !B.cineSkip ? 'wobslow' : 'wob'); } SFX.shake(); log('.'.repeat(i + 1) + ' <b>tremeu!</b>'); await cw(cin ? 750 : 500); } await cw(cin ? 500 : 300); break; }
+        case 'caught': { $('#cball')?.classList.add('click'); SFX.click2(); await cw(350); const cin = cineOn(); if (cin) cineBurst(); starsFx(); SFX.caught(); log(`🎉 ${e.text}`); await cw(1700); cineOff(); break; }
+        case 'escape': { cineOff(); $('#cball')?.remove(); const el = mon(1); el.classList.remove('caught'); el.classList.add('breakout'); popFx(1); SFX.escape(); log(e.text); await wait(900); el.classList.remove('breakout'); break; }
         case 'run': log(e.text); tone(600, 0.2, 'sine', 0.05, 0, 300); await wait(800); break;
         case 'tera': if (e.side === 0) S.stats.teras = (S.stats.teras || 0) + 1; await teraAnim(e); break;
         case 'mega': if (e.side === 0) S.stats.megas = (S.stats.megas || 0) + 1; await megaAnim(e); break;
@@ -2467,6 +2467,29 @@
       <div class="pc2-info"><small class="pc2-k">SEU PARCEIRO</small><b>${esc(pn(m))}${m.shiny ? ' ✨' : ''}</b><span class="pc2-lv">Nv ${m.lvl}</span><div class="pc2-hearts" title="Amizade ${h}/5">${hb}</div><small class="pc2-hint">${night ? '🌙 Está dormindo' : '👆 Toque para dar carinho'}</small></div></div>`; }
   { const _pet = ACT.pet; ACT.pet = function () { const r = _pet.apply(this, arguments); try { const pf = document.querySelector('.pcard2 .follow'); if (pf) { pf.classList.remove('phop'); void pf.offsetWidth; pf.classList.add('phop'); setTimeout(() => pf.classList.remove('phop'), 600); } const c = document.querySelector('.pcard2 .pc2-stage'); if (c && !RMOT()) for (let i = 0; i < 5; i++) { const s = document.createElement('span'); s.className = 'pc2-heart'; s.textContent = '❤'; s.style.setProperty('--dx', (Math.random() * 70 - 35).toFixed(0) + 'px'); s.style.animationDelay = (i * 0.08) + 's'; c.appendChild(s); setTimeout(() => s.remove(), 1400); } } catch (e) {} return r; }; }
 
+  // ===== v50 CAPTURA CINEMATOGRÁFICA =====
+  function cineOn() { const sc = $('#battle .bscene'); return !!(sc && sc.classList.contains('cine')); }
+  function cw(ms) { return wait(B && B.cineSkip ? Math.min(ms, 60) : ms); }
+  function cineStart() {
+    if (!B) return; B.cineSkip = false; if (RMOT() || (S.settings && S.settings.cine === false)) return;
+    const sc = $('#battle .bscene'), b = $('#cball'); if (!sc || !b) return;
+    const r = b.getBoundingClientRect(), o = sc.getBoundingClientRect();
+    sc.style.setProperty('--cx', (r.left - o.left + r.width / 2) + 'px'); sc.style.setProperty('--cy', (r.top - o.top + r.height / 2) + 'px');
+    sc.classList.add('cine');
+    if (!$('.cskiphint', sc)) sc.insertAdjacentHTML('beforeend', '<div class="cskiphint">toque para pular ⏩</div>');
+    const skip = ev => { if (!B) return; B.cineSkip = true; sc.classList.add('cskip'); sc.removeEventListener('pointerdown', skip); };
+    sc.addEventListener('pointerdown', skip); sc._cskip = skip;
+  }
+  function cineBurst() {
+    const fx = $('#fxl'), b = $('#cball'); if (!fx || !b) return; const o = fx.getBoundingClientRect(), r = b.getBoundingClientRect();
+    const x = (r.left - o.left + r.width / 2) / (o.width / fx.offsetWidth || 1), y = (r.top - o.top + r.height / 2) / (o.height / fx.offsetHeight || 1);
+    const w = document.createElement('div'); w.className = 'cburst'; w.style.cssText = `left:${x}px;top:${y}px`;
+    let h = '<i class="cb-ring"></i><i class="cb-flash"></i>';
+    for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2, d = 50 + Math.random() * 60; h += `<b style="--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d}px;--d:${(Math.random() * .15).toFixed(2)}s"></b>`; }
+    w.innerHTML = h; fx.appendChild(w); setTimeout(() => w.remove(), 1600);
+  }
+  function cineOff() { const sc = $('#battle .bscene'); if (!sc) return; sc.classList.remove('cine', 'cskip'); $('.cskiphint', sc)?.remove(); if (sc._cskip) sc.removeEventListener('pointerdown', sc._cskip); if (B) B.cineSkip = false; }
+  A.cine = { cineOn, cineStart, cineOff };
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------
