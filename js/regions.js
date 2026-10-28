@@ -96,6 +96,29 @@
       ['x_terminus', 'Rota 18 & Caverna Terminus', 'volcano', '🌋', 6, 'Terra árida e uma caverna onde algo verde dorme.', [78, 84], [[667, 6], [668, 3], [708, 6], [709, 2], [710, 6], [711, 2], [622, 4], [623, 2], [704, 6], [705, 2], [718, 0.2, { legend: 1 }]]],
       ['x_vitoria', 'Rota da Vitória', 'cave', '🏰', 8, 'O desafio final antes da Liga. Xerneas e Yveltal foram vistos nas ruínas.', [80, 86], [[714, 6], [715, 2], [704, 4], [705, 3], [706, 1], [633, 3], [634, 2], [716, 0.3, { legend: 1 }], [717, 0.3, { legend: 1 }]]],
       ['x_lendas', 'Fábrica Pokébola & Ruínas Ocultas', 'psychic', '✨', 'ch', 'Pós-Kalos. Diancie, Hoopa e Volcanion apareceram aqui.', [82, 88], [[707, 6], [710, 6], [711, 4], [703, 6], [700, 2], [719, 0.25, { legend: 1 }], [720, 0.25, { legend: 1 }], [721, 0.25, { legend: 1 }], [718, 0.3, { legend: 1 }]]]] };
+  R.alola = { n: 'Alola', k: 'a', base: 80, prev: 'kalos', game: 'Sun/Moon', story: 'Ilhas tropicais: Provas dos Capitães, os Tapus guardiões e as Ultra Criaturas.',
+    badges: [['Normal Z', 'hex', ['#d6d3d1'], 'silver'], ['Água Z', 'drop', ['#0ea5e9']], ['Fogo Z', 'flame', ['#f97316']], ['Planta Z', 'leaf', ['#4ade80']], ['Elétrico Z', 'sun', ['#facc15']], ['Fantasma Z', 'ghost', ['#7c3aed'], 'silver'], ['Fada Z', 'heart', ['#f9a8d4']], ['Terra Z', 'cone', ['#a16207']]],
+    gyms: [['Ilima', 'ilima', 'Caverna Verdant', 'normal', [[734, 0], [10092, 1], [735, 2]]],
+      ['Lana', 'lana', 'Lago Brooklet', 'water', [[746, 2], [748, 2], [752, 3]]],
+      ['Kiawe', 'kiawe', 'Vulcão Wela', 'fire', [[757, 3], [10115, 4], [758, 4]]],
+      ['Mallow', 'mallow', 'Selva Lush', 'grass', [[753, 4], [754, 5], [764, 5], [10114, 6]]],
+      ['Sophocles', 'sophocles', 'Observatório Hokulani', 'electric', [[737, 6], [777, 6], [738, 7], [10100, 7]]],
+      ['Acerola', 'acerola', 'Supermercado Abandonado', 'ghost', [[770, 7], [781, 8], [778, 8]]],
+      ['Mina', 'mina', 'Ilha Poni', 'fairy', [[742, 8], [764, 8], [743, 9], [10104, 10]]],
+      ['Hapu', 'hapu', 'Canyon Vast', 'ground', [[750, 10], [10106, 10], [330, 11], [623, 11]]]],
+    elite: [['Hala', 'hala', 'Elite Four de Alola', 'fighting', [[297, 14], [57, 14], [760, 15], [740, 15], [766, 16]]],
+      ['Olivia', 'olivia', 'Elite Four de Alola', 'rock', [[476, 14], [10111, 15], [745, 15], [699, 15], [697, 16]]],
+      ['Kahili', 'kahili', 'Elite Four de Alola', 'flying', [[741, 14], [227, 14], [630, 15], [701, 15], [733, 16]]],
+      ['Molayne', 'molayne', 'Elite Four de Alola', 'steel', [[707, 14], [10102, 15], [598, 15], [10106, 15], [738, 16]]],
+      ['Kukui', 'kukui', 'Campeão de Alola', 'fire', [[745, 18], [10104, 18], [628, 18], [143, 18], [462, 19], [727, 20]]]],
+    maps: [['a_melemele', 'Melemele: Rotas 1–3', 'grass', '🌺', 0, 'Iki Town e as primeiras rotas. Tapu Koko observa os desafiantes.', [78, 84], [[731, 10], [734, 10], [10091, 8], [10107, 4], [736, 6], [739, 6], [741, 4], [742, 6], [744, 4], [10109, 4], [722, 2], [725, 2], [728, 2], [785, 0.2, { legend: 1 }]]],
+      ['a_akala', 'Akala: Lago Brooklet & Vulcão Wela', 'water', '🌋', 1, 'Lagos calmos e um vulcão ativo lado a lado.', [80, 86], [[746, 8], [747, 6], [748, 2], [751, 6], [767, 6], [10112, 6], [757, 6], [758, 2], [90, 4], [786, 0.2, { legend: 1 }]]],
+      ['a_haina', 'Deserto Haina', 'safari', '🏜️', 2, 'Areia e ruínas em Ula\'ula.', [80, 86], [[10105, 10], [10106, 3], [769, 8], [770, 3], [749, 8], [750, 3], [551, 6], [328, 4]]],
+      ['a_lush', 'Selva Lush', 'forest', '🌴', 3, 'Selva densa cheia de Fomantis, Bounsweet e Passimian.', [80, 86], [[753, 8], [755, 8], [756, 3], [761, 8], [762, 3], [763, 1], [764, 4], [765, 4], [766, 4], [737, 4]]],
+      ['a_lanakila', 'Monte Lanakila', 'ice', '🏔️', 5, 'O pico nevado de Alola, onde fica a Liga.', [82, 88], [[10101, 8], [10102, 3], [10103, 8], [10104, 2], [739, 6], [740, 3], [712, 4], [713, 2], [788, 0.2, { legend: 1 }]]],
+      ['a_poni', 'Poni: Canyon Vast', 'cave', '🪨', 6, 'Penhascos e cavernas. Jangmo-o treina aqui.', [82, 88], [[782, 6], [783, 3], [784, 1], [745, 6], [774, 8], [775, 4], [779, 6], [780, 4], [787, 0.2, { legend: 1 }]]],
+      ['a_altar', 'Altar do Sol e da Lua', 'sky', '☀️', 8, 'No topo das ruínas de Poni, Solgaleo e Lunala descem do céu.', [84, 90], [[772, 2], [776, 4], [780, 4], [774, 6], [789, 1], [790, 1], [791, 0.3, { legend: 1 }], [792, 0.3, { legend: 1 }], [785, 0.2, { legend: 1 }], [786, 0.2, { legend: 1 }], [787, 0.2, { legend: 1 }], [788, 0.2, { legend: 1 }]]],
+      ['a_ultra', 'Ultra Espaço & Ruínas', 'psychic', '🌌', 'ch', 'Pós-Alola. Ultra Criaturas, Necrozma, Magearna, Marshadow e Zeraora.', [86, 92], [[772, 4], [773, 1], [793, 0.3, { legend: 1 }], [794, 0.3, { legend: 1 }], [795, 0.3, { legend: 1 }], [796, 0.3, { legend: 1 }], [797, 0.3, { legend: 1 }], [798, 0.3, { legend: 1 }], [799, 0.3, { legend: 1 }], [800, 0.25, { legend: 1 }], [801, 0.2, { legend: 1 }], [802, 0.2, { legend: 1 }], [803, 0.25, { legend: 1 }], [805, 0.2, { legend: 1 }], [806, 0.2, { legend: 1 }], [807, 0.2, { legend: 1 }]]]] };
   G.PREG = R; G.PREG_ORDER = ['hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'paldea'];
   const lv = (r, o) => Math.min(100, r.base + o);
   for (const [key, r] of Object.entries(R)) {
