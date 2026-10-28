@@ -490,6 +490,8 @@
   document.addEventListener('change', e => { if (e.target.id === 'impf' && e.target.files[0]) e.target.files[0].text().then(doImport); });
   function vSettings() {
     return `<div class="card"><h3>⚙️ Configurações</h3><div class="setrow"><span>Som</span><div class="seg">${[[true, 'Ligado'], [false, 'Desligado']].map(([v, l]) => `<button class="${S.settings.sound === v ? 'on' : ''}" data-a="set" data-k="sound" data-v="${v}">${l}</button>`).join('')}</div></div>${audioSettings()}<div class="setrow"><span>🐾 Pokémon seguindo no mapa</span><div class="seg">${[[true, 'Sim'], [false, 'Não']].map(([v, l]) => `<button class="${(S.settings.follow !== false) === v ? 'on' : ''}" data-a="setfollow" data-v="${v}">${l}</button>`).join('')}</div></div>
+      <div class="setrow"><span>📳 Vibração</span><div class="seg">${[[true, 'Ligada'], [false, 'Desligada']].map(([v, l]) => `<button class="${(S.settings.vibe !== false) === v ? 'on' : ''}" data-a="set" data-k="vibe" data-v="${v}">${l}</button>`).join('')}</div></div>
+      <p class="mut small">Vibra em golpes críticos, capturas e shinies (só em aparelhos com suporte; no iPhone o navegador não permite).</p>
       <div class="setrow"><span>Velocidade da batalha</span><div class="seg">${[[1.4, 'Lenta'], [1, 'Normal'], [0.6, 'Rápida'], [0.3, 'Turbo']].map(([v, l]) => `<button class="${S.settings.speed === v ? 'on' : ''}" data-a="set" data-k="speed" data-v="${v}">${l}</button>`).join('')}</div></div>
       <button class="btn wide ghost" data-a="lock">🔒 Bloquear site neste aparelho</button></div>
       <div class="card"><h3>🎁 Código de presente</h3><p class="mut small">Tem um código? Digite aqui para receber o presente (cada código vale uma vez por conta).</p>
@@ -579,7 +581,7 @@
     render();
   }
   document.addEventListener('submit', e => { if (e.target.id === 'giftForm') { e.preventDefault(); redeemGift($('#giftCode').value); } });
-  ACT.set = d => { S.settings[d.k] = d.k === 'sound' ? d.v === 'true' : +d.v; save(); render(); };
+  ACT.set = d => { S.settings[d.k] = (d.k === 'sound' || d.k === 'vibe') ? d.v === 'true' : +d.v; if (d.k === 'vibe' && d.v === 'true') buzz([30]); save(); render(); };
   ACT.lock = () => { save(); localStorage.removeItem(UNLOCK_KEY); sessionStorage.removeItem(SESSION_KEY); S = null; gate(); };
 
   // =====================================================================
@@ -615,7 +617,7 @@
     el.innerHTML = `<div class="row between"><b class="bnm">${m.terastal ? `<span class="terachip" style="--tc:${C.TYPE_COLOR[m.terastal]}" title="Tera ${C.TYPE_PT[m.terastal]}">💎</span>` : ''}${esc(bname(m))}${m.shiny ? ' ✨' : ''}${m.raidStars ? ` <span class="dmt">${'★'.repeat(m.raidStars)}</span>${m.shield ? ` <span class="dmt shd">🛡️${m.shield}</span>` : ''}` : m.dmax ? ` <span class="dmt">⬣${m.dmax.t}</span>` : ''}</b><small>Nv${m.lvl}</small></div><div class="row"><small class="hpl">HP</small><div class="hpbar"><b class="hpghost" style="width:${prevId === m.uid && prevP != null ? Math.max(p, prevP) : p}%"></b><i style="width:${prevId === m.uid && prevP != null ? prevP : p}%;background:${hpCol(p)}"></i></div></div>
       <div class="row between"><span>${stChip(m.status)}${B.o.kind === 'wild' && side === 1 && S.dex.caught[m.id] ? '<img class="caughtmark" src="img/items/poke-ball.png" alt="">' : ''}</span>${side ? '' : `<small class="hpn">${m.hp}/${PE.maxhp(m)}</small>`}</div>${side ? '' : `<div class="xpbar"><i style="width:${m.lvl >= 100 ? 100 : (m.xp - x0) / (x1 - x0) * 100}%"></i></div>`}`;
     if (prevId === m.uid && prevP != null && prevP !== p) { const bar = el.querySelector('.hpbar i'), gh = el.querySelector('.hpghost'); requestAnimationFrame(() => requestAnimationFrame(() => { if (bar) bar.style.width = p + '%'; setTimeout(() => { if (gh) gh.style.width = p + '%'; }, 380); })); }
-    try { const bm = document.querySelector(side ? '.emon' : '.pmon'); if (bm) { bm.classList.toggle('tera', !!m.terastal); const cr = bm.querySelector('.tcrown'); if (m.terastal) { bm.style.setProperty('--tt', C.TYPE_COLOR[m.terastal]); if (!cr) bm.insertAdjacentHTML('beforeend', '<span class="tcrown"></span>'); } else if (cr) cr.remove(); } } catch (e) {}
+    try { const bm = document.querySelector(side ? '.emon' : '.pmon'); if (bm) { bm.classList.toggle('tera', !!m.terastal); const cr = bm.querySelector('.tcrown'); if (m.terastal) { bm.style.setProperty('--tt', C.TYPE_COLOR[m.terastal]); if (!cr) bm.insertAdjacentHTML('beforeend', '<span class="tcrown"></span>'); placeCrown(bm); } else if (cr) cr.remove(); } } catch (e) {}
   }
   function setHP(side, hp, max) { const el = $(side ? '#einfo' : '#pinfo'); const i = $('.hpbar i', el); const p = Math.max(0, hp / max * 100); i.style.width = p + '%'; i.style.background = hpCol(p);
     const n = $('.hpn', el); if (n) { const from = parseInt(n.textContent) || 0; const t0 = performance.now(), dur = 600 * spd(); const tick = t => { const k = Math.min(1, (t - t0) / dur); n.textContent = Math.round(from + (hp - from) * k) + '/' + max; if (k < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); } }
@@ -632,7 +634,7 @@
       log(o.raid ? `⬣ Um <b>${D.mons[e.id].n}</b> Dinamax ${'★'.repeat(o.raid.den.stars)} bloqueia a toca!` : o.legend ? `⭐ Um <b>${D.mons[e.id].n}</b> lendário apareceu!` : `Um <b>${D.mons[e.id].n}</b> selvagem apareceu!`);
       if (o.legend) $('#battle').classList.add('legend-aura');
       await wait(900);
-      if (e.shiny) { sparkle(1); SFX.shiny(); shinyBurst(); S.stats.shinies++; log(`✨ Uau! É um ${D.mons[e.id].n} <b>SHINY</b>! ✨`); await wait(1300); }
+      if (e.shiny) { buzz([50, 50, 50, 50, 200]); sparkle(1); SFX.shiny(); shinyBurst(); S.stats.shinies++; log(`✨ Uau! É um ${D.mons[e.id].n} <b>SHINY</b>! ✨`); await wait(1300); }
       em.classList.remove('slidein'); }
     if (!B || !$('#metr')) return; $('#metr').classList.add('leave'); log(`Vai, <b>${esc(pn(p))}</b>!`); await sendOut(0, p); B.busy = false; showMain();
   }
@@ -718,7 +720,7 @@
       switch (e.e) {
         case 'use': { log(e.text); camTo(e.side); await wait(420); const el = mon(e.side); try { const gc = C.TYPE_COLOR[e.type] || '#fff'; el.style.setProperty('--mglow', gc); mon(!e.side).style.setProperty('--mglow', gc); } catch (x) {} el.classList.add('lunge'); setTimeout(() => el.classList.remove('lunge'), 450);
           if (e.cat !== 't') await projectile(e.side, e.type); else { auraFx(e.side, e.type); SFX.status(); await wait(550); } break; }
-        case 'hp': { const el = mon(e.side); if (e.dmg > 0) { el.classList.add('hit'); if (e.eff > 1 || e.crit) { SFX.superhit(); if (!RMOT()) ov.classList.add(e.crit ? 'shakex' : 'shake'); }
+        case 'hp': { const el = mon(e.side); if (e.dmg > 0) { el.classList.add('hit'); if (e.crit) buzz([40, 30, 60]); if (e.eff > 1 || e.crit) { SFX.superhit(); if (!RMOT()) ov.classList.add(e.crit ? 'shakex' : 'shake'); }
             if (e.hp <= 0 && !RMOT()) { ov.classList.add('slowmo'); setTimeout(() => ov.classList.remove('slowmo'), 1300); } else if (e.eff < 1) SFX.weak(); else SFX.hit();
             dmgNum(e.side, e.dmg, e.crit, e.eff); setTimeout(() => { el.classList.remove('hit'); ov.classList.remove('shake', 'shakex'); }, e.crit ? 650 : 500); if (e.hp <= 0) await wait(RMOT() ? 0 : 700); }
           setHP(e.side, e.hp, e.max); await wait(650); break; }
@@ -732,7 +734,7 @@
         case 'send': log(e.text); await sendOut(e.side, B.s.sides[e.side].b.m); break;
         case 'throw': log(e.text); await throwBall(e.ball); cineStart(); break;
         case 'shake': { const cin = cineOn(); log('...'); for (let i = 0; i < e.n; i++) { await cw(cin ? 450 + i * 250 : 450); const b = $('#cball'); if (b) { b.classList.remove('wob', 'wobslow'); void b.offsetWidth; b.classList.add(cin && !B.cineSkip ? 'wobslow' : 'wob'); } SFX.shake(); log('.'.repeat(i + 1) + ' <b>tremeu!</b>'); await cw(cin ? 750 : 500); } await cw(cin ? 500 : 300); break; }
-        case 'caught': { $('#cball')?.classList.add('click'); SFX.click2(); await cw(350); const cin = cineOn(); if (cin) cineBurst(); starsFx(); SFX.caught(); log(`🎉 ${e.text}`); await cw(1700); cineOff(); break; }
+        case 'caught': { $('#cball')?.classList.add('click'); SFX.click2(); await cw(350); buzz([60, 40, 120]); const cin = cineOn(); if (cin) cineBurst(); starsFx(); SFX.caught(); log(`🎉 ${e.text}`); await cw(1700); cineOff(); break; }
         case 'escape': { cineOff(); $('#cball')?.remove(); const el = mon(1); el.classList.remove('caught'); el.classList.add('breakout'); popFx(1); SFX.escape(); log(e.text); await wait(900); el.classList.remove('breakout'); break; }
         case 'run': log(e.text); tone(600, 0.2, 'sine', 0.05, 0, 300); await wait(800); break;
         case 'tera': if (e.side === 0) S.stats.teras = (S.stats.teras || 0) + 1; await teraAnim(e); break;
@@ -1172,7 +1174,7 @@
     toast('Nada por aqui… continue andando.'); if (sf.steps <= 0) return safariEnd('Acabaram seus passos!'); save(); render();
   };
   function safariEnc(m) {
-    const sf = S.safari, d = D.mons[m.id]; let mood = 0, moodT = 0, done = false; if (m.shiny) { SFX.shiny(); S.stats.shinies++; } else cry(m.id);
+    const sf = S.safari, d = D.mons[m.id]; let mood = 0, moodT = 0, done = false; if (m.shiny) { buzz([50, 50, 50, 50, 200]); SFX.shiny(); S.stats.shinies++; } else cry(m.id);
     const mm = modal(`<div class="sfenc"><div class="sfstage per-${period()}"><img id="sfm" class="${m.shiny ? 'shiny-glow' : ''}" src="${spr(m)}" alt=""><div id="sfball" class="sfball hidden">${itemImg('safari-ball')}</div><div id="sffx" class="sffx"></div></div>
       <h3>${d.n}${m.shiny ? ' ✨' : ''} <small class="mut">Nv ${m.lvl}</small> <span id="sfmood" class="chip"></span></h3><p id="sfmsg">Um ${d.n} selvagem apareceu!</p>
       <div class="sfbtns"><button class="btn primary" data-s="ball">${itemImg('safari-ball')} Bola (<span id="sfb">${sf.balls}</span>)</button><button class="btn" data-s="bait">🍓 Isca</button><button class="btn" data-s="rock">🪨 Pedra</button><button class="btn ghost" data-s="run">🏃 Fugir</button></div></div>`, 'sfm');
@@ -2490,6 +2492,20 @@
   }
   function cineOff() { const sc = $('#battle .bscene'); if (!sc) return; sc.classList.remove('cine', 'cskip'); $('.cskiphint', sc)?.remove(); if (sc._cskip) sc.removeEventListener('pointerdown', sc._cskip); if (B) B.cineSkip = false; }
   A.cine = { cineOn, cineStart, cineOff };
+
+  // ===== v51 VIBRAÇÃO + coroa Tera no topo real do sprite =====
+  function buzz(p) { try { if (S.settings.vibe === false || !navigator.vibrate) return false; return navigator.vibrate(p); } catch (e) { return false; } }
+  const _topC = {};
+  function spriteTop(img) { const k = img.currentSrc || img.src; if (k in _topC) return _topC[k];
+    try { const w = img.naturalWidth, h = img.naturalHeight; if (!w || !h) return null; const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0); const d = x.getImageData(0, 0, w, h).data;
+      for (let y = 0; y < h; y++) { let a = -1, b = -1; for (let i = 0; i < w; i++) if (d[(y * w + i) * 4 + 3] > 40) { if (a < 0) a = i; b = i; } if (a >= 0) { let a2 = w, b2 = -1; for (let y2 = y; y2 < Math.min(h, y + Math.ceil(h * .12)); y2++) for (let i = 0; i < w; i++) if (d[(y2 * w + i) * 4 + 3] > 40) { a2 = Math.min(a2, i); b2 = Math.max(b2, i); } return _topC[k] = { y: y / h, x: (a2 + b2) / 2 / w }; } }
+    } catch (e) {} return _topC[k] = null; }
+  function placeCrown(bm) { const cr = bm.querySelector('.tcrown'), img = bm.querySelector('img'); if (!cr || !img) return;
+    const go = () => { const t = spriteTop(img); const r = img.getBoundingClientRect(), o = bm.getBoundingClientRect(); if (!r.width) return;
+      const x = r.left - o.left + (t ? t.x : .5) * r.width, y = r.top - o.top + (t ? t.y : 0) * r.height;
+      cr.style.left = x + 'px'; cr.style.top = Math.max(-24, y - 30) + 'px'; cr.dataset.placed = t ? 'bbox' : 'box'; };
+    if (img.complete && img.naturalWidth) requestAnimationFrame(go); else img.addEventListener('load', go, { once: true }); }
+  A.buzz = buzz; A.placeCrown = placeCrown;
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------

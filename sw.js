@@ -1,5 +1,5 @@
 // Service worker: só faz cache de arquivos do app. NUNCA mexe em localStorage/IndexedDB (saves).
-const V = 'pkl-v50';
+const V = 'pkl-v51';
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V && k !== 'pkl-media').map(k => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', e => {
