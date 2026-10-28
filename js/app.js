@@ -2403,6 +2403,33 @@
     setTimeout(() => { try { toast('⬣ Evento Dinamax restaurado! +' + RAID_PER_DAY + ' raides extras hoje 🎁'); } catch (e) {} }, 1200); return had; } catch (e) { return 0; } }
   A.raidRestore = raidRestore;
   { const _render = render; render = function () { const r = _render.apply(this, arguments); try { raidRestore(); } catch (e) {} return r; }; }
+  // ===== Lendas de Paldea =====
+  const pB = n => () => rOpen('paldea') && rS('paldea').b.length >= n, pCh = () => rOpen('paldea') && rS('paldea').ch;
+  LEGQ.push(
+    { id: 'p_ruina', n: 'Os Tesouros da Ruína', ico: '🏺', mons: [1001, 1002, 1003, 1004], req: pB(7), reqT: '7 insígnias de Paldea', steps: [
+      { t: 'talk', npc: 'sage', who: 'Guardião dos Santuários', lines: ['Quatro Pokémon da Ruína foram selados com estacas antigas.', 'Arrancaram as estacas… e eles despertaram em quatro cantos de Paldea.', 'Siga cada santuário: deserto, cidade do rock, vale de fogo e montanha gelada.'] },
+      { t: 'riddle', q: '🏺 “O tesouro feito de um vaso antigo, que guarda fogo…”', opts: ['Chi-Yu', 'Ting-Lu', 'Wo-Chien', 'Chien-Pao'], a: 0 },
+      { t: 'hunt', id: 1003, lvl: 92, map: 'p_deserto', btn: '🦌 Abrir o santuário do deserto', intro: 'A terra treme… Ting-Lu ergue os chifres!' },
+      { t: 'hunt', id: 1001, lvl: 92, map: 'p_montenevera', btn: '🐌 Abrir o santuário das folhas', intro: 'Folhas secas giram no ar… Wo-Chien desperta!' },
+      { t: 'hunt', id: 1004, lvl: 93, map: 'p_vulcao', btn: '🐟 Abrir o santuário do fogo', intro: 'As chamas formam um peixe… Chi-Yu!' },
+      { t: 'hunt', id: 1002, lvl: 93, map: 'p_glaseado', btn: '🐆 Abrir o santuário de gelo', intro: 'Um frio cortante… Chien-Pao salta da neve!' }] },
+    { id: 'p_zero', n: 'O Tesouro da Área Zero', ico: '🕳️', mons: [1007, 1008], req: pB(8), reqT: '8 insígnias de Paldea', steps: [
+      { t: 'talk', npc: 'scientist', who: 'Professora Sada / Professor Turo', lines: ['Bem-vindo ao fundo da Área Zero.', 'Aqui existem Pokémon do passado e do futuro, trazidos por uma máquina do tempo.', 'Dois deles são lendários: Koraidon e Miraidon. Encontre os dois!'] },
+      { t: 'order', q: 'Coloque a descida da Área Zero na ordem certa:', items: ['📍 Estação de Pesquisa 1', '📍 Estação de Pesquisa 2', '📍 Estação de Pesquisa 3', '📍 Estação de Pesquisa 4', '📍 O laboratório no fundo da cratera'] },
+      { t: 'hunt', id: 1007, lvl: 96, map: 'p_zero', btn: '🦖 Seguir o rugido antigo', intro: 'Pegadas enormes no chão… Koraidon aparece!' },
+      { t: 'hunt', id: 1008, lvl: 96, map: 'p_zero', btn: '🤖 Seguir o sinal elétrico', intro: 'Luzes roxas piscam… Miraidon aparece!' }] },
+    { id: 'p_kitakami', n: 'O Festival da Máscara', ico: '👹', mons: [1014, 1015, 1016, 1017], req: pCh, reqT: 'ser Campeão de Paldea', steps: [
+      { t: 'talk', npc: 'kimonogirl', who: 'Carmine e Kieran', lines: ['Em Kitakami dizem que três Pokémon leais protegeram a vila de uma ogra.', 'Mas a verdade é outra: a ogra Ogerpon era boa, e os três é que eram maus!', 'Ajude a contar a verdadeira história.'] },
+      { t: 'riddle', q: '👹 “A ogra usa máscaras. A máscara verde de…”', opts: ['Turquesa', 'Fonte', 'Lareira', 'Pedra'], a: 0 },
+      { t: 'hunt', id: 1014, lvl: 94, map: 'p_kitakami', btn: '🐕 Seguir o latido forte', intro: 'Correntes balançam… Okidogi!' },
+      { t: 'hunt', id: 1015, lvl: 94, map: 'p_kitakami', btn: '🐒 Seguir as risadas', intro: 'Um macaco de olhos roxos… Munkidori!' },
+      { t: 'hunt', id: 1016, lvl: 94, map: 'p_kitakami', btn: '🦚 Seguir o perfume', intro: 'Penas brilhantes… Fezandipiti!' },
+      { t: 'hunt', id: 1017, lvl: 95, map: 'p_kitakami', btn: '🎭 Subir ao Monte Pedregal', intro: 'Uma máscara verde reluz… Ogerpon dança na sua frente!' }] },
+    { id: 'p_mirtilo', n: 'O Coração do Terarium', ico: '💎', mons: [1024, 1025], req: pCh, reqT: 'ser Campeão de Paldea', steps: [
+      { t: 'talk', npc: 'psychic', who: 'Briar, a pesquisadora', lines: ['Debaixo do Terarium da Academia Mirtilo há um cristal enorme.', 'Acho que é a origem do fenômeno Terastal!', 'E um Pokémon de mochi venenoso anda solto por aí…'] },
+      { t: 'riddle', q: '💎 “O Pokémon que é a fonte do brilho Terastal…”', opts: ['Terapagos', 'Pecharunt', 'Ogerpon', 'Diancie'], a: 0 },
+      { t: 'hunt', id: 1024, lvl: 98, map: 'p_mirtilo', btn: '💎 Descer até o cristal', intro: 'O cristal pulsa… Terapagos abre o casco!' },
+      { t: 'hunt', id: 1025, lvl: 98, map: 'p_mirtilo', btn: '🍑 Seguir o cheiro de mochi', intro: 'Uma casca roxa rola até você… Pecharunt!' }] });
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------
