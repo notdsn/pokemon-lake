@@ -2180,6 +2180,70 @@
   { const _as = audioSettings; audioSettings = function () { const v = Math.round(((S.settings.avol ?? 0.5)) * 100);
     return _as.apply(this, arguments) + `<div class="setrow ambrow"><span>🌿 Som ambiente</span><div class="ambctl"><input type="range" id="ambvol" min="0" max="100" step="5" value="${v}" aria-label="Volume do som ambiente"${S.settings.amute ? ' disabled' : ''}><b id="ambvolv">${v}%</b><button class="${S.settings.amute ? 'on' : ''}" data-a="ambmute">${S.settings.amute ? '🔇 Mudo' : '🔊'}</button></div></div>`; }; }
 
+  // =====================================================================
+  // 3D leve: Minha Casa em 3D (three.js carregado só nesta tela; fallback 2D automático)
+  // =====================================================================
+  const G3D = (() => {
+    let THREE = null, inst = null, failed = false; const T3URL = new URL('vendor/three.module.min.js', (document.currentScript && document.currentScript.src) || location.href.replace(/[^/]*$/, '') + 'js/').href;
+    const weak = () => (navigator.hardwareConcurrency || 4) <= 2 || (navigator.deviceMemory || 4) < 2;
+    const glOk = () => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } };
+    const want = () => { const g = S.settings.g3d; if (failed || A.h2d) return false; if (g === false) return false; if (g === true) return glOk(); return !weak() && glOk(); };
+    const P = { bed: [[1.1, .35, .7, '#e74c3c'], [1.1, .12, .7, '#fff', 0, .35], [.35, .15, .55, '#fff', -.33, .47]], sofa: [[1.2, .35, .55, '#3b82f6'], [1.2, .45, .15, '#2563eb', 0, .35, -.2], [.15, .25, .55, '#2563eb', -.52, .35], [.15, .25, .55, '#2563eb', .52, .35]],
+      plant: [[.35, .3, .35, '#a0522d'], [.5, .55, .5, '#22c55e', 0, .3, 0, 'ico']], tv: [[1, .3, .4, '#6b4f3a'], [.95, .6, .08, '#111', 0, .3, -.05], [.85, .5, .02, '#38bdf8', 0, .35, 0, 'emit']], game: [[.5, .12, .35, '#333'], [.18, .05, .12, '#ef4444', -.12, .12], [.18, .05, .12, '#3b82f6', .12, .12]],
+      books: [[.9, 1.2, .35, '#8b5e3c'], [.8, .2, .3, '#ef4444', 0, .2], [.8, .2, .3, '#22c55e', 0, .55], [.8, .2, .3, '#eab308', 0, .9]], aqua: [[.9, .6, .4, '#7dd3fc', 0, 0, 0, 'glass'], [.95, .08, .45, '#334155', 0, .6]],
+      lamp: [[.3, .05, .3, '#555'], [.06, .8, .06, '#555', 0, .05], [.35, .3, .35, '#fde68a', 0, .8, 0, 'emit']], rug: [[1.3, .02, .9, '#dc2626']], clock: [[.4, .4, .08, '#7c5a3a'], [.32, .32, .02, '#fff', 0, .04, .05]] };
+    async function init(host) {
+      if (!THREE) THREE = await import(T3URL);
+      const T = THREE, cv = host.querySelector('canvas'), W = host.clientWidth, H = host.clientHeight;
+      const r = new T.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: 'low-power' }); r.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); r.setSize(W, H, false);
+      const sc = new T.Scene(), h = houseV2(), wc = (WALLS.find(x => x[0] === h.wall) || WALLS[0])[2], night = period() === 'night';
+      sc.background = new T.Color(night ? '#1b1f3a' : '#dbeafe');
+      const cam = new T.PerspectiveCamera(42, W / H, 0.1, 50);
+      sc.add(new T.HemisphereLight(night ? '#8899ff' : '#fff8e7', '#6b4f3a', night ? 0.7 : 1.1)); const sun = new T.DirectionalLight(night ? '#9db4ff' : '#ffe8b0', night ? 0.5 : 1.2); sun.position.set(3, 5, 4); sc.add(sun);
+      const mat = (c, k) => k === 'emit' ? new T.MeshBasicMaterial({ color: c }) : new T.MeshLambertMaterial({ color: c, transparent: k === 'glass', opacity: k === 'glass' ? .55 : 1, flatShading: true });
+      const box = (w, hh, d, c, x = 0, y = 0, z = 0, k) => { const m = new T.Mesh(new T.BoxGeometry(w, hh, d), mat(c, k)); m.position.set(x, y + hh / 2, z); return m; };
+      // sala: chão de tábuas (textura gerada), 2 paredes, rodapé, janela
+      const tc = document.createElement('canvas'); tc.width = tc.height = 128; const g = tc.getContext('2d'); for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#c8935a' : '#b9824b'; g.fillRect(0, i * 16, 128, 16); g.fillStyle = 'rgba(0,0,0,.15)'; g.fillRect(0, i * 16 + 15, 128, 1); }
+      const ft = new T.CanvasTexture(tc); ft.wrapS = ft.wrapT = T.RepeatWrapping; ft.repeat.set(2, 2);
+      const floor = new T.Mesh(new T.PlaneGeometry(6, 5), new T.MeshLambertMaterial({ map: ft })); floor.rotation.x = -Math.PI / 2; sc.add(floor);
+      const wm = new T.MeshLambertMaterial({ color: wc }); const back = new T.Mesh(new T.PlaneGeometry(6, 3), wm); back.position.set(0, 1.5, -2.5); sc.add(back);
+      const left = new T.Mesh(new T.PlaneGeometry(5, 3), wm); left.rotation.y = Math.PI / 2; left.position.set(-3, 1.5, 0); sc.add(left);
+      sc.add(box(6, .15, .05, '#8b5e3c', 0, 0, -2.47)); sc.add(box(.05, .15, 5, '#8b5e3c', -2.97, 0, 0));
+      const win = box(1.2, .9, .04, night ? '#1e3a8a' : '#93c5fd', 1.4, 1.4, -2.48, 'emit'); sc.add(win); sc.add(box(1.3, .06, .1, '#fff', 1.4, 1.37, -2.45));
+      // sombra suave "assada": textura radial
+      const sh = document.createElement('canvas'); sh.width = sh.height = 64; const sg = sh.getContext('2d'), gr = sg.createRadialGradient(32, 32, 2, 32, 32, 30); gr.addColorStop(0, 'rgba(0,0,0,.45)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); sg.fillStyle = gr; sg.fillRect(0, 0, 64, 64);
+      const shT = new T.CanvasTexture(sh), shadow = (w, d, x, z) => { const m = new T.Mesh(new T.PlaneGeometry(w, d), new T.MeshBasicMaterial({ map: shT, transparent: true, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.position.set(x, 0.01, z); sc.add(m); };
+      const loader = new T.TextureLoader(), bill = (src, s, x, z, y0 = 0) => { const t = loader.load(src, () => draw()); t.colorSpace = T.SRGBColorSpace; t.magFilter = T.NearestFilter; const sp = new T.Sprite(new T.SpriteMaterial({ map: t })); sp.scale.set(s, s, 1); sp.position.set(x, y0 + s / 2, z); sc.add(sp); shadow(s * .8, s * .4, x, z); return sp; };
+      const room = document.querySelector('.room.v2'); const slotImg = i => room?.querySelector(`.fspot[data-i="${i}"] img`)?.src;
+      h.slots.forEach((f, i) => { if (!f) return; const col = i % 4, row = i < 4 ? 0 : 1, x = -2.1 + col * 1.4, z = row ? .9 : -1.4;
+        if (P[f]) { const grp = new T.Group(); P[f].forEach(([w, hh, d, c, ox = 0, oy = 0, oz = 0, k]) => grp.add(box(w, hh, d, c, ox, oy, oz, k === 'ico' ? undefined : k))); grp.position.set(x, f === 'clock' ? 2 : 0, f === 'clock' ? -2.44 : z); sc.add(grp); if (f !== 'rug' && f !== 'clock') shadow(1.4, .9, x, z); }
+        else { const s = slotImg(i); if (s) bill(s, .9, x, z); else { sc.add(box(.6, .6, .6, '#a78bfa', x, 0, z)); shadow(.9, .7, x, z); } } });
+      const ls = document.querySelector('.room.v2 .follow img')?.src; let lead = null; if (ls) lead = bill(ls, 1, .3, .4);
+      let az = 0.35, el = 0.42; const place = () => { const R = 7.2; cam.position.set(Math.sin(az) * R * Math.cos(el), 1 + Math.sin(el) * R, Math.cos(az) * R * Math.cos(el)); cam.lookAt(0, .6, -.3); };
+      let raf = 0, t0 = performance.now(), dragging = false, px = 0, py = 0, alive = true;
+      function draw() { if (!alive) return; place(); r.render(sc, cam); }
+      function loop(t) { if (!alive) return; if (!document.body.contains(cv)) return dispose(); if (lead && !RMOT()) lead.position.y = .5 + Math.abs(Math.sin((t - t0) / 450)) * .08; draw(); raf = document.hidden ? 0 : requestAnimationFrame(loop); }
+      cv.addEventListener('pointerdown', e => { dragging = true; px = e.clientX; py = e.clientY; cv.setPointerCapture(e.pointerId); });
+      cv.addEventListener('pointermove', e => { if (!dragging) return; az = Math.max(-1.0, Math.min(1.0, az - (e.clientX - px) * .008)); el = Math.max(.15, Math.min(.85, el + (e.clientY - py) * .005)); px = e.clientX; py = e.clientY; });
+      ['pointerup', 'pointercancel'].forEach(k => cv.addEventListener(k, () => dragging = false));
+      const vis = () => { if (!document.hidden && !raf) raf = requestAnimationFrame(loop); }; document.addEventListener('visibilitychange', vis);
+      function dispose() { alive = false; cancelAnimationFrame(raf); document.removeEventListener('visibilitychange', vis); sc.traverse(o => { o.geometry?.dispose(); o.material?.map?.dispose(); o.material?.dispose(); }); r.dispose(); inst = null; }
+      raf = requestAnimationFrame(loop); host.classList.add('ready');
+      return { dispose, rotate: d => { az = Math.max(-1, Math.min(1, az + d)); }, get az() { return az; }, renderer: r };
+    }
+    function mount() { const host = document.querySelector('.room3d'); if (!host || host.dataset.on) return; host.dataset.on = 1; inst && inst.dispose();
+      init(host).then(i => { inst = i; }).catch(e => { console.warn('3D falhou, usando 2D', e); failed = true; render(); }); }
+    return { want, mount, get inst() { return inst; }, weak, glOk };
+  })();
+  A.g3d = G3D;
+  { const _vh = vHouse; vHouse = function () { const html = _vh.apply(this, arguments); if (!G3D.want()) return html.replace('<h3>🏠 Minha Casa</h3>', `<h3>🏠 Minha Casa</h3>${G3D.glOk() && S.settings.g3d !== false ? '<button class="btn small" data-a="h3don">🧊 3D</button>' : ''}`);
+    return html.replace('card room-card', 'card room-card r3d').replace('<div class="room v2"', `<div class="room3d"><canvas></canvas><small class="r3hint">👆 Arraste para girar</small><button class="btn small r3edit" data-a="h2d">✏️ Editar móveis</button></div><div class="room v2"`); }; }
+  ACT.h2d = () => { A.h2d = true; render(); }; ACT.h3don = () => { A.h2d = false; render(); };
+  { const _render = render; render = function () { const r = _render.apply(this, arguments); try { if (tab === 'house') G3D.mount(); } catch (e) {} return r; }; }
+  ACT.setg3d = d => { S.settings.g3d = d.v === 'auto' ? undefined : d.v === 'true'; save(); render(); };
+  { const _as = audioSettings; audioSettings = function () { const g = S.settings.g3d, cur = g === undefined ? 'auto' : String(g);
+    return _as.apply(this, arguments) + `<div class="setrow"><span>🧊 Gráficos 3D</span><div class="seg">${[['auto', 'Auto'], ['true', 'Ligado'], ['false', 'Desligado']].map(([v, l]) => `<button class="${cur === v ? 'on' : ''}" data-a="setg3d" data-v="${v}">${l}</button>`).join('')}</div></div>`; }; }
+
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------

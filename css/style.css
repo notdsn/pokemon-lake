@@ -824,3 +824,9 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .ambctl b{font-size:12px;min-width:34px;text-align:right}
 .ambctl button{border:0;border-radius:8px;padding:4px 8px;background:#eee}
 .ambctl button.on{background:#d9534f;color:#fff}
+/* 3D leve: Minha Casa */
+.room3d{position:relative;width:100%;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#dbeafe;touch-action:none}
+.room3d canvas{width:100%;height:100%;display:block}
+.room3d .r3hint{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.45);color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;pointer-events:none}
+.room3d .r3edit{position:absolute;right:8px;bottom:8px}
+.r3d .room.v2{position:absolute!important;left:-9999px;width:340px;visibility:hidden}

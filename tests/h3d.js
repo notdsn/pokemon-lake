@@ -1,0 +1,42 @@
+// 3D leve: Minha Casa
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
+const fs = require('fs');
+const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
+const URL = process.argv[2] || 'http://127.0.0.1:18473/';
+const LIVE = URL.includes('github.io') ? 'live-' : '';
+let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
+const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-h3d-${LIVE}${n}-depois.png`;
+const at = h => new Date(2026, 9, 27, Math.floor(h), Math.round((h % 1) * 60));
+(async () => {
+  const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const errs = [];
+  p.on('pageerror', e => errs.push(e.message)); const ev = (f, a) => p.evaluate(f, a);
+  await p.clock.setFixedTime(at(12));
+  await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
+  await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="4"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
+  const reqs = []; p.on('request', r => reqs.push(r.url()));
+  await ev(() => { const S = PokeApp.debug.S; S.house = { slots: ['bed', 'tv', 'books', 'plant', 'rug', 'sofa', 'doll25', 'lamp'], wslots: [null, null, null], owned: { bed: 1, tv: 1, books: 1, plant: 1, rug: 1, sofa: 1, doll25: 1, lamp: 1 }, wall: 'w0', walls: { w0: 1 } }; });
+  await ev(() => PokeApp.debug.go('home')); await p.waitForTimeout(500);
+  ok(!reqs.some(u => u.includes('three')), 'three.js NÃO carrega fora da Casa');
+  await ev(() => PokeApp.debug.go('house')); await p.waitForSelector('.room3d.ready', { timeout: 10000 }).catch(() => {});
+  ok(await ev(() => !!document.querySelector('.room3d.ready canvas')), 'Casa 3D renderiza (WebGL)');
+  ok(reqs.some(u => u.includes('three.module.min.js')), 'three.js carregado sob demanda na Casa');
+  ok(await ev(() => PokeApp.g3d.inst.renderer.getPixelRatio() <= 2), 'pixel ratio limitado a 2');
+  await ev(() => document.querySelector('#modal-root').innerHTML = ''); await p.waitForTimeout(800); await p.screenshot({ path: OUT('casa3d-a') });
+  const az0 = await ev(() => PokeApp.g3d.inst.az); const bx = await p.locator('.room3d canvas').boundingBox();
+  await p.mouse.move(bx.x + 200, bx.y + 120); await p.mouse.down(); await p.mouse.move(bx.x + 80, bx.y + 130, { steps: 8 }); await p.mouse.up(); await p.waitForTimeout(400);
+  ok(Math.abs((await ev(() => PokeApp.g3d.inst.az)) - az0) > 0.3, 'arrastar gira a sala'); await p.screenshot({ path: OUT('casa3d-b') });
+  const fps = await ev(() => new Promise(r => { let n = 0; const t0 = performance.now(); const f = () => { n++; performance.now() - t0 < 1000 ? requestAnimationFrame(f) : r(n); }; requestAnimationFrame(f); }));
+  console.log('fps (headless, sem GPU):', fps);
+  await ev(() => document.querySelector('#modal-root').innerHTML = ''); await p.click('[data-a="h2d"]'); await p.waitForTimeout(400); ok(await ev(() => !document.querySelector('.room3d') && !!document.querySelector('.room.v2 .fspot')), 'Editar móveis volta para 2D');
+  await p.click('[data-a="h3don"]'); await p.waitForTimeout(800);
+  await ev(() => { PokeApp.debug.S.settings.g3d = false; PokeApp.debug.go('house'); }); await p.waitForTimeout(400); ok(await ev(() => !document.querySelector('.room3d')), "'Gráficos 3D' desligado = 2D");
+  await ev(() => PokeApp.debug.go('settings')); await p.waitForTimeout(300); ok(await ev(() => !!document.querySelector('[data-a="setg3d"]')), "opção 'Gráficos 3D' nas Configurações");
+  // fallback: sem WebGL
+  const c2 = await b.newContext({ viewport: { width: 375, height: 667 } }); await c2.addInitScript(h => { localStorage.setItem('pkLake.unlock', h); HTMLCanvasElement.prototype.getContext = function () { return null; }; }, HASH);
+  const p2 = await c2.newPage(); const e2 = []; p2.on('pageerror', e => e2.push(e.message)); await p2.goto(URL); await p2.fill('#au', 'Edson'); await p2.fill('#ap', 'teste123'); await p2.click('#accForm button.primary');
+  await p2.fill('#tn', 'Edson'); await p2.click('#next'); await p2.click('.starter[data-id="4"]'); await p2.click('.mbtns .btn.primary'); await p2.click('.mbtns .btn.primary'); await p2.waitForTimeout(400);
+  await p2.evaluate(() => PokeApp.debug.go('house')); await p2.waitForTimeout(500); ok(await p2.evaluate(() => !document.querySelector('.room3d') && !!document.querySelector('.room.v2')), 'sem WebGL: cai para 2D sozinho');
+  ok(errs.length === 0 && e2.length === 0, 'sem erros: ' + errs.concat(e2).join(' | '));
+  console.log(fail ? 'FALHOU ' + fail : 'TUDO OK'); await b.close(); process.exit(fail ? 1 : 0);
+})();
