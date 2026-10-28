@@ -1228,7 +1228,7 @@
     const s = B.s, rd = B.o.raid, bm = s.sides[1].b.m, st0 = rd.den.stars; rd.turn++; rd.left--;
     if (bm.hp > 0 && !bm.shield) { const fr = bm.hp / PE.maxhp(bm); const marks = st0 >= 4 ? [0.6, 0.3] : st0 >= 2 ? [0.5] : [];
       if (rd.shields < marks.length && fr <= marks[rd.shields]) { rd.shields++; bm.shield = st0 + 1; SFX.status(); log(`🛡️ ${D.mons[bm.id].n} ergueu uma <b>barreira Dinamax</b>! (${bm.shield} golpes)`); drawInfo(1); raidHud(); await wait(1300); } }
-    if (bm.hp > 0 && st0 >= 3 && rd.turn % (st0 >= 5 ? 1 : 2) === 0 && s.sides[0].b.m.hp > 0 && !s.over) { log(`⚡ ${D.mons[bm.id].n} está furioso e age de novo!`); await wait(900); await play(PE.step(s, [null, PE.aiAction(s, 1)])); rd.left++; }
+    if (bm.hp > 0 && st0 >= 3 && rd.turn % (st0 >= 5 ? 1 : 2) === 0 && s.sides[0].b.m.hp > 0 && !s.over) { log(`⚡ ${D.mons[bm.id].n} está furioso e age de novo!`); await wait(900); try { await play(PE.step(s, [null, PE.aiAction(s, 1)])); } catch (e) { console.error(e); } rd.left++; }
     raidHud(); if (!s.over && rd.left <= 0) { s.over = true; s.winner = 1; rd.timeout = 1; }
   }
   async function raidEnd() {

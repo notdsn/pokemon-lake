@@ -85,7 +85,7 @@
 
   function speedOrder(s, acts) {
     const pr = acts.map((a, i) => {
-      if (a.type !== 'move') return 6; const mv = D.moves[a.n]; return mv ? mv.pr : 0; });
+      if (!a) return -99; if (a.type !== 'move') return 6; const mv = D.moves[a.n]; return mv ? mv.pr : 0; });
     if (pr[0] !== pr[1]) return pr[0] > pr[1] ? [0, 1] : [1, 0];
     const sp = [0, 1].map(i => eStat(s.sides[i].b, 'spe'));
     if (sp[0] !== sp[1]) return sp[0] > sp[1] ? [0, 1] : [1, 0];
