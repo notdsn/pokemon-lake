@@ -762,3 +762,30 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .battle .pmon{left:3%!important;bottom:4%!important;width:42%!important;max-width:none!important;height:44%!important}
 .battle .bmon img{max-width:100%;max-height:100%;width:auto;height:auto}
 .bmon.dmax img{transform:scale(1.1)}
+/* ===== REALISMO 4: clima e estações ===== */
+.wxramp{opacity:0!important;transition:opacity 5s ease-in}
+.wxramp.wxon{opacity:calc(.35 + .5*var(--wxi,1))!important}
+.w-storm .wx{animation:rain .3s linear infinite}
+.rainheavy{position:absolute;inset:0;pointer-events:none;z-index:2;background-image:linear-gradient(100deg,transparent 46%,rgba(191,219,254,.5) 50%,transparent 54%);background-size:22px 70px;animation:rain .22s linear infinite;opacity:0;animation-delay:0s;transition:opacity 6s 4s}
+.wxon~.rainheavy,.rainheavy{opacity:.5}
+.bolt{position:absolute;inset:0;z-index:7;pointer-events:none;background:radial-gradient(ellipse at 60% 10%,rgba(255,255,255,.95),rgba(224,231,255,.5) 40%,transparent 75%);animation:bolt .6s ease-out forwards}
+@keyframes bolt{0%{opacity:0}8%{opacity:1}18%{opacity:.2}28%{opacity:.9}100%{opacity:0}}
+.snowedge{position:absolute;inset:0;pointer-events:none;z-index:5;box-shadow:inset 0 -2px 0 rgba(255,255,255,.4);animation:snowacc 90s ease-out forwards}
+.snowedge:after{content:"";position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(transparent,rgba(255,255,255,.9) 60%,#fff);border-radius:40% 40% 0 0/12px 12px 0 0;animation:snowbot 90s ease-out forwards}
+@keyframes snowacc{to{box-shadow:inset 10px 0 12px -4px rgba(255,255,255,.85),inset -10px 0 12px -4px rgba(255,255,255,.85),inset 0 -6px 10px rgba(255,255,255,.7)}}
+@keyframes snowbot{to{height:18px}}
+/* batalha na chuva: chão molhado com reflexo */
+.battle.w-rain .bpar .gnd{background:linear-gradient(rgba(148,163,184,.35),rgba(30,41,59,.25) 30%,rgba(148,163,184,.3) 70%),var(--gnd)}
+.battle.w-rain .bpar .gnd:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.14) 45%,transparent 60%)}
+.battle.w-rain .bmon img{-webkit-box-reflect:below -2px linear-gradient(transparent 55%,rgba(255,255,255,.28))}
+.p-steam{width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:radial-gradient(rgba(241,245,249,.85),rgba(226,232,240,0) 70%);animation-duration:1.2s}
+/* sol forte clareia a cena */
+.battle.w-sun .bcam:after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(200deg,rgba(255,247,200,.38),rgba(255,237,160,.12) 50%,transparent)}
+.battle.w-sun .bpar{filter:brightness(1.08) saturate(1.12)}
+/* estações (hemisfério sul) pintam a folhagem */
+[data-season=autumn] :is(.bio-forest,.bio-mountain,.bio-water) :is(.hills,.fg){filter:hue-rotate(-55deg) saturate(1.35) brightness(1.02)}
+[data-season=winter] :is(.bio-forest,.bio-mountain,.bio-water) :is(.hills,.fg){filter:saturate(.6) brightness(1.05)}
+[data-season=spring] :is(.bio-forest,.bio-mountain,.bio-water) .fg{filter:saturate(1.2) hue-rotate(8deg)}
+[data-season=summer] :is(.bio-forest,.bio-mountain,.bio-water) :is(.hills,.fg){filter:saturate(1.15) brightness(1.04)}
+[data-season=spring] .bio-forest .fg:after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,#f9a8d4 2px,transparent 2.5px),radial-gradient(circle,#fde047 1.6px,transparent 2px);background-size:46px 22px,64px 28px;background-position:5px 8px,30px 14px;opacity:.9}
+@media (prefers-reduced-motion:reduce){.wxramp{transition:none}.snowedge,.snowedge:after{animation-duration:1ms}}

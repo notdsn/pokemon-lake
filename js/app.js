@@ -2030,6 +2030,40 @@
   { const _sb = startBattle; startBattle = function (o) { const r = _sb.apply(this, arguments); try { battleCam(o); } catch (e) {} return r; }; A.debug.startBattle = startBattle; }
   { const _render = render; render = function () { const r = _render.apply(this, arguments); try { addParExplore(); } catch (e) {} return r; }; }
 
+  // ===== REALISMO 4: clima gradual, relâmpago + trovão atrasado, neve acumulando, chão molhado, estações =====
+  const ESTACOES = { autumn: '🍂 Outono', winter: '🧣 Inverno', spring: '🌸 Primavera', summer: '🏖️ Verão' };
+  function estacao(d = new Date()) { const m = d.getMonth(); return m >= 2 && m <= 4 ? 'autumn' : m >= 5 && m <= 7 ? 'winter' : m >= 8 && m <= 10 ? 'spring' : 'summer'; }
+  function wxIntensity(w) { if (w !== 'rain' && w !== 'storm' && w !== 'snow') return 1; const d = new Date(), m = (d.getHours() % 2) * 60 + d.getMinutes(); return Math.min(1, +(0.3 + m / 30).toFixed(2)); }
+  A.wx = { season: estacao, wxIntensity };
+  { const _ew = encWeights; encWeights = function (mp, w) { const ws = _ew.apply(this, arguments), se = estacao();
+      return ws.map((x, i) => { const t = D.mons[mp.enc[i][0]].t, has = k => t.includes(k);
+        if (se === 'autumn' && (has('ghost') || has('dark'))) x *= 1.25; if (se === 'autumn' && has('grass')) x *= 0.85;
+        if (se === 'winter' && has('ice')) x *= 2; if (se === 'winter' && (has('fire') || has('bug'))) x *= 0.8;
+        if (se === 'spring' && (has('grass') || has('bug') || has('fairy'))) x *= 1.3;
+        if (se === 'summer' && (has('fire') || has('water'))) x *= 1.25; return x; }); }; }
+  let boltT = null;
+  function lightning(root) { const fl = document.createElement('div'); fl.className = 'bolt'; root.appendChild(fl); setTimeout(() => fl.remove(), 700);
+    const delay = 0.6 + Math.random() * 1.6; setTimeout(() => { if (!document.body.contains(root)) return; noise(1.4, 0.09); tone(55, 1.3, 'sawtooth', 0.04, 0, -20); }, delay * 1000); return delay; }
+  A.wx.lightning = () => { const r = document.querySelector('#battle .bscene, #scene.explore'); return r ? lightning(r) : 0; };
+  function wxScene() {
+    const roots = [document.querySelector('#scene.explore'), document.querySelector('#battle .bscene')].filter(Boolean);
+    document.documentElement.dataset.season = estacao();
+    roots.forEach(r => { const host = r.matches('.bscene') ? r.closest('.battle') : r, w = (host.className.match(/\bw-(\w+)/) || [])[1] || 'clear', lay = r.querySelector('.wx, .bwx');
+      if (r.dataset.wxi) return; const k = wxIntensity(w); r.dataset.wxi = k; r.style.setProperty('--wxi', k);
+      if (lay && /rain|storm|snow/.test(w)) { lay.classList.add('wxramp'); requestAnimationFrame(() => requestAnimationFrame(() => lay.classList.add('wxon'))); }
+      if (/rain|storm/.test(w) && k >= 0.7) r.insertAdjacentHTML('beforeend', '<div class="rainheavy"></div>');
+      if (w === 'snow') r.insertAdjacentHTML('beforeend', '<div class="snowedge"></div>');
+      if (r.matches('#scene') && !r.querySelector('.sznchip')) { const top = r.querySelector('.ex-top'); top && top.insertAdjacentHTML('beforeend', `<span class="chip sznchip">${ESTACOES[estacao()]}</span>`); } });
+    const storm = roots.find(r => { const host = r.matches('.bscene') ? r.closest('.battle') : r; return /\bw-storm\b/.test(host.className) || (r.matches('.bscene') && /\bw-rain\b/.test(host.className) && B?.o?.map && weatherOf(B.o.map) === 'storm'); });
+    clearTimeout(boltT); if (storm && !RMOT()) { const loop = () => { if (!document.body.contains(storm)) return; lightning(storm); boltT = setTimeout(loop, 7000 + Math.random() * 7000); }; boltT = setTimeout(loop, 2500); }
+  }
+  A.wx.scene = wxScene;
+  { const _wo = weatherOf; weatherOf = function (m) { return A.wx.force || _wo.apply(this, arguments); }; }
+  { const _render = render; render = function () { const r = _render.apply(this, arguments); try { wxScene(); } catch (e) {} return r; }; }
+  { const _sb = startBattle; startBattle = function (o) { const r = _sb.apply(this, arguments); try { wxScene(); } catch (e) {} return r; }; A.debug.startBattle = startBattle; }
+  { const _tf = typeFx; typeFx = function (side, type) { _tf.apply(this, arguments); const ov = $('#battle'); if (type === 'fire' && ov && ov.classList.contains('w-rain')) { const fx = $('#fxl'), [x, y] = center(side);
+      for (let i = 0; i < 4; i++) { const p = document.createElement('i'); p.className = 'pfx p-steam'; p.style.cssText = `left:${x + (i - 1.5) * 14}px;top:${y}px;--tx:${(i - 1.5) * 10}px;--ty:-${50 + i * 8}px;--rot:0deg;animation-delay:${120 + i * 60}ms`; fx.appendChild(p); setTimeout(() => p.remove(), 1400); } } }; A.typeFx = typeFx; }
+
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------
