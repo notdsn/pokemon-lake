@@ -26,6 +26,30 @@
       ['h_caverna', 'Caverna Terremoto & Ruínas', 'cave', '🕳️', 6, 'Túneis tremem sem parar. Dizem que Groudon descansa aqui, e os Regis guardam as ruínas.', [66, 72], [[299, 8], [304, 8], [305, 4], [306, 2], [309, 8], [311, 5], [312, 5], [315, 6], [316, 6], [345, 4], [347, 4], [351, 5], [353, 6], [355, 6], [360, 4], [361, 6], [383, 0.3, { legend: 1 }], [377, 0.2, { legend: 1 }], [378, 0.2, { legend: 1 }], [379, 0.2, { legend: 1 }]]],
       ['h_pilar', 'Pilar Celeste', 'sky', '☁️', 8, 'Uma torre em ruínas acima das nuvens. Rayquaza mora no topo.', [70, 76], [[333, 10], [334, 4], [357, 6], [358, 6], [359, 5], [371, 6], [372, 3], [374, 5], [375, 2], [354, 6], [356, 5], [384, 0.3, { legend: 1 }]]],
       ['h_ilhas', 'Ilha do Sul & Ilha Miragem', 'psychic', '🏝️', 'ch', 'Pós-Hoenn. Ilhas que só aparecem às vezes. Jirachi e Deoxys foram vistos aqui!', [74, 80], [[280, 6], [281, 5], [282, 3], [335, 6], [336, 6], [351, 6], [357, 6], [373, 2], [376, 2], [380, 0.6, { legend: 1 }], [381, 0.6, { legend: 1 }], [385, 0.25, { legend: 1 }], [386, 0.25, { legend: 1 }]]]] };
+
+  R.sinnoh = { n: 'Sinnoh', k: 's', base: 65, prev: 'hoenn', game: 'Diamond/Pearl/Platinum', story: 'Terra dos mitos: o tempo (Dialga), o espaço (Palkia) e o Mundo Distorcido de Giratina.',
+    badges: [['Carvão', 'hex', ['#57534e'], 'silver'], ['Floresta', 'leaf', ['#22c55e']], ['Pedregulho', 'oct', ['#d97706']], ['Pântano', 'drop', ['#0ea5e9'], 'silver'], ['Relíquia', 'star5', ['#a855f7']], ['Mina', 'diamond', ['#94a3b8'], 'silver'], ['Pingente', 'snow', ['#a5f3fc'], 'silver'], ['Farol', 'sun', ['#fbbf24']]],
+    gyms: [['Roark', 'roark', 'Oreburgh', 'rock', [[95, 0], [76, 1], [409, 3]]],
+      ['Gardenia', 'gardenia', 'Eterna', 'grass', [[421, 1], [455, 2], [407, 3]]],
+      ['Maylene', 'maylene', 'Veilstone', 'fighting', [[308, 3], [68, 3], [448, 5]]],
+      ['Crasher Wake', 'crasherwake', 'Pastoria', 'water', [[130, 4], [195, 4], [419, 5]]],
+      ['Fantina', 'fantina', 'Hearthome', 'ghost', [[426, 6], [94, 6], [429, 7]]],
+      ['Byron', 'byron', 'Canalave', 'steel', [[437, 7], [208, 7], [411, 9]]],
+      ['Candice', 'candice', 'Snowpoint', 'ice', [[460, 9], [461, 9], [473, 10], [478, 10]]],
+      ['Volkner', 'volkner', 'Sunyshore', 'electric', [[26, 11], [135, 11], [405, 12], [466, 13]]]],
+    elite: [['Aaron', 'aaron', 'Elite Four de Sinnoh', 'bug', [[469, 14], [212, 14], [416, 14], [214, 15], [452, 16]]],
+      ['Bertha', 'bertha', 'Elite Four de Sinnoh', 'ground', [[195, 14], [340, 14], [464, 15], [76, 15], [450, 16]]],
+      ['Flint', 'flint', 'Elite Four de Sinnoh', 'fire', [[78, 15], [467, 16], [136, 15], [229, 16], [392, 17]]],
+      ['Lucian', 'lucian', 'Elite Four de Sinnoh', 'psychic', [[122, 16], [203, 16], [437, 16], [475, 17], [65, 18]]],
+      ['Cynthia', 'cynthia', 'Campeã de Sinnoh', 'dragon', [[442, 18], [407, 18], [468, 19], [350, 18], [448, 19], [445, 20]]]],
+    maps: [['s_rota201', 'Rotas 201–204 & Lago Verdade', 'grass', '🌱', 0, 'Twinleaf, Sandgem e Jubilife. No Lago Verdade, Uxie dorme.', [64, 70], [[396, 12], [399, 12], [401, 10], [403, 10], [406, 6], [412, 5], [415, 5], [418, 8], [433, 3], [387, 2], [390, 2], [393, 2], [480, 0.3, { legend: 1 }]]],
+      ['s_bosque', 'Bosque Eterna', 'forest', '🌲', 1, 'Árvores antigas, Burmy por todo lado e um Spiritomb escondido.', [66, 72], [[406, 8], [315, 6], [412, 8], [413, 3], [414, 3], [415, 6], [420, 8], [421, 3], [455, 4], [425, 6], [402, 4], [427, 6], [442, 1]]],
+      ['s_coronet', 'Monte Coronet', 'cave', '⛰️', 2, 'A montanha que divide Sinnoh. Gible vive nas cavernas mais fundas.', [68, 74], [[41, 8], [42, 4], [66, 6], [74, 8], [75, 4], [95, 4], [436, 6], [437, 2], [443, 3], [444, 1], [433, 4], [358, 3]]],
+      ['s_pantano', 'Grande Pântano', 'safari', '🐊', 3, 'A Zona Safári de Sinnoh: lama, Croagunk e Skorupi.', [68, 74], [[194, 8], [195, 4], [453, 8], [454, 3], [451, 8], [452, 3], [399, 6], [400, 4], [357, 3], [443, 2], [397, 4]]],
+      ['s_lagos', 'Lago Agudo & Lago Valor', 'water', '💧', 4, 'Dois lagos sagrados. Mesprit e Azelf foram vistos aqui.', [70, 76], [[418, 8], [419, 4], [422, 8], [423, 4], [456, 6], [457, 3], [458, 4], [129, 6], [130, 2], [339, 6], [340, 3], [481, 0.3, { legend: 1 }], [482, 0.3, { legend: 1 }]]],
+      ['s_neve', 'Rotas 216–217 & Snowpoint', 'ice', '❄️', 5, 'Nevasca eterna no norte de Sinnoh.', [72, 78], [[459, 10], [460, 3], [215, 6], [461, 2], [220, 6], [221, 4], [473, 2], [478, 3], [471, 1], [361, 6]]],
+      ['s_lanca', 'Coluna Lança', 'sky', '🏛️', 8, 'Ruínas no topo do Monte Coronet. Dialga e Palkia aparecem aqui.', [74, 80], [[425, 6], [426, 4], [429, 6], [442, 3], [444, 4], [445, 1], [436, 6], [437, 4], [474, 2], [483, 0.3, { legend: 1 }], [484, 0.3, { legend: 1 }]]],
+      ['s_distorcido', 'Mundo Distorcido & Ilhas', 'ghost', '🌀', 'ch', 'Pós-Sinnoh. Giratina, Heatran, Regigigas, Cresselia, Darkrai, Shaymin... e talvez Arceus.', [76, 82], [[429, 6], [477, 4], [478, 4], [442, 4], [487, 0.3, { legend: 1 }], [485, 0.25, { legend: 1 }], [486, 0.2, { legend: 1 }], [488, 0.25, { legend: 1 }], [491, 0.2, { legend: 1 }], [492, 0.2, { legend: 1 }], [489, 0.2, { legend: 1 }], [490, 0.15, { legend: 1 }], [493, 0.1, { legend: 1 }]]]] };
   G.PREG = R; G.PREG_ORDER = ['hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'paldea'];
   const lv = (r, o) => Math.min(100, r.base + o);
   for (const [key, r] of Object.entries(R)) {
