@@ -1,0 +1,35 @@
+// Movimento 2D
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
+const fs = require('fs');
+const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
+const URL = process.argv[2] || 'http://127.0.0.1:18473/';
+const LIVE = URL.includes('github.io') ? 'live-' : '';
+let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
+const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-anim-${LIVE}${n}-depois.png`;
+const at = h => new Date(2026, 9, 27, Math.floor(h), Math.round((h % 1) * 60));
+(async () => {
+  const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const errs = [];
+  p.on('pageerror', e => errs.push(e.message)); const ev = (f, a) => p.evaluate(f, a);
+  await p.clock.setFixedTime(at(12));
+  await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
+  await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="4"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
+  const TAG = process.argv[3] || 'depois'; const SH = n => `/workspace/pokemon-lake/prints/v2/375x667-anim-${LIVE}${n}-${TAG}.png`;
+  const clr = () => ev(() => document.querySelector('#modal-root').innerHTML = '');
+  const anim = sel => ev(sel => { const i = document.querySelector(sel); return i ? getComputedStyle(i).animationName : 'none'; }, sel);
+  const fr = async (name, clip, n) => { const fs2 = []; for (let i = 0; i < n; i++) { const f = `/tmp/${name}${i}.png`; await p.screenshot({ path: f, clip }); fs2.push(f); await p.waitForTimeout(110); } require('child_process').execSync(`python3 -c "from PIL import Image;import sys;f=[Image.open(x).convert('P',palette=Image.ADAPTIVE) for x in sys.argv[2:]];f[0].save(sys.argv[1],save_all=True,append_images=f[1:],duration=110,loop=0)" /workspace/pk-tmp/${name}.gif ${fs2.join(' ')}`); };
+  await ev(() => { const d = PokeApp.debug, S = d.S; const t = d.mkTeam([[658, 40]], 1, 0); S.party.unshift(t[0]); d.save(); }); await clr();
+  await ev(() => { document.querySelector('#battle')?.remove(); PokeApp.debug.startBattle({ kind: 'wild', enemy: PokeApp.debug.mkTeam([[25, 30]], 1, 0), map: PokeApp.C.MAPS[1] }); }); await p.waitForTimeout(2600); await clr();
+  for (let w = 0; w < 30 && await ev(() => document.querySelector('.pmon')?.classList.contains('hidden')); w++) await p.waitForTimeout(300); await p.waitForTimeout(800);
+  const srcs = await ev(() => [document.querySelector('#esp').getAttribute('src'), document.querySelector('#psp').getAttribute('src')]);
+  ok(/img\/front\/25\.gif/.test(srcs[0]) && /img\/back\/658\.gif/.test(srcs[1]), 'batalha usa GIF animado quadro a quadro (frente e costas): ' + srcs);
+  ok(await anim('.emon img') === 'breathe', 'movimento procedural + quadros mantido');
+  await fr('batalha-animada-v45', { x: 0, y: 60, width: 375, height: 380 }, 14);
+  await ev(() => { document.querySelector('#battle')?.remove(); PokeApp.debug.go('explore', 'floresta'); }); await p.waitForTimeout(700); await clr();
+  await ev(() => document.querySelector('#scene').classList.add('walking')); await p.waitForTimeout(100);
+  ok((await anim('#scene .follow img')).includes('ministep'), 'parceiro mini dá passos de 2 quadros andando');
+  const r = await ev(() => document.querySelector('#scene').getBoundingClientRect().toJSON()); await fr('mini-passos-v45', { x: 0, y: Math.max(0, r.y), width: 375, height: Math.min(300, r.height) }, 10);
+  await p.emulateMedia({ reducedMotion: 'reduce' }); await p.waitForTimeout(100); ok(await anim('#scene .follow img') === 'none', 'movimento reduzido respeitado');
+  ok(errs.length === 0, 'sem erros: ' + errs.join(' | '));
+  console.log(fail ? 'FALHOU ' + fail : 'TUDO OK'); await b.close(); process.exit(fail ? 1 : 0);
+})();

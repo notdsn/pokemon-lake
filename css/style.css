@@ -890,7 +890,7 @@ img.mini.mtap{animation:minitap .45s cubic-bezier(.2,1.6,.4,1)}
 @keyframes minitap{0%{transform:scale(1) rotate(0)}40%{transform:scale(1.15) rotate(-8deg)}70%{transform:scale(.95) rotate(4deg)}100%{transform:scale(1) rotate(0)}}
 .follow img.mini{animation:none}
 .explore .follow.live img.mini{animation:breathe var(--bd,2.2s) ease-in-out var(--bp,0s) infinite}
-.explore.walking>.follow.live:not(.hop) img.mini{animation:bobwalk .42s ease-in-out infinite}
+.walking>.follow.live:not(.hop) img.mini{animation:bobwalk .42s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){img.mini,img.mini.mtap{animation:none!important}}
 /* v44 shiny minis */
 img.mini.minish{filter:drop-shadow(0 2px 2px rgba(0,0,0,.35)) drop-shadow(0 0 3px rgba(255,215,90,.85));animation:minihop var(--mbd,2s) ease-in-out var(--mbp,0s) infinite,minisparkle 2.4s ease-in-out infinite}
@@ -898,3 +898,11 @@ img.mini.minish{filter:drop-shadow(0 2px 2px rgba(0,0,0,.35)) drop-shadow(0 0 3p
 .follow img.mini.minish{animation:minisparkle 2.4s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){img.mini.minish{animation:none!important}}
 .petyard .follow img.mini{width:104px;height:104px}
+/* v45 movimento realista */
+/* minis: passos de 2 quadros ao andar */
+@keyframes ministep{0%{translate:0 0;rotate:-6deg;scale:1.04 .96}50%{translate:0 -3px;rotate:6deg;scale:.97 1.04}100%{translate:0 0;rotate:-6deg;scale:1.04 .96}}
+.walking>.follow.live:not(.hop) img.mini{animation:ministep .44s steps(2,jump-none) infinite}
+.wander .follow img.mini{animation:ministep .44s steps(2,jump-none) infinite,wface 26s steps(1) infinite}
+.wander.sleep .follow img.mini{animation:breath 2.4s ease-in-out infinite}
+.walking>.follow.live:not(.hop) img.mini.minish,.wander .follow img.mini.minish{animation:ministep .44s steps(2,jump-none) infinite,minisparkle 2.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.walking>.follow.live img.mini,.wander .follow img.mini{animation:none!important}}
