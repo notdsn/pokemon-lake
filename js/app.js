@@ -2348,6 +2348,22 @@
     const bot = sc.querySelector('.ex-bot'), bt = bot && bot.querySelector('.exbtns'); if (bt) { const bar = document.createElement('div'); bar.className = 'card span2 exbar'; bar.appendChild(bt); sc.after(bar); }
     if (bot) { const pp = bot.querySelector('p'); if (pp) pp.title = pp.textContent; } }
   { const _render = render; render = function () { const r = _render.apply(this, arguments); try { tidyScene(); } catch (e) {} return r; }; }
+  // ===== Miniaturas chibi fora da batalha (v42) =====
+  const MINI = (() => { const RX = /img\/(front|shiny)\/(\d+)\.(gif|png)(\?.*)?$/, SKIP = '#battle, .wildpeek, .bigspr, .evo, .evobox, .caughtm, .raidwin, .bmon, .hatchm, .eggm';
+    const isLeg = id => !!(D.mons[id] && D.mons[id].L);
+    function fix(img) { if (!img || img.dataset.miniDone === img.getAttribute('src')) return; const src = img.getAttribute('src') || '', m = src.match(RX); if (!m) return;
+      if (img.closest(SKIP) || img.classList.contains('me')) return; const id = +m[2];
+      if (isLeg(id) || m[1] === 'shiny') { img.classList.add('minileg'); img.dataset.miniDone = src; return; }
+      const mini = 'img/mini/' + id + '.png'; img.dataset.full = src; img.classList.add('mini');
+      img.onerror = () => { img.onerror = null; img.classList.remove('mini'); img.classList.add('minileg'); img.src = img.dataset.full; img.dataset.miniDone = img.dataset.full; };
+      img.dataset.miniDone = mini; img.src = mini;
+      const h = (id * 2654435761 >>> 0) % 1000 / 1000; img.style.setProperty('--mbd', (1.6 + h * 0.9).toFixed(2) + 's'); img.style.setProperty('--mbp', (-h * 2).toFixed(2) + 's'); }
+    function scan(root) { (root || document).querySelectorAll('img').forEach(fix); }
+    const mo = new MutationObserver(ms => { for (const r of ms) { if (r.type === 'attributes') fix(r.target); else r.addedNodes.forEach(n => { if (n.nodeType !== 1) return; if (n.tagName === 'IMG') fix(n); else if (n.querySelectorAll) scan(n); }); } });
+    mo.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['src'] });
+    document.addEventListener('pointerdown', e => { const im = e.target.closest && e.target.closest('img.mini'); if (!im) return; im.classList.remove('mtap'); void im.offsetWidth; im.classList.add('mtap'); setTimeout(() => im.classList.remove('mtap'), 450); }, { passive: true });
+    scan(); return { scan, fix }; })();
+  A.mini = MINI;
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------

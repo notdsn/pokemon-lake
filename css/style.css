@@ -880,3 +880,15 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .tidy .grass-row{bottom:48px}
 .tidy .ex-top{position:absolute;top:0;left:0;right:0}.tidy .ex-bot{margin-top:auto}
 .tidy .wildpeek .hab{width:150px;font-size:.62rem;left:20%}
+/* ===== MINIATURAS CHIBI (v42) ===== */
+img.mini{object-fit:contain;image-rendering:auto;transform-origin:50% 88%;
+  background:radial-gradient(ellipse 30% 9% at 50% 91%,rgba(255,255,255,.55),transparent 70%),radial-gradient(ellipse 40% 12% at 50% 92%,#e2e8f0 0 55%,#94a3b8 56% 70%,transparent 72%);
+  filter:drop-shadow(0 3px 2px rgba(0,0,0,.35));animation:minihop var(--mbd,2s) ease-in-out var(--mbp,0s) infinite}
+img.mini.sil{filter:brightness(0) opacity(.75);background:none;animation:none}
+img.mini.mtap{animation:minitap .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes minihop{0%,100%{transform:translateY(0) scale(1,1)}45%{transform:translateY(-2px) scale(.98,1.03)}55%{transform:translateY(-2px) scale(.98,1.03)}80%{transform:translateY(0) scale(1.04,.96)}}
+@keyframes minitap{0%{transform:scale(1) rotate(0)}40%{transform:scale(1.15) rotate(-8deg)}70%{transform:scale(.95) rotate(4deg)}100%{transform:scale(1) rotate(0)}}
+.follow img.mini{animation:none}
+.explore .follow.live img.mini{animation:breathe var(--bd,2.2s) ease-in-out var(--bp,0s) infinite}
+.explore.walking>.follow.live:not(.hop) img.mini{animation:bobwalk .42s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){img.mini,img.mini.mtap{animation:none!important}}
