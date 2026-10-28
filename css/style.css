@@ -833,3 +833,26 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 /* roupas em pixel art */
 .accprev{width:56px;height:56px;object-fit:cover;object-position:50% 0;image-rendering:pixelated}
 .accs h4{margin:10px 0 4px}
+.card.accs{display:block!important}.accs .stygrid{display:grid!important;grid-template-columns:repeat(3,1fr);gap:8px}
+.accbox{display:block;width:64px;height:64px;overflow:hidden;margin:0 auto;border-radius:10px;background:#0002}
+.accbox .accprev{width:128px;height:128px;margin:-4px 0 0 -32px;object-fit:contain;max-width:none}
+/* MOVIMENTO 2D (não afeta lendários: só .live) */
+@keyframes breathe{0%,100%{transform:scale(1,1)}45%{transform:scale(calc(1 - var(--sq,.03)*.6),calc(1 + var(--sq,.03)))}75%{transform:scale(calc(1 + var(--sq,.03)*.5),calc(1 - var(--sq,.03)*.5))}}
+@keyframes bobwalk{0%,100%{transform:translateY(0) scale(1.03,.97)}50%{transform:translateY(-10%) scale(.97,1.04)}}
+@keyframes hflash{0%{filter:brightness(3.2) saturate(0)}35%{filter:brightness(1.6)}100%{filter:none}}
+@keyframes popinL{0%{transform:scale(0);filter:brightness(5) sepia(1) hue-rotate(-50deg) saturate(5)}55%{transform:scale(1.12,.88);filter:brightness(2)}75%{transform:scale(.95,1.06)}90%{transform:scale(1.02,.98)}100%{transform:scale(1)}}
+@keyframes lungeLP{15%{transform:translate(-4%,3%) scale(1.06,.92)}45%{transform:translate(20%,-14%) scale(.94,1.08)}70%{transform:translate(4%,-2%) scale(1.04,.96)}}
+@keyframes lungeLE{15%{transform:translate(4%,-3%) scale(1.06,.92)}45%{transform:translate(-20%,14%) scale(.94,1.08)}70%{transform:translate(-4%,2%) scale(1.04,.96)}}
+@keyframes hitL{0%{transform:translateX(-7%)}20%{transform:translateX(6%)}40%{transform:translateX(-4%)}60%{transform:translateX(3%)}80%{transform:translateX(-1%)}100%{transform:none}}
+@keyframes faintL{0%{transform:none}18%{transform:translateY(-5%) scale(1.05,.95)}35%{transform:translateY(0) rotate(-4deg) scale(1.08,.9)}100%{transform:translateY(55%) rotate(6deg) scale(.9,.6);opacity:0;clip-path:inset(0 0 100% 0)}}
+.bmon.live img,.wildpeek.live img,.follow.live img{transform-origin:50% 100%}
+.bmon.live:not(.hit):not(.lunge):not(.pop):not(.faint):not(.hidden) img{animation:breathe var(--bd,2.2s) ease-in-out var(--bp,0s) infinite}
+.bmon.live.pop img{animation:popinL .65s cubic-bezier(.2,1.2,.4,1)}
+.pmon.live.lunge img{animation:lungeLP .5s ease}.emon.live.lunge img{animation:lungeLE .5s ease}
+.bmon.live.hit img{animation:hitL .45s ease-out,hflash .4s ease-out}
+.battle.slowmo .bmon.live.hit img{animation-duration:1.1s,1s}
+.bmon.live.faint img{animation:faintL .85s ease-in forwards}
+.wildpeek.live img{animation:breathe var(--bd,2.2s) ease-in-out var(--bp,0s) infinite}
+:not(.wander)>.follow.live:not(.hop) img{animation:breathe var(--bd,2.2s) ease-in-out var(--bp,0s) infinite}
+.walking :not(.wander)>.follow.live img,.walking>.follow.live:not(.hop) img{animation:bobwalk .42s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.bmon.live img,.wildpeek.live img,.follow.live img{animation:none!important}}

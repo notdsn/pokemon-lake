@@ -2313,7 +2313,7 @@
   A.outfit = { ANCH, DRAW, accOf, slotOf, meKey, meSrc, compose, MECACHE };
   // Boutique: acessórios por encaixe, cada item mostra o desenho de verdade
   function accPrev(id) { const a = accOf(), s = sty(); const k = [S.avatar, 0, slotOf(id) === 'head' ? id : null, slotOf(id) === 'ears' ? id : null, slotOf(id) === 'face' ? id : null, slotOf(id) === 'back' ? id : null].join('|');
-    if (!MECACHE[k] && !MEWAIT[k]) { MEWAIT[k] = 1; setTimeout(() => compose(k)); } return `<img class="accprev" data-me="${k}" src="${MECACHE[k] || `img/tr/${S.avatar}.png`}" alt="">`; }
+    if (!MECACHE[k] && !MEWAIT[k]) { MEWAIT[k] = 1; setTimeout(() => compose(k)); } return `<span class="accbox"><img class="accprev" data-me="${k}" src="${MECACHE[k] || `img/tr/${S.avatar}.png`}" alt=""></span>`; }
   { const _vs = vStyle; vStyle = function () { const html = _vs.apply(this, arguments), s = sty(), ac = accOf();
       const list = STYLE.hats.filter(h => h[0] !== 'h0' && (h[3] >= 0 || s.owned[h[0]]));
       const sec = ['head', 'ears', 'face', 'back'].map(sl => { const its = list.filter(h => slotOf(h[0]) === sl); if (!its.length) return '';
@@ -2324,6 +2324,22 @@
     else ac[sl] = ac[sl] === d.id ? null : d.id;
     s.hat = ac.head || 'h0'; save(); render(); };
   { const _sb = ACT.stybuy; ACT.stybuy = d => { if (d.k === 'hat') return ACT.accbuy(d); return _sb(d); }; }
+
+  // =====================================================================
+  // MOVIMENTO 2D: respiração/balanço por espécie, golpe, dano, desmaio, entrada (lendários ficam como estão)
+  // =====================================================================
+  const LIVE2D = (() => {
+    const idOf = src => { const m = /\/(\d+)\.(?:gif|png)/.exec(src || ''); return m ? +m[1] : 0; };
+    function tag(el) { const im = el.querySelector('img'); if (!im) return; const id = idOf(im.getAttribute('src')); if (!id) return; if (el.dataset.lv === String(id)) return; el.dataset.lv = id;
+      const d = D.mons[id], leg = !!(d && d.L); el.classList.toggle('live', !leg); el.classList.toggle('nolive', leg); if (leg) return;
+      let h = id * 2654435761 >>> 0; const r1 = (h % 1000) / 1000, r2 = ((h >>> 10) % 1000) / 1000, heavy = d && d.s && d.s[5] < 50, fast = d && d.s && d.s[5] > 100;
+      el.style.setProperty('--bd', (heavy ? 2.7 : fast ? 1.6 : 2.1) + r1 * .6 + 's'); el.style.setProperty('--bp', (-r2 * 2).toFixed(2) + 's'); el.style.setProperty('--sq', (heavy ? .045 : .03).toFixed(3)); }
+    function scan() { document.querySelectorAll('.bmon, .follow, .wildpeek').forEach(tag); }
+    let q = 0; const mo = new MutationObserver(() => { if (!q) q = requestAnimationFrame(() => { q = 0; scan(); }); });
+    mo.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['src'] });
+    return { scan, idOf };
+  })();
+  A.live2d = LIVE2D;
 
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
