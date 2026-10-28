@@ -110,8 +110,8 @@
   function addCaught(m) { see(m.id); S.dex.caught[m.id] = 1; if (m.shiny) S.dex.shiny[m.id] = 1; }
 
   // ---------- hora, clima ----------
-  function period() { const h = new Date().getHours(); return h >= 6 && h < 18 ? 'day' : h >= 18 && h < 20 ? 'dusk' : 'night'; }
-  const PERIOD_PT = { day: '☀️ Dia', dusk: '🌇 Entardecer', night: '🌙 Noite' };
+  function period() { const d = new Date(), h = d.getHours() + d.getMinutes() / 60; return h < 5.5 || h >= 19.8 ? 'night' : h >= 17.3 || h < 6.4 ? 'dusk' : 'day'; }
+  const PERIOD_PT = { day: '☀️ Dia', get dusk() { return new Date().getHours() < 12 ? '🌅 Amanhecer' : '🌇 Entardecer'; }, night: '🌙 Noite' };
   const WEATHER = { clear: ['Céu limpo', '🌤️'], rain: ['Chuva', '🌧️'], sun: ['Sol forte', '🔥'], fog: ['Neblina', '🌫️'], snow: ['Neve', '❄️'], storm: ['Tempestade', '⛈️'] };
   const THEME_WEATHER = { grass: ['clear', 'clear', 'rain', 'sun'], forest: ['clear', 'rain', 'fog'], cave: ['clear'], water: ['clear', 'rain', 'rain', 'storm'], ghost: ['fog', 'fog', 'clear'],
     safari: ['clear', 'sun', 'rain'], electric: ['storm', 'clear', 'storm'], ice: ['snow', 'snow', 'clear'], volcano: ['sun', 'sun', 'clear'], psychic: ['clear', 'fog'], sky: ['clear', 'storm', 'sun'] };
@@ -710,10 +710,11 @@
       if (!ov || !document.body.contains(ov)) return;
       const mon = side => bq(side ? '.emon' : '.pmon');
       switch (e.e) {
-        case 'use': { log(e.text); await wait(420); const el = mon(e.side); el.classList.add('lunge'); setTimeout(() => el.classList.remove('lunge'), 450);
+        case 'use': { log(e.text); camTo(e.side); await wait(420); const el = mon(e.side); el.classList.add('lunge'); setTimeout(() => el.classList.remove('lunge'), 450);
           if (e.cat !== 't') await projectile(e.side, e.type); else { auraFx(e.side, e.type); SFX.status(); await wait(550); } break; }
-        case 'hp': { const el = mon(e.side); if (e.dmg > 0) { el.classList.add('hit'); if (e.eff > 1 || e.crit) { SFX.superhit(); ov.classList.add('shake'); } else if (e.eff < 1) SFX.weak(); else SFX.hit();
-            dmgNum(e.side, e.dmg, e.crit, e.eff); setTimeout(() => { el.classList.remove('hit'); ov.classList.remove('shake'); }, 500); }
+        case 'hp': { const el = mon(e.side); if (e.dmg > 0) { el.classList.add('hit'); if (e.eff > 1 || e.crit) { SFX.superhit(); if (!RMOT()) ov.classList.add(e.crit ? 'shakex' : 'shake'); }
+            if (e.hp <= 0 && !RMOT()) { ov.classList.add('slowmo'); setTimeout(() => ov.classList.remove('slowmo'), 1300); } else if (e.eff < 1) SFX.weak(); else SFX.hit();
+            dmgNum(e.side, e.dmg, e.crit, e.eff); setTimeout(() => { el.classList.remove('hit'); ov.classList.remove('shake', 'shakex'); }, e.crit ? 650 : 500); if (e.hp <= 0) await wait(RMOT() ? 0 : 700); }
           setHP(e.side, e.hp, e.max); await wait(650); break; }
         case 'heal': log(e.text); healFx(e.side); SFX.heal(); setHP(e.side, e.hp, e.max); await wait(800); break;
         case 'faint': { log(e.text); const el = mon(e.side); cry(B.s.sides[e.side].b.m.id); await wait(300); el.classList.add('faint'); $(e.side ? '#einfo' : '#pinfo').classList.remove('show'); drawBalls(); await wait(1000); break; }
@@ -2004,6 +2005,18 @@
   setInterval(() => { try { if (document.hidden) return; B ? flyBattle() : null; } catch (e) {} }, 500);
   setInterval(() => { try { if (!document.hidden) lightTick(); } catch (e) {} }, 60000);
   lightTick();
+
+  // ===== REALISMO 2: câmera, crítico forte, câmera lenta no golpe final, partículas por tipo =====
+  const RMOT = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const PFX = { fire: [8, -1], water: [7, 1], electric: [5, 0], rock: [7, 1], ground: [7, 1], grass: [7, 0], ice: [7, 0], psychic: [2, 0], ghost: [5, -1], poison: [6, -1], dragon: [7, 0], fairy: [7, -1], bug: [5, 0], steel: [6, 0], fighting: [5, 0], dark: [5, 0], flying: [6, 0], normal: [5, 0] };
+  function typeFx(side, type) { const fx = $('#fxl'); if (!fx) return; const [x, y] = center(side), [n0, dir] = PFX[type] || [5, 0], n = RMOT() ? Math.min(3, n0) : n0;
+    for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2 + R() * .6, r = 26 + R() * 34, p = document.createElement('i'); p.className = 'pfx p-' + type;
+      p.style.cssText = `left:${x}px;top:${y}px;--tx:${Math.round(Math.cos(a) * r)}px;--ty:${Math.round(Math.sin(a) * r * .7 + dir * 34)}px;--rot:${Math.round(R() * 360)}deg;animation-delay:${i * 30}ms`;
+      fx.appendChild(p); setTimeout(() => p.remove(), 1000); } }
+  A.typeFx = typeFx;
+  { const _pj = projectile; projectile = async function (side, type) { const r = await _pj.apply(this, arguments); typeFx(1 - side, type); return r; }; }
+  function camTo(side) { const sc = bq('.bscene'); if (!sc || RMOT()) return; sc.classList.remove('cam-p', 'cam-e'); void sc.offsetWidth; sc.classList.add(side ? 'cam-e' : 'cam-p'); clearTimeout(camTo.t); camTo.t = setTimeout(() => sc.classList.remove('cam-p', 'cam-e'), 1100); }
+  A.camTo = camTo;
 
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 

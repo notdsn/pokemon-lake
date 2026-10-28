@@ -684,3 +684,35 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 @keyframes ffd{0%{transform:translate(0,0)}50%{transform:translate(18px,-14px)}100%{transform:translate(-12px,10px)}}
 @keyframes ffb{0%{opacity:.1}100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.ffly i{animation:none;opacity:.7}.bmon.fly:before,.follow.fly:before{animation:none}}
+/* ===== REALISMO 2: câmera + efeitos por tipo ===== */
+.bscene{transition:transform .45s cubic-bezier(.3,.7,.3,1);transform-origin:50% 50%}
+.bscene.cam-p{transform:scale(1.06) translate(3%,-2%)}
+.bscene.cam-e{transform:scale(1.06) translate(-3%,3%)}
+.battle.shakex .bscene{animation:shakex .6s}
+@keyframes shakex{10%{transform:translate(-14px,7px) rotate(-.6deg)}25%{transform:translate(12px,-9px) rotate(.5deg)}40%{transform:translate(-10px,6px)}55%{transform:translate(8px,-5px)}70%{transform:translate(-5px,3px)}85%{transform:translate(3px,-2px)}}
+.battle.slowmo .bscene{transform:scale(1.05);transition:transform 1.1s ease-out;filter:saturate(1.3) contrast(1.08)}
+.battle.slowmo .bmon.hit img{animation-duration:1.4s}
+.battle.slowmo .dmg{animation-duration:1.6s!important}
+.pfx{position:absolute;width:8px;height:8px;margin:-4px 0 0 -4px;pointer-events:none;z-index:6;animation:pfx .75s cubic-bezier(.2,.7,.4,1) forwards;will-change:transform,opacity}
+@keyframes pfx{0%{transform:translate(0,0) rotate(0) scale(.4);opacity:1}70%{opacity:.9}100%{transform:translate(var(--tx),var(--ty)) rotate(var(--rot)) scale(1);opacity:0}}
+.p-fire{border-radius:50%;background:radial-gradient(#fff7a8,#f97316 55%,#dc2626);box-shadow:0 0 6px #fb923c}
+.p-water{border-radius:50% 0 50% 50%;background:#60a5fa;box-shadow:inset -2px -2px 0 #1d4ed8;width:7px;height:9px}
+.p-electric{width:6px;height:16px;background:#fde047;clip-path:polygon(60% 0,0 55%,45% 55%,30% 100%,100% 40%,55% 40%);filter:drop-shadow(0 0 3px #facc15)}
+.p-rock,.p-ground{width:7px;height:6px;border-radius:2px;background:#a8835a;box-shadow:inset -2px -2px 0 #6b4f33}
+.p-ground{background:#c9a46a}
+.p-grass,.p-bug{width:10px;height:6px;border-radius:0 100% 0 100%;background:#4ade80;box-shadow:inset -1px -1px 0 #15803d}
+.p-bug{background:#a3e635}
+.p-ice{width:7px;height:7px;background:linear-gradient(135deg,#fff,#7dd3fc);transform:rotate(45deg);box-shadow:0 0 4px #e0f2fe}
+.p-psychic{width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:3px solid #f472b6;background:none;animation-name:pring;--tx:0;--ty:0}
+@keyframes pring{0%{transform:scale(.2);opacity:1}100%{transform:scale(2.6);opacity:0}}
+.p-ghost{width:12px;height:12px;border-radius:50%;background:radial-gradient(#e9d5ff,#7c3aed 60%,transparent 72%);filter:blur(1px)}
+.p-poison{border-radius:50%;background:#c084fc;box-shadow:inset -2px -2px 0 #7e22ce}
+.p-dragon{width:9px;height:9px;background:#8b5cf6;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.p-fairy{width:10px;height:10px;background:#f9a8d4;clip-path:polygon(50% 0,61% 38%,100% 38%,68% 61%,79% 100%,50% 76%,21% 100%,32% 61%,0 38%,39% 38%)}
+.p-steel{width:9px;height:3px;background:#cbd5e1;box-shadow:0 0 3px #fff}
+.p-fighting,.p-normal,.p-dark,.p-flying{width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 5px #fff}
+.p-dark{background:#1e1b4b;box-shadow:0 0 5px #6366f1}
+.p-flying{width:10px;height:3px;background:#e0f2fe}
+@media (prefers-reduced-motion:reduce){.bscene{transition:none}.pfx{animation-duration:.4s}}
+.follow,.room .follow,.walking .follow,.follow.hop{animation:none!important}
+.follow img{animation:fidle 1.3s ease-in-out infinite}.walking .follow img{animation:fhop .42s infinite}.follow.hop img{animation:fhop .3s 3}
