@@ -2018,6 +2018,17 @@
   function camTo(side) { const sc = bq('.bscene'); if (!sc || RMOT()) return; sc.classList.remove('cam-p', 'cam-e'); void sc.offsetWidth; sc.classList.add(side ? 'cam-e' : 'cam-p'); clearTimeout(camTo.t); camTo.t = setTimeout(() => sc.classList.remove('cam-p', 'cam-e'), 1100); }
   A.camTo = camTo;
 
+  // ===== REALISMO 3: fundos em 3 camadas com paralaxe por bioma =====
+  const BIOME = { forest: 'forest', grass: 'forest', ghost: 'forest', cave: 'cave', water: 'water', sky: 'mountain', volcano: 'mountain', electric: 'city', psychic: 'city', gym: 'city', ice: 'snow', safari: 'desert' };
+  const biomeOf = th => BIOME[th] || 'forest'; A.biomeOf = biomeOf;
+  const parHtml = bio => `<div class="bpar bio-${bio}" aria-hidden="true"><i class="bl sky" style="background-image:url(img/bg/${bio}-sky.svg)"></i><i class="bl gnd"></i><i class="bl hills" style="background-image:url(img/bg/${bio}-hills.svg)"></i><i class="bl fg" style="background-image:url(img/bg/${bio}-fg.svg)"></i></div>`;
+  function addParExplore() { const sc = document.querySelector('#scene.explore'); if (!sc || sc.querySelector('.bpar')) return; const th = (sc.className.match(/theme-(\w+)/) || [])[1]; sc.insertAdjacentHTML('afterbegin', parHtml(biomeOf(th))); }
+  function battleCam(o) { const ov = $('#battle'), sc = ov && $('.bscene', ov); if (!sc || $('.bcam', sc)) return; const cam = document.createElement('div'); cam.className = 'bcam';
+    [...sc.children].forEach(ch => { if (!ch.matches('.info,.ebs,.wchip,.intro')) cam.appendChild(ch); }); sc.prepend(cam);
+    const th = o && o.map ? o.map.theme : o && o.tower ? 'psychic' : 'gym'; cam.insertAdjacentHTML('afterbegin', parHtml(biomeOf(th))); }
+  { const _sb = startBattle; startBattle = function (o) { const r = _sb.apply(this, arguments); try { battleCam(o); } catch (e) {} return r; }; A.debug.startBattle = startBattle; }
+  { const _render = render; render = function () { const r = _render.apply(this, arguments); try { addParExplore(); } catch (e) {} return r; }; }
+
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------

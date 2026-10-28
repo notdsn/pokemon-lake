@@ -716,3 +716,37 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 @media (prefers-reduced-motion:reduce){.bscene{transition:none}.pfx{animation-duration:.4s}}
 .follow,.room .follow,.walking .follow,.follow.hop{animation:none!important}
 .follow img{animation:fidle 1.3s ease-in-out infinite}.walking .follow img{animation:fhop .42s infinite}.follow.hop img{animation:fhop .3s 3}
+/* ===== REALISMO 3: paralaxe ===== */
+.bcam{position:absolute;inset:0;transition:transform .45s cubic-bezier(.3,.7,.3,1);transform-origin:50% 50%}
+.bscene.cam-p,.bscene.cam-e,.battle.slowmo .bscene{transform:none}
+.bscene.cam-p .bcam{transform:scale(1.06) translate(3%,-2%)}
+.bscene.cam-e .bcam{transform:scale(1.06) translate(-3%,3%)}
+.battle.slowmo .bcam{transform:scale(1.05);transition:transform 1.1s ease-out}
+.bpar{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bpar .bl{position:absolute;left:-6%;right:-6%;background-repeat:no-repeat;background-size:cover;background-position:50% 100%;transition:transform .5s cubic-bezier(.3,.7,.3,1)}
+.bpar .sky{top:0;bottom:30%;background-position:50% 100%;animation:skydrift 40s ease-in-out infinite alternate}
+.bpar .hills{top:0;bottom:30%}
+.bpar .gnd{top:68%;bottom:0;background:var(--gnd)}
+.bpar .fg{top:72%;bottom:-2%;z-index:4;opacity:.95}
+.battle .bpar .fg{top:auto;height:12%;bottom:0}
+.explore .bpar .fg{top:auto;height:16%;bottom:0;z-index:0}
+.explore{isolation:isolate}.explore>.bpar{z-index:-1}
+.explore .ground{opacity:0}
+@keyframes skydrift{to{transform:translateX(-3%)}}
+.bio-forest{--gnd:linear-gradient(#3f7d4c,#245a33 60%,#163f22)}
+.bio-cave{--gnd:linear-gradient(#3a3150,#2a2340 60%,#1c1730)}
+.bio-water{--gnd:linear-gradient(#1d4ed8,#1e40af 40%,#e9cf98 41%,#d9b878)}
+.bio-mountain{--gnd:linear-gradient(#5b6b52,#4a5842 60%,#3a4535)}
+.bio-city{--gnd:linear-gradient(#9ca3af,#8b929d 60%,#6b7280)}
+.bio-snow{--gnd:linear-gradient(#f1f5f9,#e2e8f0 60%,#cbd5e1)}
+.bio-desert{--gnd:linear-gradient(#d9a35a,#cf9650 60%,#b97f3e)}
+.theme-ghost .bpar{filter:hue-rotate(200deg) saturate(.6) brightness(.75)}
+.theme-volcano .bpar{filter:sepia(.5) hue-rotate(-25deg) saturate(1.6) brightness(.9)}
+.theme-psychic .bpar{filter:hue-rotate(260deg) saturate(.8)}
+/* paralaxe da câmera: camadas distantes andam menos */
+.cam-p .bpar .sky{transform:translateX(1.5%)}.cam-p .bpar .hills{transform:translateX(.5%)}.cam-p .bpar .fg{transform:translateX(-2.5%)}
+.cam-e .bpar .sky{transform:translateX(-1.5%)}.cam-e .bpar .hills{transform:translateX(-.5%)}.cam-e .bpar .fg{transform:translateX(2.5%)}
+/* paralaxe ao caminhar na exploração */
+.walking .bpar .hills{animation:parw 1.6s ease-in-out infinite alternate}.walking .bpar .fg{animation:parw2 1.6s ease-in-out infinite alternate}
+@keyframes parw{to{transform:translateX(-1.5%)}}@keyframes parw2{to{transform:translateX(-4%)}}
+@media (prefers-reduced-motion:reduce){.bpar .bl{animation:none!important;transition:none}.bcam{transition:none}}
