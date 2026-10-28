@@ -2341,6 +2341,13 @@
   })();
   A.live2d = LIVE2D;
 
+  // ===== Mapa limpo (v41): cena livre, botões compactos embaixo, chips só com ícone =====
+  function tidyScene() { const sc = document.getElementById('scene'); if (!sc || sc.dataset.tidy) return; sc.dataset.tidy = 1; sc.classList.add('tidy');
+    const top = sc.querySelector('.ex-top'); if (top) { const bk = top.querySelector('[data-a="tab"]'); if (bk) { bk.textContent = '←'; bk.title = 'Mapas'; bk.setAttribute('aria-label', 'Voltar aos mapas'); }
+      const pills = document.createElement('div'); pills.className = 'expills'; top.querySelectorAll('.chip').forEach(c => { const t = c.textContent.trim(), ic = (t.match(/^\S+/) || [t])[0]; c.title = t; c.setAttribute('aria-label', t); c.textContent = ic; c.classList.add('ico'); pills.appendChild(c); }); top.appendChild(pills); }
+    const bot = sc.querySelector('.ex-bot'), bt = bot && bot.querySelector('.exbtns'); if (bt) { const bar = document.createElement('div'); bar.className = 'card span2 exbar'; bar.appendChild(bt); sc.after(bar); }
+    if (bot) { const pp = bot.querySelector('p'); if (pp) pp.title = pp.textContent; } }
+  { const _render = render; render = function () { const r = _render.apply(this, arguments); try { tidyScene(); } catch (e) {} return r; }; }
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------

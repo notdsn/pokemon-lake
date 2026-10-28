@@ -856,3 +856,27 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 :not(.wander)>.follow.live:not(.hop) img{animation:breathe var(--bd,2.2s) ease-in-out var(--bp,0s) infinite}
 .walking :not(.wander)>.follow.live img,.walking>.follow.live:not(.hop) img{animation:bobwalk .42s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.bmon.live img,.wildpeek.live img,.follow.live img{animation:none!important}}
+/* ===== MAPA LIMPO (v41) ===== */
+.explore.tidy{min-height:330px}
+.tidy .ex-top{padding:8px;gap:6px;align-items:center;flex-wrap:nowrap;justify-content:space-between}
+.tidy .ex-top .btn{min-width:34px;height:30px;padding:0 10px;font-size:1rem;border-radius:999px}
+.tidy .expills{display:flex;gap:4px}
+.tidy .ex-top .chip.ico{width:28px;height:28px;padding:0;display:grid;place-items:center;font-size:.95rem;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.18)}
+.tidy .ex-bot{padding:5px 10px 6px;background:rgba(8,12,24,.72);backdrop-filter:none}
+.tidy .ex-bot h2{font-size:.92rem;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tidy .ex-bot p{font-size:.7rem;margin:1px 0 0;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tidy .me{bottom:52px!important}
+.tidy .follow{bottom:50px!important}
+.tidy .wildpeek{bottom:62px!important}
+.tidy .alertmark{bottom:140px}
+.exbar{padding:8px!important;margin-top:-4px}
+.exbar .exbtns{flex-wrap:nowrap;gap:6px;overflow-x:auto;scrollbar-width:none}
+.exbar .exbtns .btn,.exbar .exbtns .btn.big{flex:1 1 0;min-width:0;height:40px!important;min-height:0!important;padding:0 8px!important;font-size:.78rem!important;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:12px}
+.tidy .wx{opacity:.32!important}
+.tidy.w-rain .wx,.tidy.w-storm .wx{background-size:22px 60px;background-image:linear-gradient(105deg,transparent 47%,rgba(186,230,253,.45) 50%,transparent 53%)}
+.tidy.w-snow .wx{background-size:60px 60px,38px 38px}
+.tidy .wxramp.wxon,.tidy .rainheavy{opacity:.28!important}
+.tidy .me,.tidy .follow,.tidy .wildpeek{z-index:5}
+.tidy .grass-row{bottom:48px}
+.tidy .ex-top{position:absolute;top:0;left:0;right:0}.tidy .ex-bot{margin-top:auto}
+.tidy .wildpeek .hab{width:150px;font-size:.62rem;left:20%}
