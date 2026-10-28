@@ -630,3 +630,38 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .giftcash small b{color:#fde68a;font-size:15px;white-space:nowrap}
 .chip.money{white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
 @media (max-width:380px){.chip.money{font-size:12px;padding-left:8px;padding-right:8px}}
+/* ===== v7 insígnias de metal ===== */
+.badge.pin{position:relative;clip-path:none;background:none;width:22px;height:22px;display:inline-block;filter:drop-shadow(0 1.5px 1.2px #000a);transition:transform .2s}
+.badge.pin img{width:100%;height:100%;display:block}
+.badge.pin:not(.on) img{filter:grayscale(1) brightness(.35) contrast(.8);opacity:.6}
+.badge.pin.on::after{content:'';position:absolute;inset:0;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat;background:linear-gradient(115deg,transparent 35%,#fff9 48%,#fff0 60%) -150% 0/250% 100% no-repeat;pointer-events:none}
+.badge.pin.on.shine::after,.badge.pin.on:active::after,.bigbadge .badge.pin::after{animation:bshine 1.1s ease-out}
+.bigbadge .badge.pin::after{animation:bshine 1.4s .9s ease-out 2}
+@keyframes bshine{from{background-position:-150% 0}to{background-position:150% 0}}
+.badge.pin.on:active{transform:scale(1.15) rotate(-6deg)}
+.bg .badge.pin{width:44px;height:44px}.bigbadge .badge.pin{width:120px;height:120px;filter:drop-shadow(0 6px 6px #000b)}
+.room .trophies .badge.pin{width:18px;height:18px}
+.badges .badge.pin{width:22px;height:22px}
+.bg{background:radial-gradient(circle at 50% 35%,#2b3550,#141a2b);box-shadow:inset 0 2px 6px #000a,inset 0 -1px 0 #ffffff14}
+.badgegrid{background:linear-gradient(#3b2414,#2a170b);padding:10px;border-radius:14px;box-shadow:inset 0 3px 10px #000c}
+/* ===== v7 Minha Casa ilustrada ===== */
+.room.v2{height:350px;background:#b07a4a}
+.room.v2 .wall{inset:0 0 auto 0;height:150px;background:linear-gradient(var(--wall),color-mix(in srgb,var(--wall) 78%,#000));box-shadow:none}
+.room.v2 .wtrim{position:absolute;left:0;right:0;bottom:0;height:10px;background:linear-gradient(#e7d3b4,#a8835a);box-shadow:0 3px 4px #0005}
+.room.v2 .window{left:12px;top:14px;width:64px;height:62px;border:5px solid #fff;box-shadow:inset 0 0 0 2px #cbd5e1,0 3px 0 #0003}
+.room.v2 .window i{position:absolute;left:50%;top:0;bottom:0;width:4px;margin-left:-2px;background:#fff}.room.v2 .window::after{content:'';position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;background:#fff}
+.room.v2 .shelf{top:10px;right:8px;width:62%;padding:5px 6px 4px;background:linear-gradient(#8b5a2b,#6b4423);box-shadow:0 5px 0 #4a2c14,0 9px 6px #0005}
+.room.v2 .floor{position:absolute;inset:150px 0 0 0;background:linear-gradient(#0003,#0000 30%),repeating-linear-gradient(90deg,#b98252 0 42px,#a8723f 42px 44px),#b07a4a}
+.room.v2 .floor::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 38px,#0000001a 38px 40px)}
+.fspot,.wspot{position:absolute;transform:translateX(-50%);background:none;border:0;padding:0;display:flex;align-items:flex-end;justify-content:center;cursor:pointer}
+.fspot{width:23%;height:96px;transform:translateX(-50%) scale(var(--s));transform-origin:50% 100%}
+.fspot .fa{display:block;max-width:none;filter:drop-shadow(0 2px 1px #0003)}.fspot.rug{height:44px}
+.ftile{font-style:normal;width:46px;height:22px;display:grid;place-items:center;border:2px dashed #ffffff55;border-radius:50%;color:#fff8;font-size:14px;margin-bottom:4px}
+.wspot{width:60px;height:72px;transform:translateX(-50%);align-items:flex-start}
+.whook{font-style:normal;width:22px;height:22px;display:grid;place-items:center;border:2px dashed #0004;border-radius:6px;color:#0006;font-size:12px;margin-top:8px}
+.wspot .fa{filter:drop-shadow(2px 3px 2px #0005)}
+.fpk{position:relative;display:block;height:auto}.fpk .fbase{width:100%;display:block}.fpk .fmon{position:absolute;left:50%;bottom:30%;width:76%;transform:translateX(-50%);image-rendering:pixelated;filter:drop-shadow(0 2px 1px #0004)}
+.fpk.statue .fmon{filter:grayscale(.15) sepia(.2) drop-shadow(0 2px 1px #0004)}
+.fprev{height:56px;display:flex;align-items:flex-end;justify-content:center}.fprev .fa{max-height:56px;max-width:70px}.fprev .fpk{width:52px}
+.room.v2 .me{z-index:5;bottom:24%}.room.v2 .follow{z-index:5;bottom:23%}.room.v2 .mehat{bottom:calc(24% + 52px)}.room.v2 .meaura{bottom:22%}
+.clock .pend,.fa .pend{transform-origin:20px 38px}

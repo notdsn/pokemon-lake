@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 108 108"><defs>
+<linearGradient id="mt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7cc"/><stop offset=".3" stop-color="#e8c24a"/><stop offset=".55" stop-color="#8a6512"/><stop offset=".75" stop-color="#f7e08c"/><stop offset="1" stop-color="#6b4a08"/></linearGradient>
+<linearGradient id="bv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
+<radialGradient id="en" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="#f6acd1"/><stop offset=".45" stop-color="#ec4899"/><stop offset="1" stop-color="#6a2044"/></radialGradient>
+<linearGradient id="sp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<clipPath id="cl"><path d="M50,88 C20,66 6,48 10,30 C14,12 38,8 50,28 C62,8 86,12 90,30 C94,48 80,66 50,88Z"/></clipPath></defs>
+<g fill="url(#mt)" stroke="#6b4a08" stroke-width="1.2"><path d="M50,88 C20,66 6,48 10,30 C14,12 38,8 50,28 C62,8 86,12 90,30 C94,48 80,66 50,88Z"/></g>
+<g fill="none" stroke="url(#bv)" stroke-width="3" opacity=".9"><path d="M50,88 C20,66 6,48 10,30 C14,12 38,8 50,28 C62,8 86,12 90,30 C94,48 80,66 50,88Z"/></g>
+<g clip-path="url(#cl)"><path d="M50,88 C20,66 6,48 10,30 C14,12 38,8 50,28 C62,8 86,12 90,30 C94,48 80,66 50,88Z" fill="url(#en)" transform="translate(50 50) scale(.84) translate(-50 -50)"/><path d="M50,74 C30,60 22,48 24,36 C26,26 40,24 50,38" fill="none" stroke="#f5a3cc" stroke-width="4" opacity=".6"/><ellipse cx="38" cy="22" rx="34" ry="16" fill="url(#sp)" transform="rotate(-20 38 22)"/><rect x="-10" y="58" width="130" height="60" fill="#000" opacity=".12"/></g>
+</svg>
