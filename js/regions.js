@@ -119,7 +119,41 @@
       ['a_poni', 'Poni: Canyon Vast', 'cave', '🪨', 6, 'Penhascos e cavernas. Jangmo-o treina aqui.', [82, 88], [[782, 6], [783, 3], [784, 1], [745, 6], [774, 8], [775, 4], [779, 6], [780, 4], [787, 0.2, { legend: 1 }]]],
       ['a_altar', 'Altar do Sol e da Lua', 'sky', '☀️', 8, 'No topo das ruínas de Poni, Solgaleo e Lunala descem do céu.', [84, 90], [[772, 2], [776, 4], [780, 4], [774, 6], [789, 1], [790, 1], [791, 0.3, { legend: 1 }], [792, 0.3, { legend: 1 }], [785, 0.2, { legend: 1 }], [786, 0.2, { legend: 1 }], [787, 0.2, { legend: 1 }], [788, 0.2, { legend: 1 }]]],
       ['a_ultra', 'Ultra Espaço & Ruínas', 'psychic', '🌌', 'ch', 'Pós-Alola. Ultra Criaturas, Necrozma, Magearna, Marshadow e Zeraora.', [86, 92], [[772, 4], [773, 1], [793, 0.3, { legend: 1 }], [794, 0.3, { legend: 1 }], [795, 0.3, { legend: 1 }], [796, 0.3, { legend: 1 }], [797, 0.3, { legend: 1 }], [798, 0.3, { legend: 1 }], [799, 0.3, { legend: 1 }], [800, 0.25, { legend: 1 }], [801, 0.2, { legend: 1 }], [802, 0.2, { legend: 1 }], [803, 0.25, { legend: 1 }], [805, 0.2, { legend: 1 }], [806, 0.2, { legend: 1 }], [807, 0.2, { legend: 1 }]]]] };
+  R.galar = { n: 'Galar', k: 'g', base: 86, prev: 'alola', game: 'Sword/Shield', story: 'Estádios lotados, o Desafio de Ginásios, a Dinamax e os heróis lendários Zacian e Zamazenta.', autoTr: 1,
+    badges: [['Planta', 'leaf', ['#4ade80']], ['Água', 'drop', ['#0ea5e9']], ['Fogo', 'flame', ['#f97316']], ['Luta', 'fist', ['#b45309']], ['Fada', 'heart', ['#f9a8d4']], ['Pedra', 'cone', ['#a16207'], 'silver'], ['Sombrio', 'shield', ['#374151'], 'silver'], ['Dragão', 'dragon', ['#4f46e5']]],
+    gyms: [['Milo', 'milo', 'Turffield', 'grass', [[829, 0], [840, 1], [830, 2]]],
+      ['Nessa', 'nessa', 'Hulbury', 'water', [[118, 2], [846, 2], [834, 3]]],
+      ['Kabu', 'kabu', 'Motostoke', 'fire', [[38, 3], [59, 4], [851, 4]]],
+      ['Bea', 'bea', 'Stow-on-Side', 'fighting', [[865, 4], [870, 5], [68, 5], [853, 6]]],
+      ['Opal', 'opal', 'Ballonlea', 'fairy', [[10168, 6], [303, 6], [858, 7], [869, 7]]],
+      ['Gordie', 'gordie', 'Circhester', 'rock', [[689, 7], [874, 7], [213, 8], [839, 8]]],
+      ['Piers', 'piers', 'Spikemuth', 'dark', [[560, 8], [454, 9], [10175, 9], [862, 10]]],
+      ['Raihan', 'raihan', 'Hammerlocke', 'dragon', [[526, 10], [330, 10], [844, 11], [884, 11]]]],
+    elite: [['Marnie', 'marnie', 'Torneio dos Campeões', 'dark', [[862, 14], [877, 14], [560, 15], [454, 15], [861, 16]]],
+      ['Hop', 'hop', 'Torneio dos Campeões', 'normal', [[832, 14], [823, 15], [849, 15], [778, 15], [815, 16]]],
+      ['Bede', 'bede', 'Torneio dos Campeões', 'fairy', [[303, 14], [282, 15], [869, 15], [10168, 15], [858, 16]]],
+      ['Rose', 'rose', 'Presidente da Liga', 'steel', [[601, 14], [863, 15], [823, 15], [879, 15], [884, 16]]],
+      ['Leon', 'leon', 'Campeão de Galar', 'fire', [[681, 18], [887, 18], [612, 18], [464, 18], [537, 19], [6, 20]]]],
+    maps: [['g_rotas', 'Rotas 1–3 & Turffield', 'grass', '🐑', 0, 'Campos verdes com Wooloo pastando. Começa o Desafio de Ginásios.', [84, 90], [[819, 10], [821, 10], [831, 10], [824, 8], [827, 8], [829, 6], [10174, 8], [10161, 4], [810, 2], [813, 2], [816, 2], [840, 3]]],
+      ['g_hulbury', 'Hulbury & Rota 9', 'water', '⚓', 1, 'Porto pesqueiro e um mar gelado cheio de Arrokuda.', [84, 90], [[846, 10], [833, 8], [845, 4], [871, 6], [10173, 6], [10180, 4], [118, 6], [592, 4], [131, 1]]],
+      ['g_mina', 'Mina de Galar & Motostoke', 'volcano', '⛏️', 2, 'Túneis de carvão quente. Rolycoly rola pelos trilhos.', [85, 91], [[837, 10], [838, 4], [850, 8], [851, 2], [10176, 6], [843, 6], [852, 4], [10179, 4], [524, 4]]],
+      ['g_selvagem', 'Área Selvagem', 'safari', '🌾', 3, 'Planície enorme com tocas Dinamax. As Aves de Galar sobrevoam o lago.', [85, 92], [[10162, 6], [10164, 4], [10166, 4], [848, 6], [835, 8], [877, 6], [878, 4], [854, 4], [868, 4], [10169, 0.2, { legend: 1 }], [10170, 0.2, { legend: 1 }], [10171, 0.2, { legend: 1 }]]],
+      ['g_glimwood', 'Floresta Glimwood', 'psychic', '🍄', 4, 'Cogumelos brilhantes no escuro. Fadas e Pokémon psíquicos brincam por aqui.', [86, 92], [[856, 8], [857, 3], [859, 8], [860, 3], [854, 6], [868, 6], [10162, 6], [10163, 2], [866, 2]]],
+      ['g_circhester', 'Circhester & Rota 8', 'ice', '❄️', 5, 'Ruínas antigas e neve sem fim.', [87, 93], [[872, 10], [873, 3], [875, 6], [10176, 6], [10177, 2], [866, 4], [874, 4], [878, 4], [10165, 2]]],
+      ['g_sonolenta', 'Floresta Sonolenta', 'forest', '🌫️', 7, 'Névoa espessa e uma espada e um escudo enferrujados no altar.', [88, 94], [[884, 3], [885, 4], [886, 2], [827, 8], [828, 3], [10161, 4], [863, 3], [888, 0.25, { legend: 1 }], [889, 0.25, { legend: 1 }]]],
+      ['g_torre', 'Torre Rose & Estádio Wyndon', 'sky', '🗼', 8, 'No topo da torre, a energia Dinamax desperta Eternatus.', [88, 95], [[884, 4], [887, 1], [886, 3], [879, 3], [863, 4], [10167, 4], [890, 0.25, { legend: 1 }]]],
+      ['g_armadura', 'Ilha da Armadura', 'water', '🥋', 'ch', 'Pós-Galar. Dojo do Mestre Mustard: Kubfu treina para virar Urshifu. Zarude vive na selva.', [90, 96], [[10164, 6], [10165, 3], [118, 6], [768, 3], [852, 6], [853, 3], [891, 0.3, { legend: 1 }], [893, 0.2, { legend: 1 }]]],
+      ['g_tundra', 'Tundra Coroada', 'ice', '👑', 'ch', 'Pós-Galar. O Rei Calyrex, seus corcéis e os Regis elétrico e dragão.', [92, 98], [[872, 6], [873, 3], [875, 6], [10177, 3], [885, 3], [898, 0.25, { legend: 1 }], [896, 0.2, { legend: 1 }], [897, 0.2, { legend: 1 }], [894, 0.2, { legend: 1 }], [895, 0.2, { legend: 1 }]]]] };
   G.PREG = R; G.PREG_ORDER = ['hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'paldea'];
+  // Treinadores aleatórios (estáveis por mapa) para regiões novas
+  const TRN = { grass: [['Jovem', 'youngster'], ['Garota', 'lass'], ['Treinadora Ás', 'acetrainerf']], water: [['Nadador', 'swimmer'], ['Pescador', 'fisherman'], ['Beldade', 'beauty']], volcano: [['Alpinista', 'hiker'], ['Faixa Preta', 'blackbelt'], ['Cuspidor de Fogo', 'firebreather']],
+    safari: [['Treinador Ás', 'acetrainer'], ['Alpinista', 'hiker'], ['Garota', 'lass']], psychic: [['Médium', 'psychic'], ['Beldade', 'beauty'], ['Malabarista', 'juggler']], ice: [['Esquiadora', 'skier'], ['Alpinista', 'hiker'], ['Treinadora Ás', 'acetrainerf']],
+    forest: [['Caça-Insetos', 'bugcatcher'], ['Pokémaníaco', 'pokemaniac'], ['Treinador Ás', 'acetrainer']], sky: [['Ornitólogo', 'birdkeeper'], ['Treinador Ás', 'acetrainer'], ['Treinadora Ás', 'acetrainerf']], cave: [['Alpinista', 'hiker'], ['Faixa Preta', 'blackbelt'], ['Cientista', 'scientist']] };
+  const NOMES = ['Ana', 'Bruno', 'Carla', 'Davi', 'Elisa', 'Fábio', 'Gabi', 'Hugo', 'Íris', 'João', 'Lia', 'Marcos', 'Nina', 'Otávio', 'Paula', 'Rafa', 'Sofia', 'Téo', 'Vera', 'Yuri'];
+  function autoTr(key, id, theme, lvr, enc) { let h = 7; for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0; const rnd = () => (h = (h * 1103515245 + 12345) >>> 0) / 4294967296;
+    const pool = enc.filter(e => !(e[2] && e[2].legend)).map(e => e[0]), kinds = TRN[theme] || TRN.grass;
+    return kinds.map(([cls, sp], i) => { const n = 2 + (i > 0 ? 1 : 0) + (i > 1 && rnd() < 0.5 ? 1 : 0), team = Array.from({ length: n }, () => [pool[Math.floor(rnd() * pool.length)], Math.min(100, lvr[0] + Math.floor(rnd() * (lvr[1] - lvr[0] + 1)))]);
+      return [cls + ' ' + NOMES[Math.floor(rnd() * NOMES.length)], sp, team, 3000 + i * 1500 + team.length * 500]; }); }
   const lv = (r, o) => Math.min(100, r.base + o);
   for (const [key, r] of Object.entries(R)) {
     r.key = key;
@@ -127,7 +161,7 @@
     r.ELITE = r.elite.map(([leader, sprite, title, type, team], i) => ({ leader, sprite, title, type, team: team.map(([id, o]) => [id, lv(r, o)]), prize: i === 4 ? 40000 : 18000 }));
     r.BADGES = r.badges.map(b => b[0]);
     r.MAPS = r.maps.map(([id, name, theme, emoji, rq, desc, lvr, enc, trainers]) => ({ id, region: key, name, theme, emoji, req: rq === 'ch' ? { r: key, ch: 1 } : { r: key, b: rq }, desc, lv: lvr,
-      enc: enc.map(([i, w, o]) => o && o.legend ? [i, w, lvr[1], lvr[1], o] : [i, w, lvr[0], lvr[1]]), trainers: trainers || [], finds: [] }));
+      enc: enc.map(([i, w, o]) => o && o.legend ? [i, w, lvr[1], lvr[1], o] : [i, w, lvr[0], lvr[1]]), trainers: trainers || (r.autoTr ? autoTr(key, id, theme, lvr, enc) : []), finds: [] }));
     C.MAPS.push(...r.MAPS);
   }
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -2364,6 +2364,38 @@
     document.addEventListener('pointerdown', e => { const im = e.target.closest && e.target.closest('img.mini'); if (!im) return; im.classList.remove('mtap'); void im.offsetWidth; im.classList.add('mtap'); setTimeout(() => im.classList.remove('mtap'), 450); }, { passive: true });
     scan(); return { scan, fix }; })();
   A.mini = MINI;
+  A.legq = LEGQ;
+  // ===== Lendas de Galar =====
+  const gB = n => () => rOpen('galar') && rS('galar').b.length >= n, gCh = () => rOpen('galar') && rS('galar').ch;
+  LEGQ.push(
+    { id: 'g_aves', n: 'As Aves de Galar', ico: '🪶', mons: [10169, 10170, 10171], req: gB(4), reqT: '4 insígnias de Galar', steps: [
+      { t: 'talk', npc: 'birdkeeper', who: 'Ornitóloga Sônia', lines: ['As aves lendárias de Galar são diferentes das de Kanto!', 'Articuno virou psíquico, Zapdos corre como um lutador e Moltres brilha com energia sombria.', 'Todas foram vistas na Área Selvagem. Prepare as bolas!'] },
+      { t: 'riddle', q: '🪶 “A ave que corre mais do que voa, com pernas fortes de lutador…”', opts: ['Articuno de Galar', 'Zapdos de Galar', 'Moltres de Galar', 'Corviknight'], a: 1 },
+      { t: 'hunt', id: 10169, lvl: 90, map: 'g_selvagem', btn: '🔮 Seguir o brilho psíquico', intro: 'Um olhar hipnótico paralisa o lago… Articuno de Galar!' },
+      { t: 'hunt', id: 10170, lvl: 90, map: 'g_selvagem', btn: '⚡ Seguir as pegadas fortes', intro: 'Algo passa correndo e levanta poeira… Zapdos de Galar!' },
+      { t: 'hunt', id: 10171, lvl: 90, map: 'g_selvagem', btn: '🌑 Seguir as chamas escuras', intro: 'Chamas roxas no céu noturno… Moltres de Galar!' }] },
+    { id: 'g_herois', n: 'A Espada e o Escudo', ico: '🗡️', mons: [888, 889], req: gB(7), reqT: '7 insígnias de Galar', steps: [
+      { t: 'talk', npc: 'scientist', who: 'Professora Magnólia', lines: ['Diz a lenda que dois heróis salvaram Galar da Escuridão Negra.', 'Na Floresta Sonolenta há uma espada e um escudo enferrujados.', 'Quem for digno… talvez veja os lobos lendários.'] },
+      { t: 'order', q: 'Coloque a lenda dos heróis na ordem certa:', items: ['📜 O céu escureceu sobre Galar.', '📜 Um jovem empunhou a espada e o escudo.', '📜 Dois lobos lutaram ao lado dele.', '📜 A escuridão foi selada e os lobos dormiram na floresta.'] },
+      { t: 'hunt', id: 888, lvl: 92, map: 'g_sonolenta', btn: '🗡️ Tocar a espada enferrujada', intro: 'A névoa se abre… um lobo com uma espada na boca uiva!' },
+      { t: 'hunt', id: 889, lvl: 92, map: 'g_sonolenta', btn: '🛡️ Tocar o escudo enferrujado', intro: 'O chão treme… um lobo com um escudo brilhante aparece!' }] },
+    { id: 'g_eternatus', n: 'A Noite Mais Escura', ico: '🌌', mons: [890], req: gB(8), reqT: '8 insígnias de Galar', steps: [
+      { t: 'talk', npc: 'rose', who: 'Presidente Rose', lines: ['Galar vai ficar sem energia em mil anos!', 'Eu despertei a fonte da Dinamax no topo da torre… e ela saiu do controle.', 'Só um verdadeiro treinador pode acalmá-la. Suba a torre!'] },
+      { t: 'riddle', q: '🌌 “Caiu do céu há vinte mil anos e dá energia à Dinamax…”', opts: ['Eternatus', 'Rayquaza', 'Deoxys', 'Necrozma'], a: 0 },
+      { t: 'hunt', id: 890, lvl: 95, map: 'g_torre', btn: '🗼 Subir ao topo da torre', intro: 'O céu fica vermelho… Eternatus abre seu núcleo!' }] },
+    { id: 'g_armadura', n: 'O Dojo do Mestre Mustard', ico: '🥋', mons: [891, 893], req: gCh, reqT: 'ser Campeão de Galar', steps: [
+      { t: 'talk', npc: 'blackbelt', who: 'Mestre Mustard', lines: ['Bem-vindo ao meu dojo na Ilha da Armadura!', 'Um Kubfu treina aqui. Mostre que tem coração e ele vai com você.', 'E dizem que um macaco misterioso protege a selva…'] },
+      { t: 'riddle', q: '🥋 “Kubfu pode seguir duas torres. Uma é Sombria e a outra é…”', opts: ['da Água', 'do Fogo', 'do Vento', 'da Pedra'], a: 0 },
+      { t: 'hunt', id: 891, lvl: 90, map: 'g_armadura', btn: '🥋 Treinar com Kubfu', intro: 'Kubfu faz uma reverência… e parte para a luta!' },
+      { t: 'hunt', id: 893, lvl: 94, map: 'g_armadura', btn: '🌿 Entrar na selva funda', intro: 'Cipós se mexem sozinhos… Zarude salta das árvores!' }] },
+    { id: 'g_coroa', n: 'O Rei da Tundra', ico: '👑', mons: [898, 896, 897, 894, 895], req: gCh, reqT: 'ser Campeão de Galar', steps: [
+      { t: 'talk', npc: 'psychic', who: 'Peony, o explorador', lines: ['Na Tundra Coroada vive um rei antigo: Calyrex!', 'Ele perdeu seus corcéis, Glastrier e Spectrier.', 'E nas ruínas há dois Regis que nunca foram vistos.'] },
+      { t: 'riddle', q: '👑 “O corcel de gelo pesa muito e pisa forte; o corcel fantasma é…”', opts: ['Glastrier', 'Spectrier', 'Rapidash', 'Mudsdale'], a: 1 },
+      { t: 'hunt', id: 896, lvl: 94, map: 'g_tundra', btn: '❄️ Seguir as pegadas geladas', intro: 'O gelo racha… Glastrier bufa!' },
+      { t: 'hunt', id: 897, lvl: 94, map: 'g_tundra', btn: '👻 Seguir o vulto na neve', intro: 'Um cavalo transparente passa galopando… Spectrier!' },
+      { t: 'hunt', id: 894, lvl: 94, map: 'g_tundra', btn: '⚡ Acender o templo elétrico', intro: 'Faíscas por todo lado… Regieleki desperta!' },
+      { t: 'hunt', id: 895, lvl: 94, map: 'g_tundra', btn: '🐉 Abrir o templo dragão', intro: 'Uma cabeça de dragão de pedra se ilumina… Regidrago!' },
+      { t: 'hunt', id: 898, lvl: 96, map: 'g_tundra', btn: '👑 Visitar o Rei', intro: 'Uma voz ecoa na sua mente… “Eu sou Calyrex.”' }] });
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------
