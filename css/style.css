@@ -750,3 +750,15 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .walking .bpar .hills{animation:parw 1.6s ease-in-out infinite alternate}.walking .bpar .fg{animation:parw2 1.6s ease-in-out infinite alternate}
 @keyframes parw{to{transform:translateX(-1.5%)}}@keyframes parw2{to{transform:translateX(-4%)}}
 @media (prefers-reduced-motion:reduce){.bpar .bl{animation:none!important;transition:none}.bcam{transition:none}}
+/* ===== caixas de HP compactas que nunca cobrem os sprites ===== */
+.battle .info{width:41%!important;max-width:240px;padding:4px 8px!important;border-radius:10px;background:rgba(248,250,252,.8);box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.battle .info .bnm,.battle .info b{font-size:.74rem!important;line-height:1.1}
+.battle .info small{font-size:.62rem!important}
+.battle .info .hpbar{height:6px!important}
+.battle .info .hpl{font-size:.5rem;padding:0 3px}
+.battle .einfo{left:2%!important;top:2%!important}
+.battle .pinfo{right:2%!important;bottom:3%!important}
+.battle .emon{right:4%!important;left:auto!important;top:14%!important;width:40%!important;max-width:none!important;height:36%!important}
+.battle .pmon{left:3%!important;bottom:4%!important;width:42%!important;max-width:none!important;height:44%!important}
+.battle .bmon img{max-width:100%;max-height:100%;width:auto;height:auto}
+.bmon.dmax img{transform:scale(1.1)}
