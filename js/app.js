@@ -2108,7 +2108,7 @@
   // líder passeando (casa e início), dorme à noite, reage ao toque
   function addWander() { const night = dayLight().night;
     const room = $('.room'); if (room) { const f = $('.follow', room); if (f && !f.parentNode.classList.contains('wander')) { const w = document.createElement('div'); w.className = 'wander' + (night ? ' sleep' : ''); f.replaceWith(w); w.appendChild(f); } }
-    if (tab === 'home' && !$('.petyard')) { const hero = $('.card.hero'); const fh = followerHtml(); if (hero && fh) hero.insertAdjacentHTML('afterend', `<div class="card span2 petyard ${night ? 'per-night' : ''}"><div class="wander ${night ? 'sleep' : ''}">${fh}</div><small class="pyhint">${night ? '🌙 Seu parceiro está dormindo' : '👆 Toque no seu parceiro'}</small></div>`); }
+    if (tab === 'home' && !$('.petyard')) { const hero = $('.card.hero'); const ph = partnerCard(night); if (hero && ph) hero.insertAdjacentHTML('afterend', ph); }
     document.querySelectorAll('.wander.sleep .emo').forEach(e => e.textContent = '💤'); }
   { const _render = render; render = function () { const r = _render.apply(this, arguments); try { addHabits(); addWander(); } catch (e) {} return r; }; }
   { const _pet = ACT.pet; ACT.pet = d => { _pet(d); const f = $('.follow'); if (!f) return; const h = document.createElement('i'); h.className = 'pheart'; h.textContent = '❤️'; f.appendChild(h); setTimeout(() => h.remove(), 1100); const w = f.closest('.wander.sleep'); if (w) { w.classList.remove('sleep'); setTimeout(() => w.classList.add('sleep'), 4000); } }; }
@@ -2448,6 +2448,25 @@
   async function teraAnim(e) { const el = document.querySelector(e.side ? '.emon' : '.pmon'); log(e.text.replace(/Tera (\w+)!$/, (q, t) => 'Tera ' + (C.TYPE_PT[t] || t) + '!')); try { SFX.status(); } catch (x) {}
     if (el) { el.style.setProperty('--tt', C.TYPE_COLOR[e.t]); el.classList.add('tera', 'teraburst'); await wait(RMOT() ? 200 : 1100); el.classList.remove('teraburst'); } drawInfo(e.side); }
   A.teraHtml = teraHtml;
+  // ===== v49: Início premium — cartão de treinador e habitat do parceiro =====
+  { const _tc = trainerCard; trainerCard = function (big) { if (big) return _tc.apply(this, arguments); try {
+      const [se, ca] = dexCount(), sh = Object.keys(S.dex.shiny).length, t = titleOf() || (S.nat && S.nat.wins ? 'Mestre Eevee' : '');
+      const grp = (lbl, pins, n, tot) => `<div class="bgrp"><div class="bgl"><small>${lbl}</small><small class="bgn">${n}/${tot}</small></div><div class="bslots">${pins}</div></div>`;
+      const g = [grp('Kanto', C.BADGES.map((_, i) => badgeHtml(i, S.badges.includes(i))).join(''), S.badges.length, C.BADGES.length)];
+      if (S.champion && FEAT.johto) g.push(grp('Johto', C.JBADGES.map((_, i) => jbadgeHtml(i, S.jbadges.includes(i))).join(''), S.jbadges.length, C.JBADGES.length));
+      REG_ORDER.filter(rOpen).forEach(k => { const r = rS(k); if (r.b.length) g.push(grp(REG[k].n, REG[k].BADGES.map((_, i) => rbadgeHtml(k, i, r.b.includes(i))).join(''), r.b.length, REG[k].BADGES.length)); });
+      return `<div class="tcard2"><div class="tc2-holo"></div><div class="tc2-top"><div class="tc2-tr"><div class="tc2-spot"></div>${trImg()}</div>
+        <div class="tc2-id"><small class="tc2-k">CARTÃO DE TREINADOR</small><h2>${esc(S.trainer)}${S.champion ? ' <span class="tc2-crown">👑</span>' : ''}</h2>${t ? `<span class="tc2-title">🏆 ${t}</span>` : ''}
+        <div class="tc2-stats"><span><b>${ca}</b> capturados</span><span><b>${se}</b> vistos</span><span><b>${sh}</b> ✨</span></div></div></div>
+        <div class="tc2-badges">${g.join('')}</div></div>`; } catch (e) { return _tc.apply(this, arguments); } }; }
+  const HAB = { fire: 'volcano', water: 'lake', ice: 'snow', grass: 'meadow', bug: 'meadow', electric: 'storm', ground: 'desert', rock: 'desert', fighting: 'desert', psychic: 'mystic', fairy: 'mystic', ghost: 'night', dark: 'night', poison: 'night', dragon: 'sky', flying: 'sky', steel: 'city', normal: 'meadow' };
+  function partnerCard(night) { if (S.settings.follow === false) return ''; const m = S.party.find(x => x.hp > 0) || S.party[0]; if (!m) return '';
+    const t = (PE.monTypes(m) || ['normal'])[0], h = hearts(m), hb = Array.from({ length: 5 }, (_, i) => `<i class="${i < h ? 'on' : ''}">❤</i>`).join('');
+    return `<div class="card span2 petyard pcard2 hab-${HAB[t] || 'meadow'} ${night ? 'per-night' : ''}" style="--tc:${C.TYPE_COLOR[t]}"><div class="hab-sky"></div><div class="hab-far"></div><div class="hab-ground"></div><div class="hab-light"></div>
+      <div class="pc2-stage"><div class="pc2-ped"></div><div class="follow ${m.shiny ? 'shiny-glow' : ''}" data-a="pet"><img src="${spr(m)}" alt=""><span class="emo">♥</span></div></div>
+      <div class="pc2-info"><small class="pc2-k">SEU PARCEIRO</small><b>${esc(pn(m))}${m.shiny ? ' ✨' : ''}</b><span class="pc2-lv">Nv ${m.lvl}</span><div class="pc2-hearts" title="Amizade ${h}/5">${hb}</div><small class="pc2-hint">${night ? '🌙 Está dormindo' : '👆 Toque para dar carinho'}</small></div></div>`; }
+  { const _pet = ACT.pet; ACT.pet = function () { const r = _pet.apply(this, arguments); try { const pf = document.querySelector('.pcard2 .follow'); if (pf) { pf.classList.remove('phop'); void pf.offsetWidth; pf.classList.add('phop'); setTimeout(() => pf.classList.remove('phop'), 600); } const c = document.querySelector('.pcard2 .pc2-stage'); if (c && !RMOT()) for (let i = 0; i < 5; i++) { const s = document.createElement('span'); s.className = 'pc2-heart'; s.textContent = '❤'; s.style.setProperty('--dx', (Math.random() * 70 - 35).toFixed(0) + 'px'); s.style.animationDelay = (i * 0.08) + 's'; c.appendChild(s); setTimeout(() => s.remove(), 1400); } } catch (e) {} return r; }; }
+
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------
