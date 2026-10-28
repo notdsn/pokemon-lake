@@ -711,7 +711,7 @@
       if (!ov || !document.body.contains(ov)) return;
       const mon = side => bq(side ? '.emon' : '.pmon');
       switch (e.e) {
-        case 'use': { log(e.text); camTo(e.side); await wait(420); const el = mon(e.side); el.classList.add('lunge'); setTimeout(() => el.classList.remove('lunge'), 450);
+        case 'use': { log(e.text); camTo(e.side); await wait(420); const el = mon(e.side); try { const gc = C.TYPE_COLOR[e.type] || '#fff'; el.style.setProperty('--mglow', gc); mon(!e.side).style.setProperty('--mglow', gc); } catch (x) {} el.classList.add('lunge'); setTimeout(() => el.classList.remove('lunge'), 450);
           if (e.cat !== 't') await projectile(e.side, e.type); else { auraFx(e.side, e.type); SFX.status(); await wait(550); } break; }
         case 'hp': { const el = mon(e.side); if (e.dmg > 0) { el.classList.add('hit'); if (e.eff > 1 || e.crit) { SFX.superhit(); if (!RMOT()) ov.classList.add(e.crit ? 'shakex' : 'shake'); }
             if (e.hp <= 0 && !RMOT()) { ov.classList.add('slowmo'); setTimeout(() => ov.classList.remove('slowmo'), 1300); } else if (e.eff < 1) SFX.weak(); else SFX.hit();
@@ -2430,7 +2430,9 @@
       { t: 'riddle', q: '💎 “O Pokémon que é a fonte do brilho Terastal…”', opts: ['Terapagos', 'Pecharunt', 'Ogerpon', 'Diancie'], a: 0 },
       { t: 'hunt', id: 1024, lvl: 98, map: 'p_mirtilo', btn: '💎 Descer até o cristal', intro: 'O cristal pulsa… Terapagos abre o casco!' },
       { t: 'hunt', id: 1025, lvl: 98, map: 'p_mirtilo', btn: '🍑 Seguir o cheiro de mochi', intro: 'Uma casca roxa rola até você… Pecharunt!' }] });
-  A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
+  // ===== v47: transição de telas + cor do brilho do golpe =====
+  { let lastTab = null; const _render = render; render = function () { const r = _render.apply(this, arguments); try { const k = tab + '/' + (sub || ''); if (k !== lastTab) { lastTab = k; app.classList.remove('scr-in'); void app.offsetWidth; app.classList.add('scr-in'); clearTimeout(app._scr); app._scr = setTimeout(() => app.classList.remove('scr-in'), 600); } } catch (e) {} return r; }; }
+    A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
