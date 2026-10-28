@@ -670,3 +670,17 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .seg.region::-webkit-scrollbar{display:none}
 .seg.region button{white-space:nowrap;flex:0 0 auto}
 .badges.r{margin-top:4px}
+/* ===== REALISMO 1: luz do dia + sombras + vagalumes ===== */
+.scene-card:before,.mapc .mapimg:before,.explore:before,.battle.odr .bscene:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--tint,transparent),var(--tint,transparent))!important;z-index:1;pointer-events:none}
+.bmon:before,.follow:before{content:"";position:absolute;left:50%;bottom:3%;width:58%;height:12%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,var(--shop,.35)),rgba(0,0,0,0));transform:translateX(-50%) translateX(var(--shoff,0)) scaleX(var(--shsx,1));z-index:-1;pointer-events:none}
+.follow:before{bottom:-4%;width:70%;height:16%}
+.bmon img,.follow img{filter:none}
+.bmon.fly img{translate:0 -18%}
+.follow.fly img{translate:0 -22%}
+.bmon.fly:before,.follow.fly:before{width:42%;opacity:.75;animation:shpulse 2.4s ease-in-out infinite}
+@keyframes shpulse{0%,100%{opacity:.8}50%{opacity:.55}}
+.ffly{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden}
+.ffly i{position:absolute;width:5px;height:5px;border-radius:50%;background:#fef08a;box-shadow:0 0 8px 3px rgba(250,240,120,.65);animation:ffd 6s ease-in-out infinite alternate,ffb 1.7s ease-in-out infinite alternate;will-change:transform,opacity}
+@keyframes ffd{0%{transform:translate(0,0)}50%{transform:translate(18px,-14px)}100%{transform:translate(-12px,10px)}}
+@keyframes ffb{0%{opacity:.1}100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.ffly i{animation:none;opacity:.7}.bmon.fly:before,.follow.fly:before{animation:none}}

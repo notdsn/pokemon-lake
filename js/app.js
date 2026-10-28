@@ -1972,6 +1972,39 @@
     if (t === 'rgbadge') { const i = +x; SFX.caught(); return modal(`<div class="center badgewin"><div class="bigbadge">${rbadgeHtml(k, i, 1)}</div><h2>Insígnia ${r.BADGES[i]}!</h2><p>Você derrotou ${r.GYMS[i].leader} e recebeu a Insígnia ${r.BADGES[i]} de ${r.n}.</p><p>🍬 3 Balas Raras + 5 Ultra Balls</p><p class="mut small">${i < 7 ? `Novas áreas de ${r.n} foram liberadas!` : `A Liga de ${r.n} te espera!`}</p><button class="btn primary wide" data-a="close">Incrível!</button></div>`); }
     if (t === 'rgchamp') { const nx = REG_ORDER[REG_ORDER.indexOf(k) + 1]; SFX.caught(); return modal(`<div class="center badgewin"><div class="bigbadge crown">👑</div><h2>Campeão de ${r.n}!</h2><p>Você derrotou ${r.ELITE[4].leader}! ${esc(S.trainer)} é o novo Campeão de ${r.n}!</p>${x === '1' ? `<p>💰 ${fmt(100000)} + 1 Master Ball + 10 Balas Raras</p>` : ''}<p class="mut small">${r.MAPS.filter(m => m.req.ch).map(m => m.name).join(', ')} liberado(s)!${nx ? ` E a região de <b>${REG[nx].n}</b> abriu!` : ''}</p><button class="btn primary wide" data-a="close">🏆</button></div>`); } }
   A.regions = { REG, REG_ORDER, rS, rOpen, rUnl, rGoal, rbadgesHtml };
+  // ===== REALISMO 1: luz do dia gradual + sombras + vagalumes =====
+  A.C = C;
+  const LKEYS = [[0, [12, 20, 70, .46]], [4.5, [16, 24, 80, .44]], [5.6, [120, 70, 140, .32]], [6.4, [255, 140, 90, .24]], [7.5, [255, 210, 160, .08]], [10, [255, 255, 240, 0]], [15.5, [255, 230, 170, .04]], [17, [255, 170, 70, .2]], [18, [255, 120, 40, .32]], [18.8, [200, 70, 100, .32]], [19.8, [40, 45, 125, .4]], [21, [12, 20, 70, .46]], [24, [12, 20, 70, .46]]];
+  function dayLight(d = new Date()) {
+    const h = d.getHours() + d.getMinutes() / 60; let i = 0; while (LKEYS[i + 1][0] <= h && i < LKEYS.length - 2) i++;
+    const [h0, a] = LKEYS[i], [h1, b] = LKEYS[i + 1], f = Math.min(1, Math.max(0, (h - h0) / (h1 - h0 || 1))), c = a.map((v, k) => v + (b[k] - v) * f);
+    const sunUp = h >= 6 && h <= 18.3, el = sunUp ? Math.max(.05, Math.sin(Math.PI * (h - 6) / 12.3)) : .55; // noite: lua
+    return { h, night: h < 5.6 || h >= 19.8, tint: `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${c[3].toFixed(3)})`,
+      sx: +(1 + (1 - el) * 1.3).toFixed(2), off: Math.round((h < 12.2 ? 1 : -1) * (1 - el) * 26 * (sunUp ? 1 : .3)), op: +(sunUp ? .26 + el * .2 : .2).toFixed(2) };
+  }
+  const NOFLY = new Set([83, 84, 85, 441]), LEVIT = new Set([92, 93, 94, 109, 110, 81, 82, 200, 201, 202, 337, 338, 343, 344, 355, 358, 380, 381, 429, 433, 436, 437, 442, 455, 479, 480, 481, 482, 487, 488, 562, 592, 593, 602, 603, 604, 615, 635, 669, 670, 671, 707, 708, 770, 774, 781, 785, 786, 787, 788]);
+  function isFlyer(id) { const m = D.mons[id]; if (!m) return false; return LEVIT.has(+id) || ((m.t || []).includes('flying') && !NOFLY.has(+id)); }
+  A.isFlyer = isFlyer;
+  function lightTick() {
+    const L = dayLight(), st = document.documentElement.style;
+    st.setProperty('--tint', L.tint); st.setProperty('--shsx', L.sx); st.setProperty('--shoff', L.off + '%'); st.setProperty('--shop', L.op);
+    document.documentElement.classList.toggle('lnight', L.night);
+    const sc = document.querySelector('#scene.explore');
+    if (sc) { const fo = /theme-(forest|grass|safari|jungle)/.test(sc.className) && L.night, has = sc.querySelector('.ffly');
+      if (fo && !has) { const d = document.createElement('div'); d.className = 'ffly'; d.innerHTML = Array.from({ length: 9 }, (_, i) => `<i style="left:${8 + (i * 37) % 84}%;top:${30 + (i * 23) % 45}%;animation-delay:-${(i * 0.73).toFixed(2)}s,-${(i * 0.41).toFixed(2)}s"></i>`).join(''); sc.appendChild(d); }
+      else if (!fo && has) has.remove(); }
+    const f = document.querySelector('.follow'); if (f) { const m = S.party.find(x => x.hp > 0) || S.party[0]; f.classList.toggle('fly', !!m && isFlyer(m.id)); }
+    flyBattle();
+  }
+  function flyBattle() { if (!B || !B.s) return; const pe = document.querySelector('.bmon.pmon'), ee = document.querySelector('.bmon.emon');
+    try { pe?.classList.toggle('fly', isFlyer(B.s.sides[0].b.m.id)); ee?.classList.toggle('fly', isFlyer(B.s.sides[1].b.m.id)); } catch (e) {} }
+  A.light = { tick: lightTick, dayLight };
+  { const _render = render; render = function () { const r = _render.apply(this, arguments); try { lightTick(); } catch (e) {} return r; }; }
+  { const _sb = startBattle; startBattle = function (o) { const r = _sb.apply(this, arguments); try { if (o && o.map) document.querySelector('#battle')?.classList.add('odr'); lightTick(); } catch (e) {} return r; }; A.debug.startBattle = startBattle; }
+  setInterval(() => { try { if (document.hidden) return; B ? flyBattle() : null; } catch (e) {} }, 500);
+  setInterval(() => { try { if (!document.hidden) lightTick(); } catch (e) {} }, 60000);
+  lightTick();
+
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------
