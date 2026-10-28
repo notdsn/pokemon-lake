@@ -368,14 +368,14 @@
   ACT.search = async () => {
     if (searching) return; if (!S.party.some(m => m.hp > 0)) return toast('Seus Pokémon estão sem energia! Vá ao Centro Pokémon.', 'bad');
     const mp = C.MAPS.find(m => m.id === sub); searching = true; const sc = $('#scene'); sc.classList.add('walking'); $('#searchBtn').disabled = true;
-    const steps = 2 + Math.floor(R() * 3); for (let i = 0; i < steps; i++) { SFX.rustle(); const g = $$('.grass-row i', sc)[Math.floor(R() * 12)]; g?.classList.add('rustle'); setTimeout(() => g?.classList.remove('rustle'), 600); await sleep(420); }
+    const steps = 2 + Math.floor(R() * 3); for (let i = 0; i < steps; i++) { SFX.rustle(); const g = $$('.grass-row i', sc)[(A.gwave = ((A.gwave ?? 3) + 1 + Math.floor(R() * 2)) % 12)]; g?.classList.add('rustle'); setTimeout(() => g?.classList.remove('rustle'), 600); await sleep(420); }
     S.stats.steps += steps; track('steps', steps); sc.classList.remove('walking');
     const w = weatherOf(mp), ws = encWeights(mp, w), tot = ws.reduce((a, b) => a + b, 0); let r = R() * tot, k = 0; while (k < ws.length - 1 && r > ws[k]) r -= ws[k++];
-    const e = mp.enc[k]; const lvl = PE.ri(st, e[2], e[3]);
+    if (A.forceK != null && mp.enc[A.forceK]) k = A.forceK; const forced = A.forceK != null; A.forceK = null; const e = mp.enc[k]; const lvl = PE.ri(st, e[2], e[3]);
     eggSteps(steps); setTimeout(checkEggs, 2500);
-    if (mp.finds && R() < (A.findRate || 0.035)) { const f = pickFind(mp); if (f) { searching = false; $('#searchBtn').disabled = false; S.bag[f] = (S.bag[f] || 0) + 1; save(); SFX.caught();
+    if (!forced && mp.finds && R() < (A.findRate || 0.035)) { const f = pickFind(mp); if (f) { searching = false; $('#searchBtn').disabled = false; S.bag[f] = (S.bag[f] || 0) + 1; save(); SFX.caught();
       modal(`<div class="center badgewin"><div class="bigbadge megab"><img src="img/items/${f}.png" alt=""></div><h2>Você encontrou algo brilhando!</h2><p>Achou <b>${C.ITEM_NAME[f]}</b> escondida em ${mp.name}!</p><p class="mut small">Faça o Pokémon certo segurar para Mega Evoluir.</p><button class="btn primary wide" data-a="close">Uau!</button></div>`); return render(); } }
-    const evs = eventSpawn(mp); const m = PE.makeMon(evs ? evs.id : e[0], lvl, st, { shinyRate: A.shinyRate || (evs ? evs.rate : shinyP()), shiny: !evs && e[4] && e[4].shiny ? true : undefined }); m.caughtAt = mp.name; if (evs) m.evt = 1;
+    const evs = forced ? null : eventSpawn(mp); const m = PE.makeMon(evs ? evs.id : e[0], lvl, st, { shinyRate: A.shinyRate || (evs ? evs.rate : shinyP()), shiny: !evs && e[4] && e[4].shiny ? true : undefined }); m.caughtAt = mp.name; if (evs) m.evt = 1;
     sc.classList.add('alert'); tone(1200, 0.1); await sleep(600); searching = false;
     startBattle({ kind: 'wild', enemy: [m], map: mp, weather: battleWeather(w), legend: !evs && !!e[4]?.legend });
   };
@@ -2506,6 +2506,20 @@
       cr.style.left = x + 'px'; cr.style.top = Math.max(-24, y - 30) + 'px'; cr.dataset.placed = t ? 'bbox' : 'box'; };
     if (img.complete && img.naturalWidth) requestAnimationFrame(go); else img.addEventListener('load', go, { once: true }); }
   A.buzz = buzz; A.placeCrown = placeCrown;
+
+  // ===== v52 MAPA VIVO: nuvens, grama que balança, Pokémon selvagens passeando =====
+  function liveMap() { const sc = document.getElementById('scene'); if (!sc || !sc.classList.contains('explore') || sc.classList.contains('safari-run') || sc.dataset.live52) return; sc.dataset.live52 = 1;
+    const mp = C.MAPS.find(m => m.id === sub); if (!mp) return; const cave = /theme-(cave|ghost)/.test(sc.className);
+    if (!cave) { const cl = document.createElement('div'); cl.className = 'lclouds'; cl.innerHTML = [0, 1, 2].map(i => `<i style="top:${6 + i * 11}%;--s:${(1 - i * .18).toFixed(2)};animation-duration:${70 + i * 25}s;animation-delay:-${(i * 31 + 7)}s"></i>`).join(''); (sc.querySelector('.sky') || sc).appendChild(cl); }
+    $$('.grass-row i', sc).forEach((g, i) => g.style.setProperty('--gd', (-(i * .37) % 3).toFixed(2) + 's'));
+    const pool = mp.enc.map((e, k) => [e, k]).filter(([e]) => !(e[4] && (e[4].legend || e[4].night && !dayLight().night)) && D.mons[e[0]] && !D.mons[e[0]].L); if (!pool.length) return;
+    const n = Math.min(pool.length, innerWidth < 360 ? 2 : 3), used = new Set(), lay = document.createElement('div'); lay.className = 'wildlayer';
+    for (let i = 0; i < n; i++) { let t = 0, c; do c = pool[Math.floor(R() * pool.length)]; while (used.has(c[1]) && t++ < 8); used.add(c[1]); const id = c[0][0], fl = isFlyer(id);
+      const left = [[4, 18], [66, 18], [22, 10]][i][0] + R() * [[4, 18], [66, 18], [22, 10]][i][1], dur = 7 + R() * 6;
+      lay.insertAdjacentHTML('beforeend', `<button class="wildw ${fl ? 'wfly' : ''}" data-a="wildtap" data-k="${c[1]}" aria-label="Encontrar ${esc(D.mons[id].n)}" style="left:${left.toFixed(1)}%;bottom:${(fl ? 120 : 58) + Math.round(R() * 26)}px;--wd:${dur.toFixed(1)}s;--wx:${(14 + R() * 26).toFixed(0)}px;animation-delay:-${(R() * dur).toFixed(1)}s"><img src="img/mini/${id}.png" onerror="this.onerror=null;this.src='${sprId(id)}'" alt=""></button>`); }
+    sc.appendChild(lay); }
+  ACT.wildtap = d => { if (searching) return; const b = document.querySelector(`.wildw[data-k="${d.k}"]`); if (b) b.classList.add('spot'); A.forceK = +d.k; ACT.search(); };
+  { const _render = render; render = function () { const r = _render.apply(this, arguments); try { liveMap(); } catch (e) {} return r; }; }
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
   // ---------- boot ----------
