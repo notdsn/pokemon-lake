@@ -50,6 +50,29 @@
       ['s_neve', 'Rotas 216–217 & Snowpoint', 'ice', '❄️', 5, 'Nevasca eterna no norte de Sinnoh.', [72, 78], [[459, 10], [460, 3], [215, 6], [461, 2], [220, 6], [221, 4], [473, 2], [478, 3], [471, 1], [361, 6]]],
       ['s_lanca', 'Coluna Lança', 'sky', '🏛️', 8, 'Ruínas no topo do Monte Coronet. Dialga e Palkia aparecem aqui.', [74, 80], [[425, 6], [426, 4], [429, 6], [442, 3], [444, 4], [445, 1], [436, 6], [437, 4], [474, 2], [483, 0.3, { legend: 1 }], [484, 0.3, { legend: 1 }]]],
       ['s_distorcido', 'Mundo Distorcido & Ilhas', 'ghost', '🌀', 'ch', 'Pós-Sinnoh. Giratina, Heatran, Regigigas, Cresselia, Darkrai, Shaymin... e talvez Arceus.', [76, 82], [[429, 6], [477, 4], [478, 4], [442, 4], [487, 0.3, { legend: 1 }], [485, 0.25, { legend: 1 }], [486, 0.2, { legend: 1 }], [488, 0.25, { legend: 1 }], [491, 0.2, { legend: 1 }], [492, 0.2, { legend: 1 }], [489, 0.2, { legend: 1 }], [490, 0.15, { legend: 1 }], [493, 0.1, { legend: 1 }]]]] };
+  R.unova = { n: 'Unova', k: 'u', base: 70, prev: 'sinnoh', game: 'Black/White', story: 'Verdade e ideais: Reshiram e Zekrom, e o gelo vazio de Kyurem.',
+    badges: [['Trio', 'star5', ['#ef4444', '#3b82f6', '#22c55e']], ['Básica', 'oct', ['#a16207']], ['Inseto', 'bug', ['#84cc16']], ['Raio', 'sun', ['#facc15']], ['Tremor', 'cone', ['#b45309']], ['Jato', 'wings', ['#60a5fa'], 'silver'], ['Gelo', 'snow', ['#bae6fd'], 'silver'], ['Lenda', 'dragon', ['#64748b'], 'silver']],
+    gyms: [['Cilan', 'cilan', 'Striaton', 'grass', [[506, 0], [511, 1], [512, 2]]],
+      ['Lenora', 'lenora', 'Nacrene', 'normal', [[507, 1], [505, 2], [508, 3]]],
+      ['Burgh', 'burgh', 'Castelia', 'bug', [[542, 3], [545, 3], [558, 4]]],
+      ['Elesa', 'elesa', 'Nimbasa', 'electric', [[587, 4], [523, 5], [587, 5]]],
+      ['Clay', 'clay', 'Driftveil', 'ground', [[552, 6], [537, 6], [530, 7]]],
+      ['Skyla', 'skyla', 'Mistralton', 'flying', [[528, 7], [521, 8], [581, 9]]],
+      ['Brycen', 'brycen', 'Icirrus', 'ice', [[583, 9], [615, 9], [614, 10]]],
+      ['Drayden', 'drayden', 'Opelucid', 'dragon', [[611, 10], [621, 11], [612, 12]]]],
+    elite: [['Shauntal', 'shauntal', 'Elite Four de Unova', 'ghost', [[563, 14], [593, 14], [623, 15], [426, 15], [609, 16]]],
+      ['Marshal', 'marshal', 'Elite Four de Unova', 'fighting', [[534, 14], [538, 14], [539, 15], [560, 15], [620, 16]]],
+      ['Grimsley', 'grimsley', 'Elite Four de Unova', 'dark', [[510, 14], [553, 15], [625, 15], [560, 15], [630, 16]]],
+      ['Caitlin', 'caitlin', 'Elite Four de Unova', 'psychic', [[518, 15], [576, 15], [579, 16], [561, 16], [606, 16]]],
+      ['Alder', 'alder', 'Campeão de Unova', 'bug', [[617, 18], [626, 18], [621, 18], [631, 18], [589, 19], [637, 20]]]],
+    maps: [['u_rota1', 'Rotas 1–3 & Bosque Pinwheel', 'grass', '🌱', 0, 'Nuvema, Accumula e o Bosque Pinwheel cheio de Sewaddle.', [68, 74], [[504, 10], [506, 10], [509, 8], [519, 10], [531, 4], [540, 8], [543, 8], [546, 6], [548, 6], [511, 3], [513, 3], [515, 3], [495, 2], [498, 2], [501, 2]]],
+      ['u_deserto', 'Resort do Deserto & Castelo Relíquia', 'safari', '🏜️', 1, 'Areia sem fim e um castelo antigo engolido pelas dunas.', [70, 76], [[551, 10], [552, 3], [554, 8], [556, 6], [557, 8], [559, 6], [561, 4], [562, 6], [627, 4], [636, 1]]],
+      ['u_chargestone', 'Caverna Chargestone', 'electric', '⚡', 2, 'Pedras flutuantes e eletricidade no ar. Joltik e Klink por todo lado.', [70, 76], [[595, 10], [596, 3], [597, 8], [598, 3], [599, 8], [600, 3], [602, 6], [603, 2], [607, 6], [608, 2], [524, 6], [525, 3], [638, 0.2, { legend: 1 }]]],
+      ['u_baia', 'Baía Humilau & Rotas Marinhas', 'water', '🌊', 3, 'Águas quentes do sul de Unova.', [72, 78], [[550, 8], [592, 8], [593, 3], [594, 4], [580, 8], [581, 3], [535, 8], [536, 4], [564, 2], [566, 2], [647, 0.15, { legend: 1 }]]],
+      ['u_bosque', 'Rotas 6–7 & Torre Celestial', 'forest', '🍂', 4, 'As estações mudam Deerling e Sawsbuck. Tornadus e Thundurus passam com as tempestades.', [72, 78], [[585, 10], [586, 4], [590, 6], [591, 3], [527, 8], [528, 3], [532, 6], [533, 3], [570, 4], [571, 1], [607, 6], [640, 0.2, { legend: 1 }], [641, 0.2, { legend: 1, roam: 1 }], [642, 0.2, { legend: 1, roam: 1 }]]],
+      ['u_gelida', 'Montanha Gélida & Caverna Gigante', 'ice', '🧊', 6, 'Gelo eterno. No fundo da Caverna Gigante, Kyurem espera.', [74, 80], [[582, 10], [583, 4], [584, 1], [613, 8], [614, 3], [615, 5], [624, 6], [625, 2], [646, 0.25, { legend: 1 }]]],
+      ['u_vitoria', 'Rota da Vitória & Torre Dragoespiral', 'cave', '🐉', 8, 'O caminho final até a Liga. Reshiram e Zekrom acordaram na Torre Dragoespiral.', [76, 82], [[610, 6], [611, 3], [621, 4], [633, 4], [634, 2], [636, 4], [626, 6], [624, 6], [612, 1], [637, 1], [639, 0.2, { legend: 1 }], [643, 0.3, { legend: 1 }], [644, 0.3, { legend: 1 }]]],
+      ['u_liberdade', 'Ilha Liberdade & Floresta Abundante', 'psychic', '🏝️', 'ch', 'Pós-Unova. Victini, Landorus, Meloetta e Genesect foram vistos aqui.', [78, 84], [[577, 6], [578, 4], [579, 2], [605, 6], [606, 3], [571, 3], [494, 0.25, { legend: 1 }], [645, 0.25, { legend: 1 }], [648, 0.2, { legend: 1 }], [649, 0.2, { legend: 1 }], [641, 0.2, { legend: 1 }], [642, 0.2, { legend: 1 }]]]] };
   G.PREG = R; G.PREG_ORDER = ['hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'paldea'];
   const lv = (r, o) => Math.min(100, r.base + o);
   for (const [key, r] of Object.entries(R)) {
