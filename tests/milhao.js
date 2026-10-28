@@ -1,0 +1,28 @@
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
+const fs = require('fs');
+const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
+const URL = process.argv[2] || 'http://127.0.0.1:18473/';
+let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
+const TAG = URL.includes('github.io') ? 'milhao-live' : 'milhao';
+(async () => {
+  const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const errs = [];
+  p.on('pageerror', e => errs.push(e.message)); const ev = f => p.evaluate(f);
+  await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
+  await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="1"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
+  await p.waitForTimeout(500); await ev(() => document.querySelector('#modal-root').innerHTML = '');
+  const m0 = await ev(() => PokeApp.debug.S.money);
+  await ev(() => PokeApp.debug.go('settings')); await p.waitForTimeout(300);
+  await p.fill('#giftCode', 'edson-milhao '); await p.click('#giftForm button'); await p.waitForTimeout(1500);
+  const m1 = await ev(() => PokeApp.debug.S.money); ok(m1 === m0 + 1000000, `+1.000.000 (${m0} → ${m1})`);
+  ok(await ev(() => /1\.000\.000/.test(document.querySelector('.giftwin')?.innerText || '')), 'modal mostra P$ 1.000.000');
+  await p.screenshot({ path: `/workspace/pokemon-lake/prints/v2/375x667-${TAG}-modal.png` });
+  await ev(() => document.querySelector('#modal-root').innerHTML = ''); await ev(() => PokeApp.debug.go('home')); await p.waitForTimeout(500);
+  const hdr = await ev(() => { const c = document.querySelector('header .chip.money'), r = c.getBoundingClientRect(); return [c.textContent, r.right, c.scrollWidth <= c.clientWidth + 1, document.documentElement.scrollWidth]; });
+  ok(hdr[0].includes('1.00') && hdr[1] <= 375 && hdr[2] && hdr[3] <= 375, 'cabeçalho cabe em 375px ' + JSON.stringify(hdr));
+  await p.screenshot({ path: `/workspace/pokemon-lake/prints/v2/375x667-${TAG}-home.png` });
+  await ev(() => PokeApp.debug.go('shop')); await p.waitForTimeout(400); ok(await ev(() => document.documentElement.scrollWidth <= 375), 'loja sem overflow');
+  await p.screenshot({ path: `/workspace/pokemon-lake/prints/v2/375x667-${TAG}-shop.png` });
+  await ev(() => PokeApp.debug.go('settings')); await p.waitForTimeout(300); await p.fill('#giftCode', 'EDSON-MILHAO'); await p.click('#giftForm button'); await p.waitForTimeout(800);
+  ok(await ev(() => PokeApp.debug.S.money) === m1 && /já foi resgatado/.test(await p.textContent('#giftErr')), 'só uma vez por conta');
+  ok(!errs.length, 'sem erros JS ' + JSON.stringify(errs)); console.log(fail ? 'FALHAS: ' + fail : 'TUDO OK'); await b.close(); process.exit(fail ? 1 : 0); })();

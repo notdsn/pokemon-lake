@@ -624,3 +624,9 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 @keyframes rspin{to{transform:rotate(360deg)}}
 .riftfx{position:fixed;inset:0;z-index:50;pointer-events:none;background:radial-gradient(circle,#0000 0,#7c3aedaa 40%,#000d 75%);animation:riftfx 1.6s forwards}.riftfx.big{background:radial-gradient(circle,#0000 0,#db2777cc 35%,#000 75%)}
 @keyframes riftfx{0%{opacity:0;transform:scale(2)}40%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.6) rotate(40deg)}}
+
+/* v22 Milhão */
+.giftcash .cashico{font-size:52px;line-height:56px;display:block}
+.giftcash small b{color:#fde68a;font-size:15px;white-space:nowrap}
+.chip.money{white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+@media (max-width:380px){.chip.money{font-size:12px;padding-left:8px;padding-right:8px}}

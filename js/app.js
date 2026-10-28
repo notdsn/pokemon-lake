@@ -552,7 +552,8 @@
     '01aea158d891de1fd0c6ec8b42ba842caf7aa770452629662a4b036852608d56': { name: 'Eeveelutions + Mew do Edson', build: () => [134, 135, 136, 196, 197, 470, 471, 700, 151].map(id => PE.makeMon(id, 50, st, { ...GO(), iv: IV31, moves: giftMoves(id) })) },
     'afd38b2d7aa0ae0bf5e961abe8f6be300e58b8e023a0c8479a718132f1dd49e5': { name: 'Greninja do Edson', tip: '💧 Greninja tem a habilidade <b>Protean</b>: todos os golpes de dano ganham bônus de mesmo tipo!', build: () => [PE.makeMon(658, 50, st, { ...GO(), nat: 10, iv: [31, 28, 31, 31, 31, 31], moves: ['water-shuriken', 'hydro-pump', 'dark-pulse', 'ice-beam'] })] },
     'c8715b3a2989f1ee29a31fa5b86846f118984c807eecea6a7f13e7a16481bc40': { name: 'Mega Kit do Edson', items: { 'mega-bracelet': 1, 'charizardite-x': 1, 'charizardite-y': 1 }, build: () => [] },
-    '5d5be4c11ef135e648c907406f429f2e4bbe42279223673880eba4fa1fc89a2b': { name: 'Gigantamax do Edson', items: { 'dynamax-band': 1 }, tip: '⬣ Uma vez por batalha, toque em <b>Gigantamax</b> no menu de golpes do Charizard: ele fica gigante por 3 turnos e usa <b>Fogaréu G-Max</b>!', build: () => [] } };
+    '5d5be4c11ef135e648c907406f429f2e4bbe42279223673880eba4fa1fc89a2b': { name: 'Gigantamax do Edson', items: { 'dynamax-band': 1 }, tip: '⬣ Uma vez por batalha, toque em <b>Gigantamax</b> no menu de golpes do Charizard: ele fica gigante por 3 turnos e usa <b>Fogaréu G-Max</b>!', build: () => [] },
+    '6797212ac5ee0ad92b5524d07a0d35396be9cff796c8d65ce45b0f3c1546b3fa': { name: 'Milhão do Edson', money: 1000000, tip: '💰 Use na Loja Pokémon, na Minha Casa e onde quiser!', build: () => [] } };
   async function redeemGift(code) {
     const h = sha256(code.trim().toUpperCase()), g = GIFTS[h], err = $('#giftErr');
     if (!g) { if (err) err.textContent = 'Código inválido.'; return; }
@@ -561,9 +562,10 @@
     const mons = g.build(); let toBox = 0;
     const its = Object.entries(g.items || {}); its.forEach(([k, v]) => { S.bag[k] = k === 'mega-bracelet' || k === 'dynamax-band' ? 1 : (S.bag[k] || 0) + v; });
     mons.forEach(m => { addCaught(m); S.stats.caught++; if (S.party.length < 6) S.party.push(m); else { S.box.push(m); toBox++; } });
-    S.gifts[h] = { at: Date.now(), n: mons.length, items: its.length || undefined }; save(); SFX.caught();
+    if (g.money) S.money = Math.min(999999999, (S.money || 0) + g.money);
+    S.gifts[h] = { at: Date.now(), n: mons.length, items: its.length || undefined, money: g.money || undefined }; save(); SFX.caught();
     if (!mons.length) { modal(`<div class="center giftwin"><div class="burstbg"></div><h2>🎁 ${g.name}!</h2><p>Você recebeu:</p>
-      <div class="giftgrid">${its.map(([k, v], i) => `<div class="giftmon" style="animation-delay:${i * 0.15}s"><img src="img/items/${k}.png" alt="" style="image-rendering:pixelated;width:56px;height:56px"><small>${C.ITEM_NAME[k] || k}${k === 'mega-bracelet' || k === 'dynamax-band' ? '' : '<br>x' + v}</small></div>`).join('')}</div>
+      <div class="giftgrid">${g.money ? `<div class="giftmon giftcash"><span class="cashico">💰</span><small><b>${fmt(g.money)}</b></small></div>` : ''}${its.map(([k, v], i) => `<div class="giftmon" style="animation-delay:${i * 0.15}s"><img src="img/items/${k}.png" alt="" style="image-rendering:pixelated;width:56px;height:56px"><small>${C.ITEM_NAME[k] || k}${k === 'mega-bracelet' || k === 'dynamax-band' ? '' : '<br>x' + v}</small></div>`).join('')}</div>
       <p class="mut small">${g.tip || '🧬 Dê uma Charizardita para o Charizard segurar e toque em <b>Mega Evoluir</b> no menu de golpes!'}</p>
       <div class="mbtns"><button class="btn primary wide" data-a="close">Incrível!</button></div></div>`); render(); return; }
     modal(`<div class="center giftwin"><div class="burstbg"></div><h2>🎁 ${g.name}!</h2><p>Você recebeu <b>${mons.length} Pokémon</b>!${toBox ? ` ${toBox} foram para o PC.` : ''}</p>
