@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 108 108"><defs>
+<linearGradient id="mt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".3" stop-color="#cfd6df"/><stop offset=".55" stop-color="#6b7684"/><stop offset=".75" stop-color="#eef2f6"/><stop offset="1" stop-color="#3d4651"/></linearGradient>
+<linearGradient id="bv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
+<radialGradient id="en" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="#c4ebfd"/><stop offset=".45" stop-color="#7dd3fc"/><stop offset="1" stop-color="#385e71"/></radialGradient>
+<linearGradient id="sp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<clipPath id="cl"><path d="M50.0,4.0 L61.0,30.9 L89.8,27.0 L72.0,50.0 L89.8,73.0 L61.0,69.1 L50.0,96.0 L39.0,69.1 L10.2,73.0 L28.0,50.0 L10.2,27.0 L39.0,30.9Z"/></clipPath></defs>
+<g fill="url(#mt)" stroke="#3d4651" stroke-width="1.2"><path d="M50.0,4.0 L61.0,30.9 L89.8,27.0 L72.0,50.0 L89.8,73.0 L61.0,69.1 L50.0,96.0 L39.0,69.1 L10.2,73.0 L28.0,50.0 L10.2,27.0 L39.0,30.9Z"/></g>
+<g fill="none" stroke="url(#bv)" stroke-width="3" opacity=".9"><path d="M50.0,4.0 L61.0,30.9 L89.8,27.0 L72.0,50.0 L89.8,73.0 L61.0,69.1 L50.0,96.0 L39.0,69.1 L10.2,73.0 L28.0,50.0 L10.2,27.0 L39.0,30.9Z"/></g>
+<g clip-path="url(#cl)"><path d="M50.0,4.0 L61.0,30.9 L89.8,27.0 L72.0,50.0 L89.8,73.0 L61.0,69.1 L50.0,96.0 L39.0,69.1 L10.2,73.0 L28.0,50.0 L10.2,27.0 L39.0,30.9Z" fill="url(#en)" transform="translate(50 50) scale(.84) translate(-50 -50)"/><circle cx="50" cy="50" r="9" fill="#cbedfd"/><ellipse cx="38" cy="22" rx="34" ry="16" fill="url(#sp)" transform="rotate(-20 38 22)"/><rect x="-10" y="58" width="130" height="60" fill="#000" opacity=".12"/></g>
+</svg>

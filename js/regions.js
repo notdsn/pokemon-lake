@@ -73,6 +73,29 @@
       ['u_gelida', 'Montanha Gélida & Caverna Gigante', 'ice', '🧊', 6, 'Gelo eterno. No fundo da Caverna Gigante, Kyurem espera.', [74, 80], [[582, 10], [583, 4], [584, 1], [613, 8], [614, 3], [615, 5], [624, 6], [625, 2], [646, 0.25, { legend: 1 }]]],
       ['u_vitoria', 'Rota da Vitória & Torre Dragoespiral', 'cave', '🐉', 8, 'O caminho final até a Liga. Reshiram e Zekrom acordaram na Torre Dragoespiral.', [76, 82], [[610, 6], [611, 3], [621, 4], [633, 4], [634, 2], [636, 4], [626, 6], [624, 6], [612, 1], [637, 1], [639, 0.2, { legend: 1 }], [643, 0.3, { legend: 1 }], [644, 0.3, { legend: 1 }]]],
       ['u_liberdade', 'Ilha Liberdade & Floresta Abundante', 'psychic', '🏝️', 'ch', 'Pós-Unova. Victini, Landorus, Meloetta e Genesect foram vistos aqui.', [78, 84], [[577, 6], [578, 4], [579, 2], [605, 6], [606, 3], [571, 3], [494, 0.25, { legend: 1 }], [645, 0.25, { legend: 1 }], [648, 0.2, { legend: 1 }], [649, 0.2, { legend: 1 }], [641, 0.2, { legend: 1 }], [642, 0.2, { legend: 1 }]]]] };
+  R.kalos = { n: 'Kalos', k: 'x', base: 75, prev: 'unova', game: 'X/Y', story: 'Beleza e Mega Evolução: Xerneas dá a vida, Yveltal a tira, e Zygarde mantém o equilíbrio.',
+    badges: [['Inseto', 'bug', ['#65a30d']], ['Penhasco', 'hex', ['#78716c'], 'silver'], ['Estrondo', 'fist', ['#ea580c']], ['Planta', 'leaf', ['#16a34a']], ['Voltagem', 'sun', ['#fde047']], ['Fada', 'heart', ['#f472b6']], ['Psíquica', 'star5', ['#c026d3']], ['Iceberg', 'snow', ['#7dd3fc'], 'silver']],
+    gyms: [['Viola', 'viola', 'Santalune', 'bug', [[283, 0], [284, 1], [666, 2]]],
+      ['Grant', 'grant', 'Cyllage', 'rock', [[698, 1], [696, 2], [697, 3], [699, 3]]],
+      ['Korrina', 'korrina', 'Shalour', 'fighting', [[619, 3], [67, 3], [701, 4], [448, 5]]],
+      ['Ramos', 'ramos', 'Coumarine', 'grass', [[189, 4], [70, 4], [673, 6]]],
+      ['Clemont', 'clemont', 'Lumiose', 'electric', [[587, 5], [82, 5], [695, 7]]],
+      ['Valerie', 'valerie', 'Laverre', 'fairy', [[303, 6], [122, 6], [700, 8]]],
+      ['Olympia', 'olympia', 'Anistar', 'psychic', [[561, 8], [199, 8], [678, 10]]],
+      ['Wulfric', 'wulfric', 'Snowbelle', 'ice', [[460, 9], [615, 9], [713, 11]]]],
+    elite: [['Malva', 'malva', 'Elite Four de Kalos', 'fire', [[668, 14], [324, 14], [609, 15], [38, 15], [663, 16]]],
+      ['Siebold', 'siebold', 'Elite Four de Kalos', 'water', [[693, 14], [121, 14], [130, 15], [139, 15], [689, 16]]],
+      ['Wikstrom', 'wikstrom', 'Elite Four de Kalos', 'steel', [[707, 14], [476, 15], [212, 15], [227, 15], [681, 16]]],
+      ['Drasna', 'drasna', 'Elite Four de Kalos', 'dragon', [[691, 15], [334, 15], [715, 16], [621, 16], [149, 17]]],
+      ['Diantha', 'diantha', 'Campeã de Kalos', 'fairy', [[701, 18], [697, 18], [699, 18], [711, 18], [706, 19], [282, 20]]]],
+    maps: [['x_rota2', 'Rotas 2–4 & Bosque Santalune', 'grass', '🌸', 0, 'Vaniville, Aquacorde e Santalune. Flabébé colore os jardins.', [74, 80], [[659, 10], [661, 10], [664, 8], [665, 4], [667, 6], [669, 10], [672, 6], [674, 6], [676, 4], [677, 6], [650, 2], [653, 2], [656, 2]]],
+      ['x_caverna', 'Caverna Reflexo & Glittering', 'cave', '💎', 1, 'Paredes espelhadas e cristais brilhantes.', [76, 82], [[302, 6], [303, 6], [524, 8], [703, 6], [707, 6], [679, 8], [680, 3], [694, 6], [299, 6]]],
+      ['x_costa', 'Rotas Litorâneas & Baía Azure', 'water', '🌊', 2, 'Falésias e o mar azul de Kalos.', [76, 82], [[688, 8], [689, 2], [690, 8], [691, 2], [692, 8], [693, 2], [686, 6], [687, 2], [594, 4], [592, 6]]],
+      ['x_campos', 'Rotas 7–11 & Caverna Conexão', 'forest', '🌻', 3, 'Campos de flores, o Castelo Pokébola e o Palácio de Parfum.', [76, 82], [[673, 3], [670, 4], [682, 6], [683, 2], [684, 6], [685, 2], [701, 4], [676, 6], [674, 6], [675, 2], [702, 4]]],
+      ['x_neve', 'Rota 17 & Gruta Congelada', 'ice', '❄️', 5, 'Mamoswine abrem caminho na neve funda.', [78, 84], [[712, 10], [713, 3], [459, 6], [460, 3], [582, 6], [615, 4], [473, 2], [362, 3]]],
+      ['x_terminus', 'Rota 18 & Caverna Terminus', 'volcano', '🌋', 6, 'Terra árida e uma caverna onde algo verde dorme.', [78, 84], [[667, 6], [668, 3], [708, 6], [709, 2], [710, 6], [711, 2], [622, 4], [623, 2], [704, 6], [705, 2], [718, 0.2, { legend: 1 }]]],
+      ['x_vitoria', 'Rota da Vitória', 'cave', '🏰', 8, 'O desafio final antes da Liga. Xerneas e Yveltal foram vistos nas ruínas.', [80, 86], [[714, 6], [715, 2], [704, 4], [705, 3], [706, 1], [633, 3], [634, 2], [716, 0.3, { legend: 1 }], [717, 0.3, { legend: 1 }]]],
+      ['x_lendas', 'Fábrica Pokébola & Ruínas Ocultas', 'psychic', '✨', 'ch', 'Pós-Kalos. Diancie, Hoopa e Volcanion apareceram aqui.', [82, 88], [[707, 6], [710, 6], [711, 4], [703, 6], [700, 2], [719, 0.25, { legend: 1 }], [720, 0.25, { legend: 1 }], [721, 0.25, { legend: 1 }], [718, 0.3, { legend: 1 }]]]] };
   G.PREG = R; G.PREG_ORDER = ['hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'paldea'];
   const lv = (r, o) => Math.min(100, r.base + o);
   for (const [key, r] of Object.entries(R)) {
