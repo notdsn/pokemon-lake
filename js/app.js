@@ -650,7 +650,7 @@
     s.style.setProperty('--dx', Math.cos(a) * 75 + 'px'); s.style.setProperty('--dy', Math.sin(a) * 75 + 'px'); s.style.animationDelay = (i % 4) * 0.08 + 's'; host.appendChild(s); setTimeout(() => s.remove(), 1500); } }
   function showMain() {
     const m = B.s.sides[0].b.m; log(`O que <b>${esc(pn(m))}</b> vai fazer?`);
-    $('#bctl').innerHTML = `<div class="bmain"><button class="bb fight" data-b="fight">⚔️ Lutar</button><button class="bb bag" data-b="bag">🎒 Mochila</button><button class="bb poke" data-b="poke">🔄 Pokémon</button><button class="bb run" data-b="run">🏃 Fugir</button></div>`;
+    $('#bctl').innerHTML = `<div class="bmain wheel54"><button class="bb fight wh-main" data-b="fight"><i>⚔️</i><b>Lutar</b></button><button class="bb bag wh-s wh1" data-b="bag"><i>🎒</i><b>Mochila</b></button><button class="bb poke wh-s wh2" data-b="poke"><i>🔄</i><b>Pokémon</b></button><button class="bb run wh-s wh3" data-b="run"><i>🏃</i><b>Fugir</b></button></div>`;
     bindCtl();
   }
   function showMoves() {
@@ -659,7 +659,7 @@
     if (B.teraOn && (B.megaOn || B.dynaOn)) B.teraOn = false;
     if (B.megaOn && B.dynaOn) B.dynaOn = false; const asMax = !!m.dmax || (cd && B.dynaOn), mm = asMax ? Object.assign({}, m, { dmax: m.dmax || { t: 3, g: gx ? 1 : 0 } }) : null;
     $('#bctl').innerHTML = `${cm || cd || ct ? `<div class="powrow">${ct ? `<button class="bb teratog ${B.teraOn ? 'on' : ''}" style="--tc:${C.TYPE_COLOR[tt]}" data-b="teratog">💎 Terastal${B.teraOn ? ' ✔' : ''} <small>Tera ${C.TYPE_PT[tt]}</small></button>` : ''}${cm ? `<button class="bb megatog ${B.megaOn ? 'on' : ''}" data-b="megatog"><span class="orb"></span>🧬 Mega Evoluir${B.megaOn ? ' ✔' : ''} <small>${mf.n}</small></button>` : ''}${cd ? `<button class="bb dynatog ${B.dynaOn ? 'on' : ''}" data-b="dynatog">${gx ? '🌋 Gigantamax' : '⬣ Dinamax'}${B.dynaOn ? ' ✔' : ''} <small>${gx ? gx.n : '3 turnos, HP x2'}</small></button>` : ''}</div>` : ''}<div class="bmoves">${m.moves.map(x => { const mv0 = D.moves[x.n], mv = asMax ? PE.maxMoveOf(mm, mv0) : mv0; const ef = mv.p ? PE.eff(mv.t, mtypes(e)) : 1;
-      return `<button class="mvb ${asMax ? 'maxmv' : ''} ${known && mv.p && ef > 1 ? 'efup' : known && mv.p && ef < 1 ? 'efdn' : ''}" style="--tc:${C.TYPE_COLOR[mv.t]};--pp:${Math.max(0, x.pp / mv0.pp)}" data-b="mv" data-n="${x.n}" ${x.pp <= 0 ? 'disabled' : ''}><b>${mv.n}</b><small>${C.TYPE_PT[mv.t]} • ${mv.p ? 'Pod ' + mv.p : mv.guard ? 'Proteção' : 'Status'} • PP ${x.pp}/${mv0.pp}</small>${known ? (ef > 1 ? '<em class="ef up">Super!</em>' : ef < 1 ? `<em class="ef dn">${ef === 0 ? 'Imune' : 'Fraco'}</em>` : '') : ''}</button>`; }).join('')}</div><button class="bb back" data-b="back">← Voltar</button>`;
+      return `<button class="mvb ${asMax ? 'maxmv' : ''} ${mv.p && ef > 1 ? 'efup' : mv.p && ef === 0 ? 'efno' : mv.p && ef < 1 ? 'efdn' : ''}" style="--tc:${C.TYPE_COLOR[mv.t]};--pp:${Math.max(0, x.pp / mv0.pp)}" data-b="mv" data-n="${x.n}" ${x.pp <= 0 ? 'disabled' : ''}><b>${mv.n}</b><small>${C.TYPE_PT[mv.t]} • ${mv.p ? 'Pod ' + mv.p : mv.guard ? 'Proteção' : 'Status'} • PP ${x.pp}/${mv0.pp}</small>${mv.p ? (ef === 0 ? '<em class="ef no">Sem efeito</em>' : ef > 1 ? '<em class="ef up">Super eficaz</em>' : ef < 1 ? '<em class="ef dn">Pouco eficaz</em>' : '') : ''}</button>`; }).join('')}</div><button class="bb back" data-b="back">← Voltar</button>`;
     bindCtl();
   }
   function showBag() {
