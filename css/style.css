@@ -399,7 +399,7 @@ img[src*="img/front/"],img[src*="img/shiny/"],img[src*="img/mega/front"],img[src
 .fishshadow{position:absolute;left:20%;top:130px;width:46px;height:16px;border-radius:50%;background:#02132a80;filter:blur(3px);animation:fsw 5s ease-in-out infinite alternate}
 @keyframes fsw{to{left:58%;top:112px}}.pond.biting .fishshadow{left:calc(50% - 4px);top:100px;transition:.3s}
 .bite{position:absolute;left:calc(50% + 2px);top:22px;font:900 44px/1 system-ui;color:#fde047;text-shadow:0 0 10px #f59e0b,0 3px 0 #92400e;animation:sbz .25s}
-.pond.splash::after{content:"💦";position:absolute;left:calc(50% - 10px);top:60px;font-size:52px;animation:sbz .3s}
+.pond.splash::after{content:"";position:absolute;left:calc(50% - 22px);top:70px;width:44px;height:16px;border:3px solid #93c5fd;border-radius:50%;animation:sbz .3s}
 .fishm .btn.big{margin-top:4px}.fishm .btn+.btn{margin-top:8px}
 .quizhero{position:relative;height:120px;display:grid;place-items:center;background:radial-gradient(circle,#fde04730,transparent 70%)}
 .quizhero img{height:110px}.quizhero span{position:absolute;right:28%;top:10px;font:900 40px system-ui;color:#facc15}
@@ -1101,3 +1101,15 @@ h1{font-size:1.6rem;font-weight:800;letter-spacing:-.02em}h2{font-size:1.3rem;fo
 body.in-battle .toast{bottom:auto;top:calc(var(--sat,0px) + 58px)}
 /* v55: fusões animadas */
 .fzd .fzanim{width:56px;height:56px;object-fit:contain;display:block;margin:0 auto -4px}.fzd .fzpair img{width:22px;height:22px;opacity:.75}
+/* v57: ícones desenhados no lugar de emoji */
+.ic{width:1.05em;height:1.05em;display:inline-block;vertical-align:-.16em;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;flex:none;overflow:visible}
+.ic+.ic{margin-left:.08em}
+.ic-star,.ic-sparkles,.ic-sparkle,.ic-crown,.ic-trophy,.ic-medal,.ic-award{color:#fbbf24}
+.ic-star{fill:#fbbf24}
+.ic-heart{color:#f43f5e;fill:#f43f5e}
+.ic-flame{color:#fb923c}.ic-gem,.ic-diamond,.ic-snowflake{color:#67e8f9}.ic-droplet,.ic-droplets,.ic-waves{color:#60a5fa}
+.ic-zap{color:#facc15}.ic-leaf,.ic-sprout,.ic-tree-pine,.ic-tree-deciduous,.ic-clover{color:#4ade80}.ic-lock{color:#94a3b8}
+.ic-circle-check,.ic-check{color:#4ade80}.ic-coins{color:#fbbf24}.ic-gift,.ic-party-popper{color:#f472b6}.ic-dna{color:#c084fc}.ic-ghost,.ic-skull{color:#a78bfa}
+.ic-egg{color:#fde68a}.ic-moon{color:#c7d2fe}.ic-sun{color:#fcd34d}
+.light .ic,.btn.primary .ic,.bb .ic,.mvb .ic{color:inherit}
+.wheel54 .bb i .ic{width:1em;height:1em}
