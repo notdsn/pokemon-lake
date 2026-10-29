@@ -22,8 +22,8 @@ const URL = process.argv[2] || 'http://127.0.0.1:18473/', OUT = '/workspace/poke
     ok(await ev(() => { const S = PokeApp.debug.S; S.quests.day = '2020-1-1'; PokeApp.debug.render(); return S.quests.day !== '2020-1-1' && S.quests.d.every(x => !x.c); }), `${tag} reset diário`);
     await ev(() => PokeApp.debug.go('more')); await shot('more');
     // 2. Pokédex
-    await ev(() => { const S = PokeApp.debug.S; for (let i = 1; i <= 55; i++) { S.dex.seen[i] = 1; S.dex.caught[i] = 1; } PokeApp.debug.go('dex'); }); await p.waitForTimeout(200); console.log(await ev(() => [...document.querySelectorAll('.dm')].map(x => x.textContent).join('|'))); await shot('dex');
-    for (const k of [10, 25, 50]) await p.evaluate(k => { document.querySelector(`[data-a="dexclaim"][data-k="${k}"]`).click(); document.querySelector('#modal-root').innerHTML = ''; }, k);
+    await ev(() => { const S = PokeApp.debug.S; for (let i = 1; i <= 55; i++) { S.dex.seen[i] = 1; S.dex.caught[i] = 1; } PokeApp.debug.go('dex'); }); await p.waitForTimeout(200); await ev(() => document.querySelector('.dexrwbtn').click()); console.log(await ev(() => [...document.querySelectorAll('.dm')].map(x => x.textContent).join('|'))); await shot('dex');
+    for (const k of [10, 25, 50]) await p.evaluate(k => { document.querySelector('.dexrwbtn').click(); document.querySelector(`[data-a="dexclaim"][data-k="${k}"]`).click(); document.querySelector('#modal-root').innerHTML = ''; }, k);
     const dm = await ev(() => ({ charm: PokeApp.debug.S.bag['shiny-charm'], p: PokeApp.shinyP() })); ok(dm.charm === 1 && Math.abs(dm.p - 3 / 512) < 1e-9, `${tag} Amuleto Brilhante → chance ${dm.p.toFixed(5)}`);
     ok(await ev(() => !document.querySelector('[data-a="dexclaim"][data-k="10"]')), `${tag} marco não repete`);
     // 3. Shiny

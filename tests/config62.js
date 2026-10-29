@@ -1,0 +1,25 @@
+// v62: configurações com chaves e sliders
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
+const fs = require('fs'); const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
+const URL = process.argv[2] || 'http://127.0.0.1:18473/'; const LIVE = URL.includes('github.io') ? 'live-' : '';
+let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
+const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-${LIVE}${n}-v62.png`;
+(async () => { const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const ev = (f, a) => p.evaluate(f, a); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
+  await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="4"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
+  await p.waitForTimeout(500); await ev(() => document.querySelector('#modal-root').innerHTML = '');
+  await ev(() => PokeApp.debug.go('settings')); await p.waitForTimeout(400);
+  const r = await ev(() => ({ g: [...document.querySelectorAll('.sgh')].map(x => x.textContent), t: document.querySelectorAll('.tgl').length, s: document.querySelectorAll('input.sld').length, oldseg: document.querySelectorAll('.set62 .seg').length, emo: /\p{Extended_Pictographic}/u.test(document.body.innerText), ovx: document.documentElement.scrollWidth <= innerWidth + 1, big: [...document.querySelectorAll('.tgl')].every(x => x.getBoundingClientRect().height >= 32) }));
+  ok(r.g.join() === 'Som,Jogo,Conta', 'seções: ' + r.g.join(' / ')); ok(r.t === 4 && r.s === 3 && !r.oldseg, `${r.t} chaves e ${r.s} sliders, sem botões antigos`); ok(r.big, 'chaves fáceis de tocar'); ok(!r.emo && r.ovx, 'sem emoji, sem overflow');
+  await ev(() => document.querySelectorAll('.toast').forEach(t => t.style.visibility = 'hidden')); await p.screenshot({ path: OUT('config') }); await ev(() => document.querySelector('.srow.col').scrollIntoView({ block: 'center' })); await p.waitForTimeout(700); await ev(() => document.querySelectorAll('.toast').forEach(t => t.remove())); await p.screenshot({ path: OUT('config-2') });
+  await p.click('[data-a="setfollow"]'); await p.waitForTimeout(200); ok(await ev(() => PokeApp.debug.S.settings.follow === false && !document.querySelector('[data-a="setfollow"]').classList.contains('on')), 'chave desliga Pokémon seguindo');
+  await p.click('[data-a="setfollow"]'); await p.waitForTimeout(200); ok(await ev(() => PokeApp.debug.S.settings.follow === true), 'e liga de novo');
+  await p.click('[data-a="setmus"]'); await p.waitForTimeout(200); ok(await ev(() => PokeApp.debug.S.settings.music === false), 'chave da música');
+  await ev(() => { const s = document.querySelector('.sld[data-k="speed"]'); s.value = 3; s.dispatchEvent(new Event('input', { bubbles: true })); s.dispatchEvent(new Event('change', { bubbles: true })); });
+  ok(await ev(() => PokeApp.debug.S.settings.speed === 0.3 && document.getElementById('spdl').textContent === 'Turbo'), 'slider de velocidade: Turbo');
+  await ev(() => { const s = document.querySelector('.sld[data-k="mvol"]'); s.value = 0.1; s.dispatchEvent(new Event('input', { bubbles: true })); s.dispatchEvent(new Event('change', { bubbles: true })); });
+  ok(await ev(() => Math.abs(PokeApp.debug.S.settings.mvol - 0.1) < 1e-9), 'slider de volume da música');
+  await p.reload(); await p.waitForTimeout(800); await ev(() => PokeApp.debug.go('settings')); await p.waitForTimeout(300);
+  ok(await ev(() => PokeApp.debug.S.settings.speed === 0.3 && document.querySelector('.sld[data-k="speed"]').value === '3'), 'ajustes ficam salvos após recarregar');
+  ok(!errs.length, 'sem erros JS ' + errs.slice(0, 2)); await b.close(); console.log(fail ? 'FALHOU' : 'TUDO OK'); process.exit(fail ? 1 : 0); })();

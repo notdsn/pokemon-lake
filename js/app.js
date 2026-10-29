@@ -556,16 +556,27 @@
     try { S = PS.importSave(txt, user); toast('Save importado!', 'good'); go('home'); } catch (e) { toast('Código inválido: ' + esc(e.message), 'bad'); } }
   ACT.imp = () => doImport($('#imp').value);
   document.addEventListener('change', e => { if (e.target.id === 'impf' && e.target.files[0]) e.target.files[0].text().then(doImport); });
+  // v62: configurações com chaves deslizantes e sliders, em seções simples
+  const SPEEDS = [[1.4, 'Lenta'], [1, 'Normal'], [0.6, 'Rápida'], [0.3, 'Turbo']];
+  const tog = (act, on, k) => `<button class="tgl ${on ? 'on' : ''}" role="switch" aria-checked="${on}" data-a="${act}" ${k ? `data-k="${k}"` : ''} data-v="${!on}"><i></i></button>`;
+  const sld = (k, min, max, step, val, lab) => `<input type="range" class="sld" data-k="${k}" min="${min}" max="${max}" step="${step}" value="${val}" aria-label="${lab}" style="--p:${(val - min) / (max - min) * 100}%">`;
+  const srow = (ic, t, ctl, sub) => `<div class="srow"><span class="sic">${ic}</span><div class="grow"><b>${t}</b>${sub ? `<small class="mut">${sub}</small>` : ''}</div>${ctl}</div>`;
   function vSettings() {
-    return `<div class="card"><h3>⚙️ Configurações</h3><div class="setrow"><span>Som</span><div class="seg">${[[true, 'Ligado'], [false, 'Desligado']].map(([v, l]) => `<button class="${S.settings.sound === v ? 'on' : ''}" data-a="set" data-k="sound" data-v="${v}">${l}</button>`).join('')}</div></div>${audioSettings()}<div class="setrow"><span>🐾 Pokémon seguindo no mapa</span><div class="seg">${[[true, 'Sim'], [false, 'Não']].map(([v, l]) => `<button class="${(S.settings.follow !== false) === v ? 'on' : ''}" data-a="setfollow" data-v="${v}">${l}</button>`).join('')}</div></div>
-      <div class="setrow"><span>📳 Vibração</span><div class="seg">${[[true, 'Ligada'], [false, 'Desligada']].map(([v, l]) => `<button class="${(S.settings.vibe !== false) === v ? 'on' : ''}" data-a="set" data-k="vibe" data-v="${v}">${l}</button>`).join('')}</div></div>
-      <p class="mut small">Vibra em golpes críticos, capturas e shinies (só em aparelhos com suporte; no iPhone o navegador não permite).</p>
-      <div class="setrow"><span>Velocidade da batalha</span><div class="seg">${[[1.4, 'Lenta'], [1, 'Normal'], [0.6, 'Rápida'], [0.3, 'Turbo']].map(([v, l]) => `<button class="${S.settings.speed === v ? 'on' : ''}" data-a="set" data-k="speed" data-v="${v}">${l}</button>`).join('')}</div></div>
-      <button class="btn wide ghost" data-a="lock">🔒 Bloquear site neste aparelho</button></div>
+    const st0 = S.settings, mus = st0.music !== false, si = Math.max(0, SPEEDS.findIndex(x => x[0] === (st0.speed || 1)));
+    return `<div class="card set62"><h3>⚙️ Configurações</h3>
+      <h4 class="sgh">Som</h4>${srow('🔊', 'Efeitos sonoros', tog('set', st0.sound !== false, 'sound'))}${srow('🎵', 'Música', tog('setmus', mus))}
+      ${srow('', 'Volume da música', sld('mvol', 0, 0.6, 0.05, st0.mvol ?? 0.35, 'Volume da música'))}${srow('', 'Volume dos efeitos', sld('svol', 0, 1.2, 0.1, st0.svol ?? 0.8, 'Volume dos efeitos'))}
+      <h4 class="sgh">Jogo</h4>${srow('🐾', 'Pokémon seguindo no mapa', tog('setfollow', st0.follow !== false))}${srow('📳', 'Vibração', tog('set', st0.vibe !== false, 'vibe'), 'Críticos, capturas e shinies (o iPhone não permite)')}
+      <div class="srow col"><div class="row between"><b>Velocidade da batalha</b><span class="chip" id="spdl">${SPEEDS[si][1]}</span></div>${sld('speed', 0, 3, 1, si, 'Velocidade da batalha')}<div class="sticks">${SPEEDS.map(x => `<small>${x[1]}</small>`).join('')}</div></div>
+      <h4 class="sgh">Conta</h4><button class="btn wide ghost" data-a="lock">🔒 Bloquear site neste aparelho</button></div>
       <div class="card"><h3>🎁 Código de presente</h3><p class="mut small">Tem um código? Digite aqui para receber o presente (cada código vale uma vez por conta).</p>
       <form id="giftForm" class="row gift"><input id="giftCode" autocapitalize="characters" autocomplete="off" placeholder="XXXX-XXXX" aria-label="Código de presente"><button class="btn primary">Resgatar</button></form><p id="giftErr" class="err"></p></div>
       <div class="card"><h3>🛟 Recuperar Pokémon</h3><p class="mut small">Sumiu algum Pokémon? Procura nas cópias de segurança deste aparelho e devolve para o PC. Não apaga nada.</p><button class="btn wide" data-a="recover">🔎 Procurar Pokémon perdidos</button></div>`;
   }
+  document.addEventListener('input', e => { const t = e.target; if (!t.classList || !t.classList.contains('sld') || !S) return; const k = t.dataset.k, v = +t.value;
+    t.style.setProperty('--p', (v - +t.min) / (+t.max - +t.min) * 100 + '%');
+    if (k === 'speed') { S.settings.speed = SPEEDS[v][0]; const l = document.getElementById('spdl'); if (l) l.textContent = SPEEDS[v][1]; } else { S.settings[k] = v; if (k === 'mvol') MUS.refresh(); } });
+  document.addEventListener('change', e => { const t = e.target; if (t.classList && t.classList.contains('sld') && S) { save(); if (t.dataset.k === 'svol' && SFX.coin) SFX.coin(); } });
   // ---------- recuperação de Pokémon (lê backups; só ADICIONA ao PC) ----------
   const monKey = m => m.uid || ['x', m.id, m.ot, m.caughtAt, (m.iv || []).join('.')].join('|');
   function allMine() { const L = [...S.party, ...S.box, ...((S.daycare && S.daycare.slots) || []), ...expMons(S)].filter(Boolean); return [...L, ...L.filter(m => m.fz && m.fz.b).map(m => m.fz.b)]; }
