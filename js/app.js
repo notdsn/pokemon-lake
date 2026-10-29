@@ -2844,6 +2844,30 @@
     toast(`Sanduíche pronto! ${PK_POW[sel.pow][0]} para ${C.TYPE_PT[sel.type]} por ${PK_MIN} min.`, 'good'); };
   HOJE.push(() => { const p = pkLive(); if (!p) return ''; return hrow('data-a="tab" data-t="picnic"', 'img/items/oran-berry.png', `Piquenique: ${PK_POW[p.pow][0]}`, `${C.TYPE_PT[p.type]} • ${pkLeft()} min restantes`); });
   A.pk68 = { live: pkLive, left: pkLeft, has: pkHas };
+
+  // v69: Treino rápido de status (Z-A / SV): natureza, golpes e pontos de status trocados por dinheiro do jogo.
+  const TR_NAT = 2000, TR_MOVE = 500, TR_EV = 300, TR_EVSTEP = 32, TR_RESET = 1000;
+  const trMon = () => { const i = Math.min(S.party.length - 1, Math.max(0, S.tr69 | 0)); return S.party[i]; };
+  const trLearn = m => [...new Set((D.mons[m.id].l || []).filter(([lv, n]) => lv <= m.lvl && D.moves[n]).map(x => x[1]))].filter(n => !m.moves.some(x => x.n === n));
+  const pay = c => { if (S.money < c) { toast(`Precisa de ${fmt(c)}.`, 'bad'); return false; } S.money -= c; return true; };
+  MORE_X.push(() => ['train69', '💪', 'Treino Rápido', 'Natureza, golpes e pontos de status']);
+  XV.train69 = () => { const m = trMon(); if (!m) return '<div class="card">Sem Pokémon no time.</div>'; const ev = m.ev || [0, 0, 0, 0, 0, 0], tot = ev.reduce((a, b) => a + b, 0), stt = PE.calcStats(m), L = trLearn(m);
+    return `<div class="card tr69"><h3>💪 Treino Rápido</h3><div class="trpick">${S.party.map((x, i) => `<button class="${x === m ? 'on' : ''}" data-a="trpick" data-i="${i}"><img src="${sprId(x.id, x.shiny)}" alt=""></button>`).join('')}</div>
+      <div class="trhead"><b>${x_n(m)}</b> <small class="mut">Nv ${m.lvl} • ${natTxt(m)}</small></div>
+      <h4>Natureza <small class="mut">${fmt(TR_NAT)}</small></h4><div class="trrow"><select id="trnat">${PE.NATURES.map((n, i) => `<option value="${i}" ${i === (m.nat ?? 0) ? 'selected' : ''}>${natTxt({ nat: i })}</option>`).join('')}</select><button class="btn small primary" data-a="trnat">Trocar</button></div>
+      <h4>Golpes <small class="mut">${fmt(TR_MOVE)} cada</small></h4>
+      <div class="trmoves">${m.moves.map((x, i) => `<label class="trmv"><input type="radio" name="trslot" value="${i}" ${i === 0 ? 'checked' : ''}><span>${moveName(x.n)}</span></label>`).join('')}</div>
+      ${L.length ? `<div class="trrow"><select id="trmove">${L.map(n => `<option value="${n}">${moveName(n)}</option>`).join('')}</select><button class="btn small primary" data-a="trmove">Ensinar</button></div>` : '<small class="mut">Nenhum golpe novo para aprender neste nível.</small>'}
+      <h4>Pontos de status <small class="mut">${tot}/510 • +${TR_EVSTEP} por ${fmt(TR_EV)}</small></h4>
+      <div class="trevs">${SNP.map((n, i) => `<div class="trev"><span>${n}</span><i><b style="width:${ev[i] / 252 * 100}%"></b></i><small>${stt[i]}</small><button class="btn small" data-a="trev" data-i="${i}" ${ev[i] >= 252 || tot >= 510 ? 'disabled' : ''}>+</button></div>`).join('')}</div>
+      <button class="btn wide" data-a="trreset" ${tot ? '' : 'disabled'}>Zerar pontos (${fmt(TR_RESET)})</button></div>`; };
+  const x_n = m => m.nick || D.mons[m.id].n;
+  ACT.trpick = d => { S.tr69 = +d.i; render(); };
+  ACT.trnat = () => { const m = trMon(), v = +document.querySelector('#trnat').value; if (v === (m.nat ?? 0)) return toast('Essa já é a natureza dele.'); if (!pay(TR_NAT)) return; const r = PE.calcStats(m)[0] - m.hp; m.nat = v; m.hp = Math.max(1, PE.calcStats(m)[0] - r); save(); render(); toast(`${x_n(m)} agora é ${PE.NATURES[v][0]}.`, 'good'); };
+  ACT.trmove = () => { const m = trMon(), n = document.querySelector('#trmove').value, sl = +(document.querySelector('input[name="trslot"]:checked') || { value: 0 }).value; if (!n || !pay(TR_MOVE)) return; const old = m.moves[sl] ? moveName(m.moves[sl].n) : ''; if (m.moves.length < 4 && !m.moves[sl]) m.moves.push({ n, pp: D.moves[n].pp }); else m.moves[sl] = { n, pp: D.moves[n].pp }; save(); render(); toast(`${x_n(m)} aprendeu ${moveName(n)}${old ? ' no lugar de ' + old : ''}!`, 'good'); };
+  ACT.trev = d => { const m = trMon(), i = +d.i; m.ev = m.ev || [0, 0, 0, 0, 0, 0]; const tot = m.ev.reduce((a, b) => a + b, 0), add = Math.min(TR_EVSTEP, 252 - m.ev[i], 510 - tot); if (add <= 0 || !pay(TR_EV)) return; const h0 = PE.calcStats(m)[0]; m.ev[i] += add; if (i === 0) m.hp += PE.calcStats(m)[0] - h0; save(); render(); };
+  ACT.trreset = () => { const m = trMon(); if (!pay(TR_RESET)) return; m.ev = [0, 0, 0, 0, 0, 0]; m.hp = Math.min(m.hp, PE.calcStats(m)[0]); save(); render(); toast('Pontos de status zerados.'); };
+  A.tr69 = { learn: trLearn };
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   if (localStorage.getItem(UNLOCK_KEY) !== PASS_HASH) gate();

@@ -1249,3 +1249,13 @@ body.in-battle .toast{bottom:auto;top:calc(var(--sat,0px) + 58px)}
 .pk68 h4{margin:12px 0 6px}.pk68 .pkon{background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.35);border-radius:10px;padding:8px 10px;margin:8px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .pktypes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.pktypes .type{border:2px solid transparent;padding:6px 0;font:inherit;font-size:13px;cursor:pointer;opacity:.75}
 .pktypes .type.on{border-color:#fff;opacity:1;box-shadow:0 0 8px var(--tc)}.pk68 .pkgo{margin:14px 0 6px}.pk68 .center{display:block;text-align:center}
+/* v69 Treino */
+.tr69 h4{margin:14px 0 6px;display:flex;justify-content:space-between;align-items:baseline}
+.trpick{display:flex;gap:6px;overflow-x:auto;padding:4px 0}.trpick button{flex:none;width:52px;height:52px;border-radius:12px;border:2px solid transparent;background:rgba(255,255,255,.06);cursor:pointer;padding:0}
+.trpick button.on{border-color:#fbbf24;background:rgba(251,191,36,.15)}.trpick img{width:44px;height:44px;image-rendering:pixelated}
+.trhead{margin:6px 0}.trrow{display:flex;gap:8px;align-items:center}.trrow select{flex:1;min-width:0;padding:9px;border-radius:10px;background:rgba(255,255,255,.08);color:inherit;border:1px solid rgba(255,255,255,.15);font:inherit;font-size:14px}
+.trrow select option{color:#111}
+.trmoves{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}.trmv{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.06);font-size:13px;cursor:pointer}
+.trmv:has(input:checked){background:rgba(251,191,36,.18);outline:1px solid #fbbf24}.trmv input{accent-color:#fbbf24;margin:0}
+.trevs{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}.trev{display:grid;grid-template-columns:62px 1fr 34px 36px;gap:8px;align-items:center;font-size:13px}
+.trev i{height:8px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}.trev i b{display:block;height:100%;background:#4ade80}.trev small{text-align:right}.trev .btn{padding:4px 0}

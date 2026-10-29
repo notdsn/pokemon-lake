@@ -1,0 +1,36 @@
+// v69: Treino rápido
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
+const fs = require('fs'); const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
+const URL = process.argv[2] || 'http://127.0.0.1:18473/'; const LIVE = URL.includes('github.io') ? 'live-' : '';
+let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
+const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-${LIVE}${n}-v69.png`;
+(async () => { const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const ev = (f, a) => p.evaluate(f, a); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
+  await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="4"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
+  await p.waitForTimeout(500); const clr = () => ev(() => document.querySelector('#modal-root').innerHTML = ''); await clr();
+  await ev(() => { const S = PokeApp.debug.S; S.money = 20000; S.party[0].lvl = 30; PokeApp.debug.go('more'); }); await p.waitForTimeout(300); await clr();
+  ok(await ev(() => /Treino Rápido/.test(document.body.innerText)), 'Treino Rápido no Mais');
+  await ev(() => PokeApp.debug.go('train69')); await p.waitForTimeout(300); await clr();
+  const v = await ev(() => ({ emo: /\p{Extended_Pictographic}/u.test(document.body.innerText), ovx: document.documentElement.scrollWidth <= innerWidth + 1, evs: document.querySelectorAll('.trev').length, nat: PokeApp.debug.S.party[0].nat }));
+  ok(v.evs === 6 && !v.emo && v.ovx, 'tela sem emoji/overflow, 6 status');
+  await p.screenshot({ path: OUT('treino-tela') });
+  const nn = (v.nat + 3) % 25; await p.selectOption('#trnat', String(nn)); await p.click('[data-a="trnat"]'); await p.waitForTimeout(300);
+  const a = await ev(() => ({ nat: PokeApp.debug.S.party[0].nat, m: PokeApp.debug.S.money }));
+  ok(a.nat === nn && a.m === 18000, 'natureza trocada por P$ 2.000');
+  const learn = await ev(() => PokeApp.tr69.learn(PokeApp.debug.S.party[0]));
+  ok(learn.length > 0, 'golpes disponíveis: ' + learn.length);
+  await p.click('.trmv:nth-child(2)'); await p.selectOption('#trmove', learn[0]); await p.click('[data-a="trmove"]'); await p.waitForTimeout(300);
+  const b2 = await ev(() => ({ mv: PokeApp.debug.S.party[0].moves.map(x => x.n), m: PokeApp.debug.S.money }));
+  ok(b2.mv[1] === learn[0] && b2.m === 17500, 'golpe ensinado no slot 2 ' + JSON.stringify(b2));
+  const s0 = await ev(() => PokeApp.debug.S.party[0].ev[1]);
+  for (let i = 0; i < 3; i++) { await p.click('[data-a="trev"][data-i="1"]'); await p.waitForTimeout(150); }
+  const c = await ev(() => ({ ev: PokeApp.debug.S.party[0].ev[1], m: PokeApp.debug.S.money }));
+  ok(c.ev === s0 + 96 && c.m === 17500 - 900, 'ataque +96 pontos por P$ 900');
+  await p.screenshot({ path: OUT('treino-feito') });
+  await p.click('[data-a="trreset"]'); await p.waitForTimeout(200);
+  ok(await ev(() => PokeApp.debug.S.party[0].ev.every(x => x === 0) && PokeApp.debug.S.money === 15600), 'zerar pontos');
+  ok(await ev(() => JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => /^pkLake\.save\.[^.]+$/.test(k)))).party[0].nat) === nn, 'salvo');
+  ok(!errs.length, 'sem erros: ' + errs.join(' | '));
+  console.log(fail ? 'FALHOU ' + fail : 'TUDO OK'); await b.close(); process.exit(fail ? 1 : 0);
+})();
