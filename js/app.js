@@ -43,7 +43,7 @@
   document.addEventListener('load', e => { const t = e.target; if (t.tagName === 'IMG' && t.closest && t.closest('.bmon')) fitSpr(t); }, true);
   function fitSpr(img) { if (!img.naturalWidth) return; const back = !!img.closest('.pmon'), k = innerWidth < 600 ? (back ? 1.15 : 1.7) : (back ? 1.5 : 2.4), box = img.closest('.bmon');
     let w = img.naturalWidth * k, h = img.naturalHeight * k; const mh = box ? box.clientHeight : 1e9, mw = box ? box.clientWidth : 1e9; const f = Math.min(1, mh / h, mw / w); w *= f; h *= f; img.style.width = w + 'px'; img.style.height = h + 'px'; }
-  const spr = (m, back) => { const d = back ? (m.shiny ? 'backshiny' : 'back') : (m.shiny ? 'shiny' : 'front'); if (m.dmax && m.dmax.g && PE.GMAX[m.id]) return `img/gmax/${d}/${PE.GMAX[m.id].k}.gif`; return m.fz && m.fz.img && !m.mega ? m.fz.img : m.mega ? `img/mega/${d}/${m.mega}.gif` : `img/${d}/${m.id}.gif`; };
+  const spr = (m, back) => { const d = back ? (m.shiny ? 'backshiny' : 'back') : (m.shiny ? 'shiny' : 'front'); if (m.dmax && m.dmax.g && PE.GMAX[m.id]) return `img/gmax/${d}/${PE.GMAX[m.id].k}.gif`; return m.fz && !m.mega && (m.fz.img || m.fz.bid) ? fzSpr(m, back) : m.mega ? `img/mega/${d}/${m.mega}.gif` : `img/${d}/${m.id}.gif`; };
   const bname = m => m.dmax && m.dmax.g && PE.GMAX[m.id] && !m.nick ? PE.GMAX[m.id].n : m.mega && !m.nick && D.megas[m.mega] ? D.megas[m.mega].n : pn(m);
   const mtypes = m => PE.monTypes(m);
   const tod = () => period() === 'night' ? 'night' : 'day';
@@ -1717,18 +1717,81 @@
     const rank = L => { let lo = 0, hi = Ls.length; while (lo < hi) { const m = (lo + hi) >> 1; if (Ls[m] < L) lo = m + 1; else hi = m; } return lo / Math.max(1, Ls.length - 1); };
     for (let i = 0; i < d.length; i += 4) { if (d[i + 3] < 128) continue; const L = lum(d[i], d[i + 1], d[i + 2]); if (L < 35) continue; const t = pb[Math.min(pb.length - 1, Math.floor(rank(L) * pb.length))], k = 0.72; d[i] = d[i] * (1 - k) + t[0] * k; d[i + 1] = d[i + 1] * (1 - k) + t[1] * k; d[i + 2] = d[i + 2] * (1 - k) + t[2] * k; }
     xa.putImageData(da, 0, 0); return ca.toDataURL('image/png'); }
+  // ===== v55: fusões animadas — decodifica todos os quadros do GIF de A, aplica a paleta de B e gera um APNG (cache IndexedDB) =====
+  var FZ_MEM = new Map(), FZ_INFO = new Map(), FZ_PEND = new Map(), FZ_FAIL = new Set(), FZ_Q = Promise.resolve(), FZ_RT = 0;
+  function gifDecode(buf, onFrame) { const u = new Uint8Array(buf); let p = 0; const r8 = () => u[p++], r16 = () => { const v = u[p] | u[p + 1] << 8; p += 2; return v; };
+    if (String.fromCharCode(u[0], u[1], u[2]) !== 'GIF') throw new Error('gif'); p = 6; const W = r16(), H = r16(), pk = r8(); r8(); r8();
+    const rdCT = n => { const t = new Uint8Array(n * 3); t.set(u.subarray(p, p + n * 3)); p += n * 3; return t; };
+    const gct = pk & 0x80 ? rdCT(1 << ((pk & 7) + 1)) : null; const cur = new Uint8ClampedArray(W * H * 4); let gce = { disp: 0, delay: 10, ti: -1 }, n = 0;
+    const subs = () => { let len = 0; const parts = []; for (let s = r8(); s; s = r8()) { parts.push(u.subarray(p, p + s)); len += s; p += s; } const o = new Uint8Array(len); let k = 0; for (const x of parts) { o.set(x, k); k += x.length; } return o; };
+    while (p < u.length) { const b = r8();
+      if (b === 0x3B) break;
+      if (b === 0x21) { const lb = r8(); if (lb === 0xF9) { r8(); const f = r8(), d = r16(), ti = r8(); r8(); gce = { disp: (f >> 2) & 7, delay: d < 2 ? 10 : d, ti: f & 1 ? ti : -1 }; } else subs(); continue; }
+      if (b !== 0x2C) break;
+      const fx = r16(), fy = r16(), fw = r16(), fh = r16(), ip = r8(); const ct = ip & 0x80 ? rdCT(1 << ((ip & 7) + 1)) : gct; const mcs = r8(), data = subs();
+      const px = new Uint8Array(fw * fh); { const clear = 1 << mcs, eoi = clear + 1; let size = mcs + 1, mask = (1 << size) - 1, avail = clear + 2, old = -1, first = 0, bits = 0, datum = 0, i = 0, o = 0;
+        const pre = new Int16Array(4096), suf = new Uint8Array(4096), stk = new Uint8Array(4097); for (let c = 0; c < clear; c++) suf[c] = c;
+        while (o < px.length) { while (bits < size && i < data.length) { datum |= data[i++] << bits; bits += 8; } if (bits < size) break; let code = datum & mask; datum >>= size; bits -= size;
+          if (code === clear) { size = mcs + 1; mask = (1 << size) - 1; avail = clear + 2; old = -1; continue; } if (code === eoi) break;
+          if (old === -1) { px[o++] = suf[code]; old = code; first = code; continue; }
+          const in0 = code; let sp = 0; if (code >= avail) { stk[sp++] = first; code = old; } while (code > clear) { stk[sp++] = suf[code]; code = pre[code]; } first = suf[code]; stk[sp++] = first;
+          if (avail < 4096) { pre[avail] = old; suf[avail] = first; avail++; if ((avail & mask) === 0 && avail < 4096) { size++; mask += avail; } } old = in0; while (sp && o < px.length) px[o++] = stk[--sp]; } }
+      const rows = []; if (ip & 0x40) { for (const [s, st] of [[0, 8], [4, 8], [2, 4], [1, 2]]) for (let y = s; y < fh; y += st) rows.push(y); } else for (let y = 0; y < fh; y++) rows.push(y);
+      const prev = gce.disp === 3 ? cur.slice() : null;
+      for (let k = 0; k < fh; k++) { const yy = fy + rows[k]; if (yy >= H) continue; for (let x = 0; x < fw; x++) { const c = px[k * fw + x]; if (c === gce.ti || !ct) continue; const xx = fx + x; if (xx >= W) continue; const q = (yy * W + xx) * 4; cur[q] = ct[c * 3]; cur[q + 1] = ct[c * 3 + 1]; cur[q + 2] = ct[c * 3 + 2]; cur[q + 3] = 255; } }
+      onFrame(cur, W, H, gce.delay, n++);
+      if (gce.disp === 2) { for (let y = fy; y < Math.min(H, fy + fh); y++) cur.fill(0, (y * W + fx) * 4, (y * W + Math.min(W, fx + fw)) * 4); } else if (prev) cur.set(prev);
+      gce = { disp: 0, delay: 10, ti: -1 }; }
+    return { W, H, n }; }
+  const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function pngChunk(type, data) { const o = new Uint8Array(12 + data.length), dv = new DataView(o.buffer); dv.setUint32(0, data.length); for (let i = 0; i < 4; i++) o[4 + i] = type.charCodeAt(i); o.set(data, 8); let c = 0xFFFFFFFF; for (let i = 4; i < 8 + data.length; i++) c = CRC_T[(c ^ o[i]) & 255] ^ (c >>> 8); dv.setUint32(8 + data.length, (c ^ 0xFFFFFFFF) >>> 0); return o; }
+  async function zlib(raw) { const cs = new CompressionStream('deflate'); const s = new Blob([raw]).stream().pipeThrough(cs); return new Uint8Array(await new Response(s).arrayBuffer()); }
+  const lumF = (r, g, b) => 0.3 * r + 0.59 * g + 0.11 * b;
+  async function fzPalette(bId) { const im = await loadImg(`img/front/${bId}.gif`); const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, c.width, c.height).data;
+    const m = new Map(); for (let i = 0; i < d.length; i += 4) { if (d[i + 3] < 128) continue; const r = d[i], g = d[i + 1], b = d[i + 2], L = lumF(r, g, b); if (L < 35 || L > 245) continue; const k = (r >> 4) << 8 | (g >> 4) << 4 | (b >> 4); const e = m.get(k) || [0, 0, 0, 0]; e[0] += r; e[1] += g; e[2] += b; e[3]++; m.set(k, e); }
+    return [...m.values()].sort((a, b) => b[3] - a[3]).slice(0, 10).map(e => [e[0] / e[3], e[1] / e[3], e[2] / e[3]]).sort((a, b) => lumF(...a) - lumF(...b)); }
+  function fzLut(rgba, pb) { const Ls = []; for (let i = 0; i < rgba.length; i += 4) if (rgba[i + 3] >= 128) Ls.push(lumF(rgba[i], rgba[i + 1], rgba[i + 2])); Ls.sort((a, b) => a - b);
+    const lut = new Float32Array(256 * 3); for (let L = 0; L < 256; L++) { let lo = 0, hi = Ls.length; while (lo < hi) { const m = (lo + hi) >> 1; if (Ls[m] < L) lo = m + 1; else hi = m; } const t = pb[Math.min(pb.length - 1, Math.floor(lo / Math.max(1, Ls.length - 1) * pb.length))]; lut[L * 3] = t[0]; lut[L * 3 + 1] = t[1]; lut[L * 3 + 2] = t[2]; } return lut; }
+  function fzRecolor(src, lut, W, H) { const o = new Uint8Array(H * (W * 4 + 1)), k = 0.72; for (let y = 0; y < H; y++) { const ro = y * (W * 4 + 1); o[ro] = 0; for (let x = 0; x < W; x++) { const i = (y * W + x) * 4, j = ro + 1 + x * 4; let r = src[i], g = src[i + 1], b = src[i + 2]; const a = src[i + 3];
+      if (a >= 128) { const L = lumF(r, g, b); if (L >= 35) { const l = Math.min(255, L | 0) * 3; r = r * (1 - k) + lut[l] * k; g = g * (1 - k) + lut[l + 1] * k; b = b * (1 - k) + lut[l + 2] * k; } } o[j] = r; o[j + 1] = g; o[j + 2] = b; o[j + 3] = a; } } return o; }
+  async function fzBuild(path, bId) { const pb = await fzPalette(bId); if (!pb.length) throw new Error('pal'); const buf = await (await fetch(path)).arrayBuffer(); const frames = []; let lut = null, W = 0, H = 0;
+    gifDecode(buf, (cur, w, h, delay, i) => { W = w; H = h; if (!lut) lut = fzLut(cur, pb); frames.push([fzRecolor(cur, lut, w, h), delay]); });
+    if (!frames.length) throw new Error('nof'); const parts = [new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])], ih = new Uint8Array(13), dv = new DataView(ih.buffer); dv.setUint32(0, W); dv.setUint32(4, H); ih.set([8, 6, 0, 0, 0], 8); parts.push(pngChunk('IHDR', ih));
+    const ac = new Uint8Array(8); new DataView(ac.buffer).setUint32(0, frames.length); parts.push(pngChunk('acTL', ac)); let seq = 0;
+    for (let f = 0; f < frames.length; f++) { const fc = new Uint8Array(26), fv = new DataView(fc.buffer); fv.setUint32(0, seq++); fv.setUint32(4, W); fv.setUint32(8, H); fv.setUint16(20, frames[f][1]); fv.setUint16(22, 100); fc[24] = 0; fc[25] = 0; parts.push(pngChunk('fcTL', fc));
+      const z = await zlib(frames[f][0]); frames[f][0] = null; if (!f) parts.push(pngChunk('IDAT', z)); else { const fd = new Uint8Array(4 + z.length); new DataView(fd.buffer).setUint32(0, seq++); fd.set(z, 4); parts.push(pngChunk('fdAT', fd)); } }
+    parts.push(pngChunk('IEND', new Uint8Array(0))); return new Blob(parts, { type: 'image/png' }); }
+  function fzMiniBuild(aId, bId, sh) { return (async () => { const pb = await fzPalette(bId); if (!pb.length) throw new Error('pal'); const im = await loadImg(`img/${sh ? 'minishiny' : 'mini'}/${aId}.png`); const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext('2d'); x.drawImage(im, 0, 0); const id = x.getImageData(0, 0, c.width, c.height);
+      const raw = fzRecolor(id.data, fzLut(id.data, pb), c.width, c.height), d = id.data; for (let y = 0; y < c.height; y++) d.set(raw.subarray(y * (c.width * 4 + 1) + 1, (y + 1) * (c.width * 4 + 1)), y * c.width * 4); x.putImageData(id, 0, 0); return await new Promise(r => c.toBlob(r, 'image/png')); })(); }
+  let fzDB = null; const fzIDB = () => fzDB || (fzDB = new Promise(res => { try { const rq = indexedDB.open('pkLakeFz', 1); rq.onupgradeneeded = () => rq.result.createObjectStore('a'); rq.onsuccess = () => res(rq.result); rq.onerror = () => res(null); } catch (e) { res(null); } }));
+  const fzGet = async k => { const db = await fzIDB(); if (!db) return null; return new Promise(r => { try { const q = db.transaction('a').objectStore('a').get(k); q.onsuccess = () => r(q.result || null); q.onerror = () => r(null); } catch (e) { r(null); } }); };
+  const fzPut = async (k, v) => { const db = await fzIDB(); if (!db) return; try { db.transaction('a', 'readwrite').objectStore('a').put(v, k); } catch (e) {} };
+  const FZ_V = 'v1:';
+  function fzEnsure(k, aId, bId, sh, kind) { if (FZ_MEM.has(k) || FZ_PEND.has(k) || FZ_FAIL.has(k)) return FZ_PEND.get(k);
+    const p = FZ_Q = FZ_Q.then(async () => { let bl = await fzGet(FZ_V + k);
+        if (!bl) { if (typeof CompressionStream === 'undefined' && kind !== 'm') throw new Error('nocs'); bl = kind === 'm' ? await fzMiniBuild(aId, bId, sh) : await fzBuild(`img/${kind === 'b' ? (sh ? 'backshiny' : 'back') : (sh ? 'shiny' : 'front')}/${aId}.gif`, bId); if (bl) fzPut(FZ_V + k, bl); }
+        const url = URL.createObjectURL(bl); FZ_MEM.set(k, url); FZ_INFO.set(url, { a: aId, b: bId, sh, kind }); FZ_PEND.delete(k); fzRefresh(); return url; })
+      .catch(() => { FZ_FAIL.add(k); FZ_PEND.delete(k); return null; });
+    FZ_PEND.set(k, p); return p; }
+  function fzKey(aId, bId, sh, kind) { return `${aId}-${bId}-${sh ? 1 : 0}-${kind}`; }
+  function fzAnimSrc(aId, bId, sh, kind, fallback) { if (D.mons[aId] && D.mons[aId].L) return fallback; const k = fzKey(aId, bId, sh, kind); const u = FZ_MEM.get(k); if (u) return u; fzEnsure(k, aId, bId, sh, kind); return fallback; }
+  function fzSpr(m, back) { const bid = m.fz.bid || (m.fz.b && m.fz.b.id), fb = m.fz.img || `img/${back ? (m.shiny ? 'backshiny' : 'back') : (m.shiny ? 'shiny' : 'front')}/${m.id}.gif`; if (!bid) return fb; return fzAnimSrc(m.id, bid, !!m.shiny, back ? 'b' : 'f', fb); }
+  function fzRefresh() { clearTimeout(FZ_RT); FZ_RT = setTimeout(() => { try { if (B && B.s) { for (const [side, sel] of [[0, '#psp'], [1, '#esp']]) { const m = B.s.sides[side].b.m, el = $(sel); if (m && m.fz && el) { const s = spr(m, !side); if (el.getAttribute('src') !== s) el.src = s; } } }
+      document.querySelectorAll('img[data-fzk]').forEach(i => { const u = FZ_MEM.get(i.dataset.fzk); if (u && i.getAttribute('src') !== u) i.src = u; });
+      if (!B && !document.querySelector('#modal-root .modal, #modal-root > *')) render(); } catch (e) {} }, 220); }
+  A.fza = { gifDecode, fzBuild, fzKey, fzAnimSrc, fzEnsure, mem: FZ_MEM, info: FZ_INFO, fail: FZ_FAIL, pend: FZ_PEND, wait: () => FZ_Q };
   const fzName = (a, b) => { const A = D.mons[a].n, B = D.mons[b].n; return A.slice(0, Math.ceil(A.length / 2)) + B.slice(Math.floor(B.length / 2)).toLowerCase(); };
   const fzTypes = (a, b) => { const A = D.mons[a].t, B = D.mons[b].t, t1 = A[0], t2 = B[B.length - 1] !== t1 ? B[B.length - 1] : B[0] !== t1 ? B[0] : null; return t2 ? [t1, t2] : [t1]; };
   const fzStats = (a, b) => D.mons[a].s.map((v, i) => Math.round((v + D.mons[b].s[i]) / 2));
   const fusodex = () => { S.fusodex = S.fusodex || {}; return S.fusodex; };
   let fzPick = [null, null];
-  const fzCands = () => [...S.party.map((m, i) => ['p', i, m]), ...S.box.map((m, i) => ['b', i, m])].filter(([, , m]) => !m.fz && !m.mega && m.lvl >= 20 && !(m.dmax));
+  const fzCands = () => [...S.party.map((m, i) => ['p', i, m]), ...S.box.map((m, i) => ['b', i, m])].filter(([, , m]) => !m.fz && !m.mega && m.lvl >= 20 && !(m.dmax) && !(D.mons[m.id] && D.mons[m.id].L));
   ACT.fzsel = d => { const slot = +d.s, c = fzCands(); const mm = modal(`<h3>Escolha o Pokémon ${slot ? 'B (cores e 2º tipo)' : 'A (corpo e 1º tipo)'}</h3><p class="mut small">Nível 20+, sem Mega/Fusão.</p><div class="expick">${c.map(([w, i, m]) => `<button class="exm" data-w="${w}" data-i="${i}"><img src="${spr(m)}" alt=""><small>${esc(pn(m))} Nv${m.lvl}</small></button>`).join('') || '<p>Nenhum Pokémon nível 20+.</p>'}</div><div class="mbtns"><button class="btn ghost" data-a="close">Voltar</button></div>`);
     mm.querySelectorAll('.exm').forEach(b => b.onclick = () => { const m = (b.dataset.w === 'p' ? S.party : S.box)[+b.dataset.i]; fzPick[slot] = m.uid; if (fzPick[1 - slot] === m.uid) fzPick[1 - slot] = null; closeModal(); render(); }); };
   const byUid = u => S.party.find(m => m.uid === u) || S.box.find(m => m.uid === u);
   const FZ_COST = 5000;
   ACT.fzgo = async () => { const a = byUid(fzPick[0]), b = byUid(fzPick[1]); if (!a || !b) return; if (S.money < FZ_COST) return toast('Precisa de ' + fmt(FZ_COST), 'bad'); if (S.party.length === 1 && S.party[0] === b) return toast('Não dá pra fundir seu único Pokémon do time como B.', 'bad');
-    let img = null; try { img = await blendSprite(a.id, b.id, a.shiny); } catch (e) { img = null; }
+    let img = null; try { img = await blendSprite(a.id, b.id, a.shiny); } catch (e) { img = null; } try { if (!(D.mons[a.id] && D.mons[a.id].L)) await Promise.race([fzEnsure(fzKey(a.id, b.id, !!a.shiny, 'f'), a.id, b.id, !!a.shiny, 'f'), new Promise(r => setTimeout(r, 4000))]); } catch (e) {}
     S.money -= FZ_COST; const bl = S.party.includes(b) ? S.party : S.box; bl.splice(bl.indexOf(b), 1);
     a.fz = { b: JSON.parse(JSON.stringify(b)), a0: { moves: a.moves, hp: a.hp }, bid: b.id, n: fzName(a.id, b.id), t: fzTypes(a.id, b.id), s: fzStats(a.id, b.id), img };
     const mv = [...a.moves.slice(0, 2), ...b.moves.filter(x => !a.moves.slice(0, 2).some(y => y.n === x.n)).slice(0, 2)]; a.moves = mv.map(x => ({ n: x.n, pp: D.moves[x.n].pp })); a.hp = PE.maxhp(a);
@@ -1740,7 +1803,7 @@
     const prev = a && b ? (() => { const t = fzTypes(a.id, b.id), s = fzStats(a.id, b.id); return `<div class="fzprev"><h3>${esc(fzName(a.id, b.id))}</h3><p>${t.map(x => `<span class="type" style="background:${C.TYPE_COLOR[x]}">${C.TYPE_PT[x]}</span>`).join(' ')}</p><div class="fzst">${['HP', 'Atq', 'Def', 'AtE', 'DfE', 'Vel'].map((n, i) => `<span>${n} <b>${s[i]}</b></span>`).join('')}</div><p class="mut small">Estatísticas = média das duas espécies (equilibrado). Golpes: 2 de cada. Não evolui nem Mega Evolui enquanto fundido.</p><button class="btn primary wide" data-a="fzgo">🧬 Fundir (${fmt(FZ_COST)})</button></div>`; })() : '';
     return `<div class="card fzlab"><h3>🧬 Laboratório de Fusão</h3><p class="mut small">Junte dois Pokémon em um só: corpo do A, cores do B, tipos e estatísticas misturados. Totalmente reversível — o B fica guardado dentro da fusão.</p><div class="fzrow">${slot(a, 0)}<span class="fzplus">+</span>${slot(b, 1)}</div>${prev}</div>
       ${fused.length ? `<div class="card"><h3>Suas fusões</h3>${fused.map(m => `<div class="exrun"><img class="fzi" src="${spr(m)}" alt=""><div class="grow"><b>${esc(pn(m))}</b> <small>Nv ${m.lvl}</small><div>${m.fz.t.map(x => `<span class="type" style="background:${C.TYPE_COLOR[x]}">${C.TYPE_PT[x]}</span>`).join('')}</div></div><button class="btn ghost sm" data-a="fzundo" data-u="${m.uid}">Desfazer</button></div>`).join('')}</div>` : ''}
-      <div class="card"><h3>📗 Fusodex <small class="mut">${ks.length} descobertas</small></h3>${ks.length ? `<div class="fzdex">${ks.map(k => { const f = fd[k]; return `<div class="fzd"><div class="fzpair"><img src="${sprId(f.a)}" alt=""><img src="${sprId(f.b)}" alt=""></div><b>${esc(f.n)}</b><div>${f.t.map(x => `<span class="type" style="background:${C.TYPE_COLOR[x]}">${C.TYPE_PT[x]}</span>`).join('')}</div></div>`; }).join('')}</div>` : '<p class="mut">Faça sua primeira fusão!</p>'}</div>`; }
+      <div class="card"><h3>📗 Fusodex <small class="mut">${ks.length} descobertas</small></h3>${ks.length ? `<div class="fzdex">${ks.map(k => { const f = fd[k]; return `<div class="fzd"><img class="fzanim" data-fzk="${fzKey(f.a, f.b, false, 'f')}" src="${fzAnimSrc(f.a, f.b, false, 'f', sprId(f.a))}" alt=""><div class="fzpair"><img src="${sprId(f.a)}" alt=""><img src="${sprId(f.b)}" alt=""></div><b>${esc(f.n)}</b><div>${f.t.map(x => `<span class="type" style="background:${C.TYPE_COLOR[x]}">${C.TYPE_PT[x]}</span>`).join('')}</div></div>`; }).join('')}</div>` : '<p class="mut">Faça sua primeira fusão!</p>'}</div>`; }
   XV.fusion = vFusion; MORE_TABS.push('fusion');
   MORE_X.push(() => ['fusion', '🧬', 'Laboratório de Fusão', `${Object.keys(fusodex()).length} na Fusodex`]);
   A.g4 = { EXPS, expLoot, blendSprite, fzName, fzTypes, fzStats, exped, pick: (a, b) => { fzPick = [a, b]; } };
@@ -2337,7 +2400,7 @@
   // MOVIMENTO 2D: respiração/balanço por espécie, golpe, dano, desmaio, entrada (lendários ficam como estão)
   // =====================================================================
   const LIVE2D = (() => {
-    const idOf = src => { const m = /\/(\d+)\.(?:gif|png)/.exec(src || ''); return m ? +m[1] : 0; };
+    const idOf = src => { const fi = FZ_INFO.get(src); if (fi) return fi.a; const m = /\/(\d+)\.(?:gif|png)/.exec(src || ''); return m ? +m[1] : 0; };
     function tag(el) { const im = el.querySelector('img'); if (!im) return; const id = idOf(im.getAttribute('src')); if (!id) return; if (el.dataset.lv === String(id)) return; el.dataset.lv = id;
       const d = D.mons[id], leg = !!(d && d.L); el.classList.toggle('live', !leg); el.classList.toggle('nolive', leg); if (leg) return;
       let h = id * 2654435761 >>> 0; const r1 = (h % 1000) / 1000, r2 = ((h >>> 10) % 1000) / 1000, heavy = d && d.s && d.s[5] < 50, fast = d && d.s && d.s[5] > 100;
@@ -2359,7 +2422,7 @@
   // ===== Miniaturas chibi fora da batalha (v42) =====
   const MINI = (() => { const RX = /img\/(?:(mega|gmax)\/)?(front|shiny)\/([\w-]+)\.(gif|png)(\?.*)?$/, slug = t => String(t || '').toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, ''), NAMEID = {}, nameId = k => { if (!NAMEID._ok) { for (const i in D.mons) NAMEID[slug(D.mons[i].n)] = +i; try { for (const i in PE.GMAX) NAMEID['g:' + PE.GMAX[i].k] = +i; } catch (e) {} NAMEID._ok = 1; } return NAMEID['g:' + k] || NAMEID[slug(k.replace(/-(mega|gmax).*$/, ''))] || NAMEID[slug(k.split('-')[0])] || 0; }, SKIP = '#battle, .wildpeek, .bigspr, .evo, .evobox, .caughtm, .raidwin, .bmon, .hatchm, .eggm';
     const isLeg = id => !!(D.mons[id] && D.mons[id].L);
-    function fix(img) { if (!img || img.dataset.miniDone === img.getAttribute('src')) return; const src = img.getAttribute('src') || '', m = src.match(RX); if (!m) return;
+    function fix(img) { if (!img || img.dataset.miniDone === img.getAttribute('src')) return; const src = img.getAttribute('src') || ''; const fi = FZ_INFO.get(src); if (fi) { const hv = (fi.a * 2654435761 >>> 0) % 1000 / 1000; if (fi.kind === 'm') { img.classList.add('mini'); img.style.setProperty('--mbd', (1.6 + hv * 0.9).toFixed(2) + 's'); img.style.setProperty('--mbp', (-hv * 2).toFixed(2) + 's'); img.dataset.miniDone = src; return; } if (fi.kind !== 'f' || img.closest(SKIP) || img.closest('.fzflash, .fzd') || img.classList.contains('me')) return; const mk = fzKey(fi.a, fi.b, fi.sh, 'm'), mu = FZ_MEM.get(mk); img.dataset.fzk = mk; img.dataset.full = src; if (mu) img.src = mu; else fzEnsure(mk, fi.a, fi.b, fi.sh, 'm'); return; } const m = src.match(RX); if (!m) return;
       if (img.closest(SKIP) || img.classList.contains('me')) return; const id = /^\d+$/.test(m[3]) ? +m[3] : nameId(m[3]), sh = m[2] === 'shiny';
       if (!id || isLeg(id)) { img.classList.add('minileg'); img.dataset.miniDone = src; return; }
       const mini = 'img/' + (sh ? 'minishiny/' : 'mini/') + id + '.png'; img.classList.toggle('minish', sh); img.dataset.full = src; img.classList.add('mini');
