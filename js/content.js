@@ -95,18 +95,18 @@
     { leader:'Falkner', sprite:'falkner', city:'Violet', type:'flying', team:[[16,jl(9)],[17,jl(13)]], prize:6000, reward:'pidgeotite' },
     { leader:'Bugsy', sprite:'bugsy', city:'Azalea', type:'bug', team:[[11,jl(15)],[14,jl(15)],[123,jl(17)]], prize:6500, reward:'scizorite' },
     { leader:'Whitney', sprite:'whitney', city:'Goldenrod', type:'normal', team:[[35,jl(17)],[241,jl(19)]], prize:7000, reward:'kangaskhanite' },
-    { leader:'Morty', sprite:'morty', city:'Ecruteak', type:'ghost', team:[[92,jl(21)],[93,jl(21)],[93,jl(23)],[94,jl(25)]], prize:7500, reward:'gengarite' },
+    { leader:'Morty', sprite:'morty', city:'Ecruteak', type:'ghost', team:[[92,jl(21)],[93,jl(21)],[200,jl(23)],[94,jl(25)]], prize:7500, reward:'gengarite' },
     { leader:'Chuck', sprite:'chuck', city:'Cianwood', type:'fighting', team:[[57,jl(27)],[62,jl(30)]], prize:8000, reward:'heracronite' },
-    { leader:'Jasmine', sprite:'jasmine', city:'Olivine', type:'steel', team:[[81,jl(30)],[81,jl(30)],[208,jl(35)]], prize:8500, reward:'steelixite' },
+    { leader:'Jasmine', sprite:'jasmine', city:'Olivine', type:'steel', team:[[81,jl(30)],[82,jl(30)],[208,jl(35)]], prize:8500, reward:'steelixite' },
     { leader:'Pryce', sprite:'pryce', city:'Mahogany', type:'ice', team:[[86,jl(30)],[87,jl(32)],[221,jl(34)]], prize:9000, reward:'swampertite' },
-    { leader:'Clair', sprite:'clair', city:'Blackthorn', type:'dragon', team:[[148,jl(37)],[148,jl(37)],[148,jl(37)],[230,jl(40)]], prize:10000, reward:'ampharosite' },
+    { leader:'Clair', sprite:'clair', city:'Blackthorn', type:'dragon', team:[[148,jl(37)],[117,jl(37)],[181,jl(37)],[230,jl(40)]], prize:10000, reward:'ampharosite' },
   ];
   const JELITE = [
-    { leader:'Will', sprite:'will', title:'Elite Four de Johto', type:'psychic', team:[[178,jl(40)],[124,jl(41)],[103,jl(41)],[178,jl(42)],[80,jl(41),{item:'slowbronite'}]], prize:12000, reward:'latiosite' },
+    { leader:'Will', sprite:'will', title:'Elite Four de Johto', type:'psychic', team:[[178,jl(40)],[124,jl(41)],[103,jl(41)],[203,jl(42)],[80,jl(41),{item:'slowbronite'}]], prize:12000, reward:'latiosite' },
     { leader:'Koga', sprite:'koga', title:'Elite Four de Johto', type:'poison', team:[[168,jl(40)],[49,jl(41)],[205,jl(43)],[89,jl(42)],[169,jl(44)]], prize:12000, reward:'beedrillite' },
-    { leader:'Bruno', sprite:'bruno', title:'Elite Four de Johto', type:'fighting', team:[[237,jl(42)],[106,jl(42)],[107,jl(42)],[95,jl(43)],[68,jl(46)]], prize:12000, reward:'tyranitarite' },
-    { leader:'Karen', sprite:'karen', title:'Elite Four de Johto', type:'dark', team:[[197,jl(42)],[45,jl(42)],[198,jl(44)],[94,jl(45)],[229,jl(47),{item:'houndoominite'}]], prize:12000, reward:'houndoominite' },
-    { leader:'Lance', sprite:'lance', title:'Campeão de Johto', type:'dragon', team:[[130,jl(44),{item:'gyaradosite'}],[149,jl(47)],[149,jl(47)],[142,jl(46)],[6,jl(46)],[149,jl(50)]], prize:25000, reward:'latiasite' },
+    { leader:'Bruno', sprite:'bruno', title:'Elite Four de Johto', type:'fighting', team:[[237,jl(42)],[106,jl(42)],[107,jl(42)],[214,jl(43)],[62,jl(46)]], prize:12000, reward:'tyranitarite' },
+    { leader:'Karen', sprite:'karen', title:'Elite Four de Johto', type:'dark', team:[[197,jl(42)],[45,jl(42)],[198,jl(44)],[215,jl(45)],[229,jl(47),{item:'houndoominite'}]], prize:12000, reward:'houndoominite' },
+    { leader:'Lance', sprite:'lance', title:'Campeão de Johto', type:'dragon', team:[[130,jl(44),{item:'gyaradosite'}],[131,jl(47)],[248,jl(47)],[142,jl(46)],[6,jl(46)],[149,jl(50)]], prize:25000, reward:'latiasite' },
   ];
   // Mega Pedras: segure no Pokémon certo + Mega Pulseira (prêmio de Campeão de Kanto)
   const MEGA_STONES = { venusaurite:'Venusaurita', 'charizardite-x':'Charizardita X', 'charizardite-y':'Charizardita Y', blastoisinite:'Blastoisinita', beedrillite:'Beedrillita',
@@ -124,17 +124,17 @@
     { leader:'Misty', sprite:'misty', city:'Cerulean', type:'water', team:[[120,18],[121,21]], prize:2100 },
     { leader:'Lt. Surge', sprite:'ltsurge', city:'Vermilion', type:'electric', team:[[100,21],[25,18],[26,24]], prize:2400 },
     { leader:'Erika', sprite:'erika', city:'Celadon', type:'grass', team:[[71,29],[114,24],[45,29]], prize:2900 },
-    { leader:'Koga', sprite:'koga', city:'Fuchsia', type:'poison', team:[[109,37],[89,39],[109,37],[110,43]], prize:4300 },
+    { leader:'Koga', sprite:'koga', city:'Fuchsia', type:'poison', team:[[109,37],[89,39],[49,37],[110,43]], prize:4300 },
     { leader:'Sabrina', sprite:'sabrina', city:'Saffron', type:'psychic', team:[[64,38],[122,37],[49,38],[65,43]], prize:4300 },
     { leader:'Blaine', sprite:'blaine', city:'Cinnabar', type:'fire', team:[[58,42],[77,40],[78,42],[59,47]], prize:4700 },
     { leader:'Giovanni', sprite:'giovanni', city:'Viridian', type:'ground', team:[[111,45],[51,42],[31,44],[34,45],[112,50]], prize:5000 },
   ];
   const ELITE = [
     { leader:'Lorelei', sprite:'lorelei', title:'Elite Four', type:'ice', team:[[87,52],[91,51],[124,54],[131,54],[80,55,{item:'slowbronite'}]], prize:5000 },
-    { leader:'Bruno', sprite:'bruno', title:'Elite Four', type:'fighting', team:[[95,51],[107,53],[106,53],[95,54],[68,56]], prize:5000 },
-    { leader:'Agatha', sprite:'agatha', title:'Elite Four', type:'ghost', team:[[42,54],[93,53],[24,56],[94,54],[94,58,{item:'gengarite'}]], prize:5000 },
-    { leader:'Lance', sprite:'lance', title:'Elite Four', type:'dragon', team:[[130,56,{item:'gyaradosite'}],[148,54],[148,54],[142,58],[149,60]], prize:6000 },
-    { leader:'Blue', sprite:'blue', title:'Campeão', type:'normal', team:[[18,59],[65,57],[112,59],[103,59],[130,59],[6,63,{item:'charizardite-y'}]], prize:10000 },
+    { leader:'Bruno', sprite:'bruno', title:'Elite Four', type:'fighting', team:[[95,51],[107,53],[106,53],[57,54],[68,56]], prize:5000 },
+    { leader:'Agatha', sprite:'agatha', title:'Elite Four', type:'ghost', team:[[42,54],[93,53],[24,56],[97,54],[94,58,{item:'gengarite'}]], prize:5000 },
+    { leader:'Lance', sprite:'lance', title:'Elite Four', type:'dragon', team:[[130,56,{item:'gyaradosite'}],[148,54],[117,54],[142,58],[149,60]], prize:6000 },
+    { leader:'Blue', sprite:'blue', title:'Campeão', type:'normal', team:[[18,59],[65,57],[112,59],[103,59],[59,59],[6,63,{item:'charizardite-y'}]], prize:10000 },
   ];
   const SHOP = [
     { id:'poke-ball', name:'Poké Bola', price:200, desc:'Bola básica de captura.', req:0 },
