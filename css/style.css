@@ -1157,3 +1157,20 @@ body.in-battle .toast{bottom:auto;top:calc(var(--sat,0px) + 58px)}
 .bcell .itemimg{width:48px;height:48px;image-rendering:pixelated}
 .bcell b{font-size:.74rem;line-height:1.15;text-align:center;font-weight:700}.bcell small{font-size:.72rem;color:var(--mut,#94a3b8)}
 .bempty{text-align:center;padding:24px 0}
+/* v60: ofertas do dia + medalhas */
+.offers60{background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(239,68,68,.08))}
+.ofrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
+.ofcard{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);text-align:center}
+.ofcard .itemimg{width:44px;height:44px;image-rendering:pixelated}.ofcard b{font-size:.74rem;line-height:1.15}.ofcard small{font-size:.7rem}.ofcard .btn{width:100%;padding:6px 2px;font-size:.72rem}
+.ofoff{position:absolute;top:4px;right:4px;background:#ef4444;color:#fff;font-size:.65rem;font-weight:800;border-radius:8px;padding:1px 5px}
+.bundle{display:flex;align-items:center;gap:10px;padding:8px;border-radius:14px;background:rgba(255,255,255,.04);margin-top:6px}
+.bundle .bimgs{display:flex}.bundle .bimgs .itemimg{width:34px;height:34px;image-rendering:pixelated;margin-right:-8px}.bundle .grow{display:flex;flex-direction:column;gap:1px;padding-left:6px}.bundle small{font-size:.72rem}
+.medals{grid-template-columns:repeat(3,1fr)}
+.ach.medal{align-items:center;text-align:center;opacity:1;padding:10px 6px}
+.medal .md{position:relative;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#475569,#1e293b);border:3px solid #334155;overflow:hidden;margin-bottom:4px;filter:grayscale(1)}
+.medal.got .md{background:radial-gradient(circle at 35% 30%,#fde68a,#d97706);border-color:#fbbf24;filter:none;box-shadow:0 0 12px rgba(251,191,36,.35)}
+.medal.got .md::after{content:"";position:absolute;inset:-20%;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.75) 50%,transparent 60%);transform:translateX(-120%);animation:mshine 3.2s ease-in-out infinite;will-change:transform}
+@keyframes mshine{0%,60%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.medal .ae{font-size:24px}.medal .ae svg{width:26px;height:26px}.medal:not(.got) b{opacity:.75}
+.mprog{display:block;width:100%;height:6px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:4px}.mprog i{display:block;height:100%;background:linear-gradient(90deg,#f59e0b,#fde047);border-radius:4px}
+@media (prefers-reduced-motion:reduce){.medal.got .md::after{animation:none;display:none}}
