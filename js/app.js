@@ -2903,6 +2903,23 @@
       <small class="mut">${dn}/3 hoje${f.br ? ` • ${f.br} descoberta(s) no total` : ''}</small></div>`; };
   HOJE.push(() => { const f = field(), dn = f.t.filter(x => x.p >= x.n).length; return hrow('data-a="tab" data-t="field"', 'img/items/poke-ball.png', 'Pesquisa de campo', `${dn}/3 tarefas • carimbos ${f.st}/${FR_STAMPS}`, stampRow(f.st), dn === 3); });
   A.fr71 = { field, track: (...a) => track(...a) };
+
+  // v72: Relatório da manhã: um resumo por dia (o que mudou desde ontem + o que tem hoje) e um presentinho ao ler.
+  const MR_GIFT = { money: 500, 'poke-ball': 3 };
+  function mrData() { const st = S.stats || {}, snap = (S.mr && S.mr.snap) || {}, d = k => Math.max(0, (st[k] || 0) - (snap[k] || 0)), mp = C.MAPS.find(m => m.id === S.lastMap) || C.MAPS[0], w = WEATHER[weatherOf(mp)] || WEATHER.clear;
+    const o = obState(), b = bossToday(), f = field(), dc = dcInfo();
+    return { since: { caught: d('caught'), wins: d('wins'), shinies: d('shinies') }, first: !(S.mr && S.mr.snap), wi: w[1], w: `${w[0]} em ${mp.name}`, ob: o ? `${D.mons[o.id].n} em ${C.MAPS.find(m => m.id === o.map).name}` : '', boss: b ? D.mons[b.id].n : '', fr: f.t.map(frTxt), dc: dc.clear, eggs: (S.eggs || []).length }; }
+  const mrRead = () => !!(S.mr && S.mr.d === effKey());
+  ACT.morning = () => { const r = mrData(), fresh = !mrRead();
+    if (fresh) { giveReward(MR_GIFT); S.mr = { d: effKey(), snap: { caught: S.stats.caught || 0, wins: S.stats.wins || 0, shinies: S.stats.shinies || 0 } }; save(); }
+    const li = (i, t) => `<li><span class="mri">${i}</span><span>${t}</span></li>`;
+    modal(`<div class="mr72"><h2>📰 Relatório da manhã</h2><small class="mut">${new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</small>
+      <h4>Desde o último relatório</h4><ul>${r.first ? li('⭐', 'Primeiro relatório! A partir de amanhã você vê aqui o que fez no dia anterior.') : li('⬣', `${r.since.caught} capturas • ${r.since.wins} vitórias${r.since.shinies ? ` • ${r.since.shinies} shiny` : ''}`)}${r.eggs ? li('🥚', `${r.eggs} ovo(s) chocando`) : ''}</ul>
+      <h4>Hoje</h4><ul>${li(r.wi, r.w)}${r.ob ? li('✨', `Surto: ${r.ob}`) : ''}${r.boss ? li('🔥', `Chefe enfurecido: ${r.boss}`) : ''}${li('🔍', `Pesquisa: ${r.fr.join(' • ')}`)}${li('🏆', r.dc ? 'Desafio do dia concluído' : 'Desafio do dia esperando por você')}</ul>
+      ${fresh ? `<div class="mrgift">🎁 Presente do dia: <b>${rewardText(MR_GIFT)}</b></div>` : ''}<button class="btn primary wide" data-a="close">Vamos lá!</button></div>`, 'mrm');
+    if (fresh) render(); };
+  HOJE.unshift(() => hrow('data-a="morning"', 'img/items/poke-ball.png', 'Relatório da manhã', mrRead() ? 'Lido hoje • toque para rever' : 'Novo! Resumo do dia + presente', mrRead() ? '' : '<i class="ndot mrdot"></i>', mrRead()));
+  A.mr72 = { data: mrData, read: mrRead };
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   if (localStorage.getItem(UNLOCK_KEY) !== PASS_HASH) gate();

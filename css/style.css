@@ -1279,3 +1279,8 @@ body.in-battle .toast{bottom:auto;top:calc(var(--sat,0px) + 58px)}
 .hrow{padding:4px 10px;gap:8px}.hrow>img{width:36px;height:36px}.hrow small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hrow .hx{flex:none;display:flex;align-items:center}.hrow .hx>*{margin:0}.hrow .hx .stamps{display:grid;grid-template-columns:repeat(4,10px);gap:3px}.hrow .hx .stamps i{width:10px;height:10px;border-width:1.5px}
 .hrow .hx .fury{flex-direction:column;gap:3px}.hrow .hx .fury i{width:16px;height:5px}.hrow .hx .hteam img{width:20px;height:20px}
+/* v72 Relatório da manhã */
+.mr72 h2{margin:0}.mr72 h4{margin:14px 0 6px}.mr72 ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.mr72 li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.35}.mr72 .mri{flex:none;width:22px;text-align:center}
+.mrgift{margin:14px 0 10px;padding:10px;border-radius:12px;background:rgba(244,114,182,.12);border:1px solid rgba(244,114,182,.35);font-size:14px}
+.hrow .mrdot{position:static;width:10px;height:10px;border-radius:50%;background:#ef4444;display:block}
