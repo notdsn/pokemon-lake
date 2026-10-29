@@ -2786,7 +2786,7 @@
 
   // v67: cartão único "Hoje" no Início (surto, desafio, chefe e próximos itens diários)
   const HOJE = [];
-  const hrow = (act, img, t, sub, extra = '', done = false) => `<button class="hrow ${done ? 'done' : ''}" ${act}><img src="${img}" alt="" loading="lazy"><div class="grow"><b>${t}</b><small class="mut">${sub}</small>${extra}</div><span class="arrow">›</span></button>`;
+  const hrow = (act, img, t, sub, extra = '', done = false) => `<button class="hrow ${done ? 'done' : ''}" ${act}><img src="${img}" alt="" loading="lazy"><div class="grow"><b>${t}</b><small class="mut">${sub}</small></div>${extra ? `<span class="hx">${extra}</span>` : ''}<span class="arrow">›</span></button>`;
   HOJE.push(() => { const o = obState(); if (!o) return ''; const mp = C.MAPS.find(m => m.id === o.map), n = S.ob.n; return hrow(`data-a="enter" data-id="${mp.id}"`, sprId(o.id), `Surto: ${D.mons[o.id].n}`, `${mp.name} • ${n} derrotados • shiny ${obLevel(n)}x`); });
   HOJE.push(() => { const c = dcInfo(); return hrow('data-a="tab" data-t="rogue"', sprId(c.team[0]), 'Desafio do dia', c.clear ? `Concluído • onda ${c.wave}` : c.done ? `Onda ${c.wave} de ${DC_GOAL}` : c.run ? `Em andamento • onda ${c.run.wave}` : `Time fixo • chegue à onda ${DC_GOAL}`, `<span class="hteam">${c.team.map(id => `<img src="${sprId(id)}" alt="">`).join('')}</span>`, c.clear); });
   function hojeCard() { const rows = HOJE.map(f => { try { return f(); } catch (e) { return ''; } }).filter(Boolean); if (!rows.length) return '';
@@ -2812,7 +2812,7 @@
             setTimeout(() => modal(`<div class="center badgewin"><img class="bigspr" src="${sprId(b.id)}" alt=""><h2>${D.mons[b.id].n} se acalmou!</h2><p>Ele decidiu seguir você. Prêmio: <b>${fmt(8000)}</b> e <b>2 Balas Raras</b>.</p><button class="btn primary wide" data-a="close">Ótimo!</button></div>`), 500); }
           else { b.hp = Math.max(0.01, e.hp / PE.maxhp(e)); setTimeout(() => notice(`O chefe ainda está com fúria ${furyPips(b)}/3. Cure seu time e volte!`), 400); } save(); } } } catch (er) {} return _cb.apply(this, arguments); }; }
   HOJE.push(() => { const b = bossToday(); if (!b) return ''; const mp = C.MAPS.find(m => m.id === b.map);
-    return hrow('data-a="boss67"', sprId(b.id), `Chefe enfurecido: ${D.mons[b.id].n}`, b.done ? 'Acalmado hoje' : `${mp.name} • a vida fica salva entre lutas`, b.done ? '' : `<span class="fury">${[0, 1, 2].map(i => `<i class="${i < furyPips(b) ? 'on' : ''}"></i>`).join('')}</span>`, !!b.done); });
+    return hrow('data-a="boss67"', sprId(b.id), `Chefe enfurecido: ${D.mons[b.id].n}`, b.done ? 'Acalmado hoje' : `${mp.name} • fúria ${furyPips(b)}/3`, b.done ? '' : `<span class="fury">${[0, 1, 2].map(i => `<i class="${i < furyPips(b) ? 'on' : ''}"></i>`).join('')}</span>`, !!b.done); });
   A.boss67 = { today: bossToday, pips: furyPips, close: () => closeBattle(), maxhp: m => PE.maxhp(m) };
 
   // v68: Piquenique (Scarlet/Violet). Um sanduíche dá 30 min de bônus para um tipo: mais aparições + captura, EXP ou shiny.
@@ -2882,6 +2882,27 @@
         return `<div class="trnode ${st}"><span class="trdot">${st === 'done' ? '✅' : st === 'ready' ? '🎁' : '🔒'}</span><div class="grow"><b>${need} troféus</b><small class="mut">${rewardText(r)}</small></div>${st === 'ready' && i === cl ? '<button class="btn small primary" data-a="trclaim">Pegar</button>' : ''}</div>`; }).join('')}</div></div>`; };
   ACT.trclaim = () => { const i = trClaimed(); if (i >= TROAD.length || TROAD[i][0] > trophies().t) return; giveReward(TROAD[i][1]); S.troad = i + 1; save(); SFX.evo && SFX.evo(); render(); toast(`Prêmio do caminho: ${rewardText(TROAD[i][1])}!`, 'good'); };
   A.tr70 = { trophies, ready: trReady, road: TROAD };
+
+  // v71: Pesquisa de campo com carimbos (Pokémon GO). 3 tarefas por dia; cada uma dá prêmio + 1 carimbo; 7 carimbos = Descoberta.
+  const FR_POOL = [['catch', 5, 'Capture 5 Pokémon', { 'poke-ball': 5 }], ['catchT', 3, 'Capture 3 do tipo {t}', { 'great-ball': 3 }], ['win', 5, 'Vença 5 batalhas', { money: 1500 }], ['fish', 2, 'Pesque 2 vezes', { 'great-ball': 2 }],
+    ['hatch', 1, 'Choque 1 ovo', { 'rare-candy': 1 }], ['trainer', 2, 'Vença 2 treinadores', { money: 2500 }], ['newdex', 1, 'Registre 1 espécie nova', { 'ultra-ball': 2 }], ['quiz', 3, 'Acerte 3 no Quem é esse Pokémon?', { money: 1000 }]];
+  const FR_TYPES = ['grass', 'water', 'fire', 'bug', 'normal', 'flying', 'electric', 'poison'], FR_STAMPS = 7;
+  function field() { const k = effKey(); S.fr = S.fr || { st: 0 }; if (S.fr.d !== k) { const r = srng(hseed(k + S.trainer + 'fr')), pool = FR_POOL.slice(), t = [];
+      while (t.length < 3) { const x = pool.splice(Math.floor(r() * pool.length), 1)[0]; t.push({ k: x[0], n: x[1], p: 0, ty: x[0] === 'catchT' ? FR_TYPES[Math.floor(r() * FR_TYPES.length)] : null }); }
+      S.fr.d = k; S.fr.t = t; } return S.fr; }
+  const frDef = x => FR_POOL.find(p => p[0] === x.k); const frTxt = x => frDef(x)[2].replace('{t}', C.TYPE_PT[x.ty] || '');
+  function frDone(x) { const f = S.fr; giveReward(frDef(x)[3]); f.st = (f.st || 0) + 1; let msg = `Pesquisa concluída: ${frTxt(x)}! ${rewardText(frDef(x)[3])} e 1 carimbo.`;
+    if (f.st >= FR_STAMPS) { f.st = 0; f.br = (f.br || 0) + 1; giveEgg('rare', 'Descoberta de Pesquisa'); S.bag['rare-candy'] = (S.bag['rare-candy'] || 0) + 3; msg = `Descoberta de Pesquisa! 7 carimbos: Ovo Raro e 3 Balas Raras.`; }
+    save(); notice(msg, 'good'); }
+  { const _t = track; track = function (ev, n = 1, m) { const r = _t.apply(this, arguments); try { if (S && S.trainer) { const f = field(); for (const x of f.t) { if (x.p >= x.n || x.k !== ev) continue; if (ev === 'catchT' && !(m && D.mons[m.id].t.includes(x.ty))) continue; x.p = Math.min(x.n, x.p + n); if (x.p >= x.n) frDone(x); } } } catch (e) {} return r; }; }
+  const stampRow = st => `<span class="stamps">${Array.from({ length: FR_STAMPS }, (_, i) => `<i class="${i < st ? 'on' : ''}"></i>`).join('')}</span>`;
+  XV.field = () => { const f = field(), dn = f.t.filter(x => x.p >= x.n).length;
+    return `<div class="card fr71"><h3>🔍 Pesquisa de campo</h3><p class="mut">3 tarefas novas por dia. Cada tarefa dá um prêmio e um carimbo; com ${FR_STAMPS} carimbos você ganha uma Descoberta (Ovo Raro + 3 Balas Raras).</p>
+      <div class="frst"><b>Carimbos ${f.st}/${FR_STAMPS}</b>${stampRow(f.st)}</div>
+      <div class="frlist">${f.t.map(x => `<div class="frt ${x.p >= x.n ? 'done' : ''}"><div class="grow"><b>${frTxt(x)}</b><small class="mut">${rewardText(frDef(x)[3])}</small><i class="frbar"><b style="width:${x.p / x.n * 100}%"></b></i></div><span>${x.p >= x.n ? '✅' : `${x.p}/${x.n}`}</span></div>`).join('')}</div>
+      <small class="mut">${dn}/3 hoje${f.br ? ` • ${f.br} descoberta(s) no total` : ''}</small></div>`; };
+  HOJE.push(() => { const f = field(), dn = f.t.filter(x => x.p >= x.n).length; return hrow('data-a="tab" data-t="field"', 'img/items/poke-ball.png', 'Pesquisa de campo', `${dn}/3 tarefas • carimbos ${f.st}/${FR_STAMPS}`, stampRow(f.st), dn === 3); });
+  A.fr71 = { field, track: (...a) => track(...a) };
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   if (localStorage.getItem(UNLOCK_KEY) !== PASS_HASH) gate();

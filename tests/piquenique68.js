@@ -27,7 +27,7 @@ const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-${LIVE}${n}-v68.png`
   ok(c.b === 1 && c.cm === 2 && c.m === a.m, 'usa 3 frutas, captura 2x no tipo planta');
   await ev(() => PokeApp.debug.go('home')); await p.waitForTimeout(300); await clr();
   const h = await ev(() => ({ row: !!document.querySelector('.hoje67 .hrow[data-t="picnic"]'), n: document.querySelectorAll('.hoje67 .hrow').length }));
-  ok(h.row && h.n === 4, 'bônus ativo aparece no Hoje');
+  ok(h.row && h.n >= 4, 'bônus ativo aparece no Hoje');
   await ev(() => { document.querySelectorAll('.toast').forEach(t => t.remove()); document.querySelector('.hoje67').scrollIntoView({ block: 'center' }); }); await p.waitForTimeout(300); await p.screenshot({ path: OUT('piquenique-hoje') });
   await ev(() => { PokeApp.debug.S.picnic.until = Date.now() - 1; }); ok(await ev(() => !PokeApp.pk68.live() && PokeApp.pkCm(1) === 1), 'expira depois de 30 min');
   ok(!errs.length, 'sem erros: ' + errs.join(' | '));

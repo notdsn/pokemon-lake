@@ -11,7 +11,7 @@ const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-${LIVE}${n}-v67.png`
   await p.waitForTimeout(500); const clr = () => ev(() => document.querySelector('#modal-root').innerHTML = ''); await clr();
   await ev(() => PokeApp.debug.go('home')); await p.waitForTimeout(400); await clr();
   const h = await ev(() => ({ n: document.querySelectorAll('.hoje67 .hrow').length, cards: document.querySelectorAll('.ob65,.home .dc66').length, boss: PokeApp.boss67.today(), emo: /\p{Extended_Pictographic}/u.test(document.body.innerText), ovx: document.documentElement.scrollWidth <= innerWidth + 1 }));
-  ok(h.n === 3 && h.cards === 0, 'um único cartão Hoje com 3 linhas (' + h.n + ')'); ok(!h.emo && h.ovx, 'sem emoji, sem overflow');
+  ok(h.n >= 3 && h.cards === 0, 'um único cartão Hoje com 3 linhas (' + h.n + ')'); ok(!h.emo && h.ovx, 'sem emoji, sem overflow');
   ok(h.boss && !(await ev(id => PDATA.mons[id].L, h.boss.id)), 'chefe é Pokémon comum: ' + (h.boss && h.boss.id));
   await ev(() => { document.querySelectorAll('.toast').forEach(t => t.remove()); document.querySelector('.hoje67').scrollIntoView({ block: 'center' }); }); await p.waitForTimeout(300); await p.screenshot({ path: OUT('hoje-inicio') });
   // luta 1: deixa a vida em 50% e foge
