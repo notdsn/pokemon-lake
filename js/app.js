@@ -406,7 +406,7 @@
     eggSteps(steps); setTimeout(checkEggs, 2500);
     if (!forced && mp.finds && R() < (A.findRate || 0.035)) { const f = pickFind(mp); if (f) { searching = false; $('#searchBtn').disabled = false; S.bag[f] = (S.bag[f] || 0) + 1; save(); SFX.caught();
       modal(`<div class="center badgewin"><div class="bigbadge megab"><img src="img/items/${f}.png" alt=""></div><h2>Você encontrou algo brilhando!</h2><p>Achou <b>${C.ITEM_NAME[f]}</b> escondida em ${mp.name}!</p><p class="mut small">Faça o Pokémon certo segurar para Mega Evoluir.</p><button class="btn primary wide" data-a="close">Uau!</button></div>`); return render(); } }
-    const evs = forced ? null : eventSpawn(mp); const m = PE.makeMon(evs ? evs.id : e[0], lvl, st, { shinyRate: A.shinyRate || (evs ? evs.rate : shinyP() * obMult(mp, e[0])), shiny: !evs && e[4] && e[4].shiny ? true : undefined }); m.caughtAt = mp.name; if (evs) m.evt = 1;
+    const evs = forced ? null : eventSpawn(mp); const m = PE.makeMon(evs ? evs.id : e[0], lvl, st, { shinyRate: A.shinyRate || (evs ? evs.rate : shinyP() * obMult(mp, e[0])), shiny: !evs && e[4] && e[4].shiny ? true : undefined }); m.caughtAt = mp.name; if (A.pkCm) m.cm = A.pkCm(m.id); if (evs) m.evt = 1;
     sc.classList.add('alert'); tone(1200, 0.1); await sleep(600); searching = false;
     startBattle({ kind: 'wild', enemy: [m], map: mp, weather: battleWeather(w), legend: !evs && !!e[4]?.legend });
   };
@@ -1678,7 +1678,7 @@
     return { start, end: start + 3600e3, id: SP_LIST[i], bonus: SP_BONUS[((wk % 4) + 4) % 4], kind: 'sp' }; }
   const liveEv = () => { const t = nowT(), c = nextCDs(1)[0], s = spOf(t); return [c, s].filter(e => e && e.start <= t && t < e.end); };
   const cdLive = () => liveEv().find(e => e.kind === 'cd'), spLive = () => liveEv().find(e => e.kind === 'sp');
-  const evXpMul = () => (cdLive() ? 1.5 : 1) * (spLive()?.bonus[0] === 'xp' ? 2 : 1);
+  const evXpMul = () => (A.pkXp ? A.pkXp() : 1) * (cdLive() ? 1.5 : 1) * (spLive()?.bonus[0] === 'xp' ? 2 : 1);
   const evEggMul = () => (cdLive() ? 2 : 1) * (spLive()?.bonus[0] === 'egg' ? 2 : 1);
   const evMoneyMul = () => spLive()?.bonus[0] === 'money' ? 2 : 1;
   function eventSpawn(mp) { const c = cdLive(), s = spLive(); if (c && R() < 0.6) return { id: c.id, rate: shinyP() * 8 }; if (s && R() < 0.5) return { id: s.id, rate: shinyP() * (s.bonus[0] === 'shiny' ? 2 : 1) }; return null; }
@@ -2814,6 +2814,36 @@
   HOJE.push(() => { const b = bossToday(); if (!b) return ''; const mp = C.MAPS.find(m => m.id === b.map);
     return hrow('data-a="boss67"', sprId(b.id), `Chefe enfurecido: ${D.mons[b.id].n}`, b.done ? 'Acalmado hoje' : `${mp.name} • a vida fica salva entre lutas`, b.done ? '' : `<span class="fury">${[0, 1, 2].map(i => `<i class="${i < furyPips(b) ? 'on' : ''}"></i>`).join('')}</span>`, !!b.done); });
   A.boss67 = { today: bossToday, pips: furyPips, close: () => closeBattle(), maxhp: m => PE.maxhp(m) };
+
+  // v68: Piquenique (Scarlet/Violet). Um sanduíche dá 30 min de bônus para um tipo: mais aparições + captura, EXP ou shiny.
+  const PK_MIN = 30, PK_COST = 3, PK_MONEY = 1200;
+  const PK_POW = { catch: ['Captura', 'Bolas 2x mais eficazes no tipo', '⬣'], xp: ['EXP', '+50% de EXP em todas as lutas', '⭐'], shiny: ['Brilho', 'Shiny 2x no tipo', '✨'] };
+  const PK_TYPES = Object.keys(C.TYPE_PT).filter(t => C.TYPE_COLOR[t]);
+  function pkLive() { const p = S && S.picnic; return p && p.until > Date.now() ? p : null; }
+  const pkLeft = () => { const p = pkLive(); return p ? Math.ceil((p.until - Date.now()) / 60000) : 0; };
+  const pkHas = id => { const p = pkLive(); return !!(p && D.mons[id] && D.mons[id].t.includes(p.type)); };
+  A.pkCm = id => pkHas(id) && pkLive().pow === 'catch' ? 2 : 1;
+  A.pkXp = () => { const p = pkLive(); return p && p.pow === 'xp' ? 1.5 : 1; };
+  { const _om = obMult; obMult = function (mp, id) { return _om(mp, id) * (pkHas(id) && pkLive().pow === 'shiny' ? 2 : 1); }; }
+  { const _ew = encWeights; encWeights = function (mp, w) { const ws = _ew(mp, w); if (!pkLive()) return ws; return ws.map((x, i) => mp.enc[i] && pkHas(mp.enc[i][0]) ? x * 3 : x); }; }
+  const pkBerries = () => Object.keys(S.bag).filter(k => /-berry$/.test(k) && S.bag[k] > 0);
+  const pkBerryN = () => pkBerries().reduce((a, k) => a + S.bag[k], 0);
+  MORE_X.push(() => ['picnic', '🧺', 'Piquenique', pkLive() ? `${PK_POW[pkLive().pow][0]} • ${C.TYPE_PT[pkLive().type]} • ${pkLeft()} min` : 'Sanduíche de bônus por 30 min']);
+  XV.picnic = () => { S.pkSel = S.pkSel || { type: 'grass', pow: 'catch' }; const sel = S.pkSel, p = pkLive(), bn = pkBerryN();
+    return `<div class="card pk68"><h3>🧺 Piquenique</h3><p class="mut">Monte um sanduíche: por ${PK_MIN} minutos, Pokémon do tipo escolhido aparecem mais e você ganha um bônus.</p>
+      ${p ? `<div class="pkon"><b>Sanduíche ativo:</b> ${PK_POW[p.pow][0]} • ${typeChip(p.type)} <small class="mut">${pkLeft()} min restantes</small></div>` : ''}
+      <h4>Bônus</h4><div class="seg2 pkpow">${Object.entries(PK_POW).map(([k, v]) => `<button class="${sel.pow === k ? 'on' : ''}" data-a="pksel" data-k="pow" data-v="${k}">${v[2]} ${v[0]}</button>`).join('')}</div><small class="mut">${PK_POW[sel.pow][1]}</small>
+      <h4>Tipo</h4><div class="pktypes">${PK_TYPES.map(t => `<button class="type tpick ${sel.type === t ? 'on' : ''}" style="--tc:${C.TYPE_COLOR[t]}" data-a="pksel" data-k="type" data-v="${t}">${C.TYPE_PT[t]}</button>`).join('')}</div>
+      <button class="btn primary wide pkgo" data-a="pkmake">${bn >= PK_COST ? `Preparar com ${PK_COST} frutas` : `Comprar ingredientes (${fmt(PK_MONEY)})`}</button>
+      <small class="mut center">Você tem ${bn} frutas. ${p ? 'Um novo sanduíche substitui o atual.' : ''}</small></div>`; };
+  ACT.pksel = d => { S.pkSel = S.pkSel || {}; S.pkSel[d.k] = d.v; render(); };
+  ACT.pkmake = () => { const sel = S.pkSel || { type: 'grass', pow: 'catch' };
+    if (pkBerryN() >= PK_COST) { let n = PK_COST; for (const k of pkBerries().sort((a, b) => S.bag[b] - S.bag[a])) { while (n && S.bag[k] > 0) { S.bag[k]--; n--; } if (!S.bag[k]) delete S.bag[k]; } }
+    else if (S.money >= PK_MONEY) S.money -= PK_MONEY; else return toast('Faltam frutas e dinheiro para o sanduíche.', 'bad');
+    S.picnic = { type: sel.type, pow: sel.pow, until: Date.now() + PK_MIN * 60000 }; S.stats.picnics = (S.stats.picnics || 0) + 1; save(); SFX.evo && SFX.evo(); render();
+    toast(`Sanduíche pronto! ${PK_POW[sel.pow][0]} para ${C.TYPE_PT[sel.type]} por ${PK_MIN} min.`, 'good'); };
+  HOJE.push(() => { const p = pkLive(); if (!p) return ''; return hrow('data-a="tab" data-t="picnic"', 'img/items/oran-berry.png', `Piquenique: ${PK_POW[p.pow][0]}`, `${C.TYPE_PT[p.type]} • ${pkLeft()} min restantes`); });
+  A.pk68 = { live: pkLive, left: pkLeft, has: pkHas };
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   if (localStorage.getItem(UNLOCK_KEY) !== PASS_HASH) gate();

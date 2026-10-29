@@ -215,7 +215,7 @@
     ev.push({ e: 'throw', ball, text: `Você jogou uma ${ballName(ball)}!` });
     if (ball === 'master-ball') { ev.push({ e: 'shake', n: 3 }); ev.push({ e: 'caught', text: `Pegou! ${D.mons[t.id].n} foi capturado!` }); s.caught = t; s.over = true; s.winner = 0; return; }
     const sb = (t.status === 'slp' || t.status === 'frz') ? 2 : t.status ? 1.5 : 1;
-    const a = ((3 * M - 2 * t.hp) * rate * bm_) / (3 * M) * sb;
+    const a = ((3 * M - 2 * t.hp) * rate * bm_ * (t.cm || 1)) / (3 * M) * sb;
     let shakes = 0;
     if (a >= 255) shakes = 4; else { const b = 1048560 / Math.sqrt(Math.sqrt(16711680 / a)); while (shakes < 4 && rnd(s) * 65536 < b) shakes++; }
     ev.push({ e: 'shake', n: Math.min(3, shakes) });

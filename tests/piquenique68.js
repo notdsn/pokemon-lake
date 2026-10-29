@@ -1,0 +1,35 @@
+// v68: Piquenique
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
+const fs = require('fs'); const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
+const URL = process.argv[2] || 'http://127.0.0.1:18473/'; const LIVE = URL.includes('github.io') ? 'live-' : '';
+let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
+const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-${LIVE}${n}-v68.png`;
+(async () => { const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const ev = (f, a) => p.evaluate(f, a); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
+  await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="4"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
+  await p.waitForTimeout(500); const clr = () => ev(() => document.querySelector('#modal-root').innerHTML = ''); await clr();
+  await ev(() => PokeApp.debug.go('more')); await p.waitForTimeout(300); await clr();
+  ok(await ev(() => !!document.querySelector('[data-t="picnic"],[data-v="picnic"],[data-id="picnic"]') || /Piquenique/.test(document.body.innerText)), 'Piquenique no Mais');
+  await ev(() => PokeApp.debug.go('picnic')); await p.waitForTimeout(300); await clr();
+  await p.click('[data-a="pksel"][data-v="shiny"]'); await p.waitForTimeout(150); await p.click('[data-a="pksel"][data-v="electric"]'); await p.waitForTimeout(150);
+  const v = await ev(() => ({ on: document.querySelectorAll('.pk68 .on').length, emo: /\p{Extended_Pictographic}/u.test(document.body.innerText), ovx: document.documentElement.scrollWidth <= innerWidth + 1, m: PokeApp.debug.S.money }));
+  ok(v.on === 2 && !v.emo && v.ovx, 'tela com seleção, sem emoji/overflow');
+  await p.screenshot({ path: OUT('piquenique-tela') });
+  await p.click('.pkgo'); await p.waitForTimeout(400);
+  const a = await ev(() => { const S = PokeApp.debug.S, pk = PokeApp.pk68; const mp = { id: 'x' }; return { live: pk.live(), left: pk.left(), m: S.money, el: pk.has(25), gr: pk.has(1), cm: PokeApp.pkCm(25), xp: PokeApp.pkXp() }; });
+  ok(a.live && a.live.type === 'electric' && a.live.pow === 'shiny' && a.left === 30 && a.m === v.m - 1200, 'sanduíche pago com dinheiro, 30 min ' + JSON.stringify(a));
+  ok(a.el && !a.gr && a.cm === 1 && a.xp === 1, 'bônus só no tipo elétrico');
+  // frutas em vez de dinheiro + bônus de captura
+  await ev(() => { const S = PokeApp.debug.S; S.bag['oran-berry'] = 2; S.bag['pecha-berry'] = 2; S.pkSel = { type: 'grass', pow: 'catch' }; PokeApp.debug.render(); }); await p.waitForTimeout(200);
+  await p.click('.pkgo'); await p.waitForTimeout(400);
+  const c = await ev(() => { const S = PokeApp.debug.S; return { b: (S.bag['oran-berry'] || 0) + (S.bag['pecha-berry'] || 0), cm: PokeApp.pkCm(1), m: S.money }; });
+  ok(c.b === 1 && c.cm === 2 && c.m === a.m, 'usa 3 frutas, captura 2x no tipo planta');
+  await ev(() => PokeApp.debug.go('home')); await p.waitForTimeout(300); await clr();
+  const h = await ev(() => ({ row: !!document.querySelector('.hoje67 .hrow[data-t="picnic"]'), n: document.querySelectorAll('.hoje67 .hrow').length }));
+  ok(h.row && h.n === 4, 'bônus ativo aparece no Hoje');
+  await ev(() => { document.querySelectorAll('.toast').forEach(t => t.remove()); document.querySelector('.hoje67').scrollIntoView({ block: 'center' }); }); await p.waitForTimeout(300); await p.screenshot({ path: OUT('piquenique-hoje') });
+  await ev(() => { PokeApp.debug.S.picnic.until = Date.now() - 1; }); ok(await ev(() => !PokeApp.pk68.live() && PokeApp.pkCm(1) === 1), 'expira depois de 30 min');
+  ok(!errs.length, 'sem erros: ' + errs.join(' | '));
+  console.log(fail ? 'FALHOU ' + fail : 'TUDO OK'); await b.close(); process.exit(fail ? 1 : 0);
+})();
