@@ -277,14 +277,14 @@
   function monCard(m, i, where) {
     const p = hpPct(m), d = fzD(m);
     return `<button class="mcard ${m.hp <= 0 ? 'fainted' : ''}" data-a="mon" data-i="${i}" data-w="${where}" style="--tc:${C.TYPE_COLOR[d.t[0]]}">
-      <div class="msp">${m.shiny ? '<span class="shinytag">★</span>' : ''}${m.item ? `<span class="helditem" title="${C.ITEM_NAME[m.item] || ''}">${itemImg(m.item)}</span>` : ''}<img src="${spr(m)}" alt="" loading="lazy"></div>
+      <div class="msp">${m.shiny ? '<span class="shinytag">★</span>' : ''}${m.fav ? '<span class="favtag">♥</span>' : ''}${m.item ? `<span class="helditem" title="${C.ITEM_NAME[m.item] || ''}">${itemImg(m.item)}</span>` : ''}<img src="${spr(m)}" alt="" loading="lazy"></div>
       <div class="minfo"><div class="row between"><b>${esc(pn(m))}</b><small>Nv ${m.lvl}</small></div><div class="types">${d.t.map(typeChip).join('')}${stChip(m.status)}</div>
       <div class="hpbar"><i style="width:${p}%;background:${hpCol(p)}"></i></div><small class="mut">${m.hp}/${PE.maxhp(m)} HP</small></div></button>`;
   }
   function vTeam() {
     return `<div class="grid"><div class="card span2"><div class="row between"><h3>Time (${S.party.length}/6)</h3><span class="mut small">Toque para detalhes</span></div><div class="mgrid">${S.party.map((m, i) => monCard(m, i, 'p')).join('')}</div></div>
       ${S.eggs.length ? `<div class="card"><h3>🥚 Ovos (${S.eggs.length})</h3><div class="eggs">${S.eggs.map(eggCard).join('')}</div><p class="mut small">Ovos chocam ao explorar (cada busca = passos) ou com o tempo.</p></div>` : ''}
-      <div class="card"><h3>💻 PC — Caixa (${S.box.length})</h3>${S.box.length ? `<div class="mgrid small">${S.box.map((m, i) => monCard(m, i, 'b')).join('')}</div>` : '<p class="mut">Os Pokémon capturados com o time cheio vão para cá.</p>'}</div></div>`;
+      <div class="card"><div class="row between"><h3>💻 PC — Caixa (${S.box.length})</h3>${S.box.some(m => m.fav) ? `<button class="chip73 ${S.boxFav ? 'on' : ''}" data-a="boxfav">♥ Favoritos</button>` : ''}</div>${S.box.length ? `<div class="mgrid small">${S.box.map((m, i) => [m, i]).filter(([m]) => !S.boxFav || m.fav).sort((a, b) => (b[0].fav ? 1 : 0) - (a[0].fav ? 1 : 0) || a[1] - b[1]).map(([m, i]) => monCard(m, i, 'b')).join('')}</div>` : '<p class="mut">Os Pokémon capturados com o time cheio vão para cá.</p>'}</div></div>`;
   }
   ACT.mon = d => { if (d.w === 'x') return; monDetail(d.w === 'b' ? 'b' : 'p', +d.i); };
   function monDetail(w, i) {
@@ -300,15 +300,16 @@
       <p class="small">🎒 Segurando: <b>${m.item ? C.ITEM_NAME[m.item] || m.item : 'nada'}</b>${megaHint(m)}</p>${teraHtml(m)}${bondHtml(m, w, i)}${ribbonHtml(m)}${condHtml(m)}
       <h4>Golpes</h4><div class="moves">${m.moves.map(x => { const mv = D.moves[x.n]; return `<div class="mv" style="--tc:${C.TYPE_COLOR[mv.t]}"><b>${mv.n}</b><small>${C.TYPE_PT[mv.t]} • ${mv.c === 't' ? 'Status' : mv.c === 'p' ? 'Físico' : 'Especial'}${mv.p ? ' • Poder ' + mv.p : ''} • PP ${x.pp}/${mv.pp}</small>${mv.ds ? `<small class="mds">${mv.ds}</small>` : ''}</div>`; }).join('')}</div>
       ${evo ? `<p class="mut small">Evolui para: ${evo}</p>` : ''}<p class="mut small">Treinador original: ${esc(m.ot || '-')} • ${esc(m.caughtAt || '')}</p>
-      <div class="mbtns wrap">${w === 'p' ? `${i > 0 ? `<button class="btn small" data-k="lead">⭐ Líder</button>` : ''}${S.party.length > 1 ? `<button class="btn small" data-k="tobox">💻 Mandar p/ PC</button>` : ''}` : `<button class="btn small" ${S.party.length >= 6 ? 'disabled' : ''} data-k="toparty">➕ Pôr no time</button><button class="btn small danger" data-k="release">Soltar</button>`}
+      <div class="mbtns wrap">${w === 'p' ? `${i > 0 ? `<button class="btn small" data-k="lead">⭐ Líder</button>` : ''}${S.party.length > 1 ? `<button class="btn small" data-k="tobox">💻 Mandar p/ PC</button>` : ''}` : `<button class="btn small" ${S.party.length >= 6 ? 'disabled' : ''} data-k="toparty">➕ Pôr no time</button>${m.fav ? '' : '<button class="btn small danger" data-k="release">Soltar</button>'}`}<button class="btn small ${m.fav ? 'primary' : ''}" data-k="fav">♥ ${m.fav ? 'Favorito' : 'Favoritar'}</button>
       <button class="btn small" data-k="nick">✏️ Apelido</button><button class="btn small primary" data-k="item">🎒 Usar item</button><button class="btn small" data-k="hold">💎 ${m.item ? 'Trocar/tirar item' : 'Segurar item'}</button>${m.id === 384 && !m.moves.some(x => x.n === 'dragon-ascent') ? '<button class="btn small primary" data-k="tutor">🐉 Ensinar Ascensão do Dragão</button>' : ''}</div></div>`, 'wide');
     $$('[data-k]', mm).forEach(b => b.onclick = async () => { SFX.click(); const k = b.dataset.k; if (k === 'judge') return judge(m);
       i = list.indexOf(m); if (i < 0) { closeModal(); render(); return; } // índice sempre atual (nunca mexe no Pokémon errado)
       if (k === 'lead') S.party.unshift(S.party.splice(i, 1)[0]);
       if (k === 'tobox') S.box.push(S.party.splice(i, 1)[0]);
       if (k === 'toparty') S.party.push(S.box.splice(i, 1)[0]);
-      if (k === 'release') { if (w !== 'b') return; if (!(await ask('Soltar?', `Soltar ${esc(pn(m))} na natureza? Isso não pode ser desfeito.`, [{ t: 'Cancelar', v: 0 }, { t: 'Soltar', cls: 'danger', v: 1 }]))) return monDetail(w, i); const j = S.box.indexOf(m); if (j >= 0) S.box.splice(j, 1); }
-      if (k === 'nick') { const n = prompt('Apelido (vazio para remover):', m.nick || ''); if (n !== null) m.nick = n.trim().slice(0, 12) || null; }
+      if (k === 'fav') { m.fav = !m.fav || undefined; save(); render(); return monDetail(w, list.indexOf(m)); }
+      if (k === 'release') { if (w !== 'b' || m.fav) return; if (!(await ask('Soltar?', `Soltar ${esc(pn(m))} na natureza? Isso não pode ser desfeito.`, [{ t: 'Cancelar', v: 0 }, { t: 'Soltar', cls: 'danger', v: 1 }]))) return monDetail(w, i); const j = S.box.indexOf(m); if (j >= 0) S.box.splice(j, 1); }
+      if (k === 'nick') return nickModal(m, () => monDetail(w, list.indexOf(m)));
       if (k === 'item') return pickItemFor(m);
       if (k === 'hold') return pickHold(m, w, i);
       if (k === 'tutor') { closeModal(); await learnMove(m, 'dragon-ascent'); save(); return monDetail(w, i); }
@@ -2920,6 +2921,19 @@
     if (fresh) render(); };
   HOJE.unshift(() => hrow('data-a="morning"', 'img/items/poke-ball.png', 'Relatório da manhã', mrRead() ? 'Lido hoje • toque para rever' : 'Novo! Resumo do dia + presente', mrRead() ? '' : '<i class="ndot mrdot"></i>', mrRead()));
   A.mr72 = { data: mrData, read: mrRead };
+
+  // v73: Apelidos (janela própria com sugestões) e favoritos (♥ no card, primeiro no PC, filtro, não podem ser soltos)
+  const NICK_POOL = ['Faísca', 'Pipoca', 'Bolinha', 'Trovão', 'Chama', 'Gota', 'Folhinha', 'Pingo', 'Tufão', 'Biscoito', 'Fumaça', 'Cometa', 'Pedrinha', 'Sombra', 'Brisa', 'Nuvem', 'Amora', 'Tico', 'Zeca', 'Luna', 'Sol', 'Rex', 'Mel', 'Kiwi'];
+  function nickIdeas(m) { const n = D.mons[m.id].n, r = srng(hseed(m.uid || n)), out = new Set([n.slice(0, Math.min(4, n.length)) + 'inho']);
+    while (out.size < 5) out.add(NICK_POOL[Math.floor(r() * NICK_POOL.length)]); return [...out].map(x => x.slice(0, 12)); }
+  function nickModal(m, back) { const mm = modal(`<div class="nk73"><h3>✏ Apelido</h3><p class="mut small">${D.mons[m.id].n} • até 12 letras</p>
+      <input id="nkin" maxlength="12" value="${esc(m.nick || '')}" placeholder="${D.mons[m.id].n}" autocomplete="off">
+      <div class="nksug">${nickIdeas(m).map(x => `<button class="chip73" data-n="${esc(x)}">${esc(x)}</button>`).join('')}</div>
+      <div class="mbtns"><button class="btn" data-nk="clear">Remover</button><button class="btn primary" data-nk="ok">Salvar</button></div></div>`);
+    $$('[data-n]', mm).forEach(b => b.onclick = () => { $('#nkin').value = b.dataset.n; });
+    $$('[data-nk]', mm).forEach(b => b.onclick = () => { const v = b.dataset.nk === 'clear' ? '' : $('#nkin').value.trim().slice(0, 12); m.nick = v || null; save(); closeModal(); render(); if (v) toast(`Agora ${D.mons[m.id].n} se chama ${v}!`, 'good'); back && back(); }); }
+  ACT.boxfav = () => { S.boxFav = !S.boxFav; render(); };
+  A.nk73 = { ideas: nickIdeas };
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   if (localStorage.getItem(UNLOCK_KEY) !== PASS_HASH) gate();
