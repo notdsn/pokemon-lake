@@ -2767,6 +2767,24 @@
   HOME_X.unshift(() => obCard());
   A.ob65 = { outbreak, obState, obMult, obHit, level: obLevel };
   { const _ve = vExplore; vExplore = function () { const h = _ve.apply(this, arguments), o = obState(); if (!o || sub !== o.map) return h; return `<div class="obchip"><img src="${sprId(o.id)}" alt="">Surto de ${D.mons[o.id].n} aqui • ${S.ob.n} derrotados • shiny ${obLevel(S.ob.n)}x</div>` + h; }; }
+
+  // v66: Desafio diário com time fixo (Daily Run do PokeRogue): mesmo time de 3 para todos, meta de 20 ondas, prêmios por marco.
+  const DC_GOAL = 20;
+  const dcTeam = dk => { const r = srng(hseed('daily:' + dk + ':team')); return pickCount(STARTER_IDS.slice(), 3, r); };
+  function dcInfo() { const R0 = rogue(), dk = dayKey(), dd = R0.daily[dk], run = R0.run && R0.run.daily && R0.run.seed === 'daily:' + dk ? R0.run : null;
+    return { dk, team: dcTeam(dk), dd, run, wave: run ? run.wave - 1 : dd && dd.wave != null ? dd.wave : 0, done: !!(dd && dd.wave != null), clear: !!(dd && dd.clear) }; }
+  function dcCard(home) { const c = dcInfo(), pc = Math.min(100, c.wave / DC_GOAL * 100);
+    const st = c.clear ? `Concluído! Onda ${c.wave}` : c.done ? `Hoje: onda ${c.wave} de ${DC_GOAL}` : c.run ? `Em andamento: onda ${c.run.wave}` : `Chegue à onda ${DC_GOAL} com este time`;
+    return `<${home ? 'button data-a="tab" data-t="rogue"' : 'div'} class="card span2 dc66 ${c.clear ? 'clear' : ''}"><div class="dchead"><div><small>DESAFIO DE HOJE</small><h3>Time fixo do dia</h3></div>${home ? '<span class="arrow">›</span>' : ''}</div>
+      <div class="dcteam">${c.team.map(id => `<div><img src="${sprId(id)}" alt=""><small>${D.mons[id].n}</small></div>`).join('')}</div>
+      <div class="dcbar"><i style="width:${pc}%"></i><span class="mk" style="left:50%"></span></div><div class="row between small"><span>${st}</span><span class="mut">Onda 10: 3 Fichas de Ovo • Onda ${DC_GOAL}: Ovo Raro</span></div></${home ? 'button' : 'div'}>`; }
+  HOME_X.push(() => { try { const c = dcInfo(); return c.clear ? '' : dcCard(true); } catch (e) { return ''; } });
+  { const _f = ACT.rgfight; ACT.rgfight = d => { const run = rogue().run; if (run && run.daily && run.wave > DC_GOAL) { run.cleared = 1; return rgOver(); } return _f(d); }; }
+  { const _o = rgOver; rgOver = function () { const run = rogue().run; const r = _o.apply(this, arguments); if (!run || !run.daily) return r; const w = run.wave - 1, dk = run.seed.slice(6), dd = rogue().daily[dk] || {};
+      const bonus = []; if (w >= 10) { S.bag['egg-token'] = (S.bag['egg-token'] || 0) + 3; bonus.push('3 Fichas de Ovo'); } if (w >= DC_GOAL) { giveEgg('rare', 'Desafio Diário'); dd.clear = 1; S.stats.dcClears = (S.stats.dcClears || 0) + 1; bonus.push('1 Ovo Raro'); }
+      rogue().daily[dk] = dd; save(); const m = document.querySelector('#modal-root .rgover'); if (m && bonus.length) m.querySelector('h2').insertAdjacentHTML('afterend', `<p class="dcwin">${w >= DC_GOAL ? 'Desafio do dia concluído!' : 'Prêmio do desafio'}: <b>${bonus.join(' + ')}</b></p>`); return r; }; }
+  { const _v = XV.rogue; XV.rogue = function () { const h = _v.apply(this, arguments); return rogue().run && !rogue().run.daily ? h : h.replace('<div class="card daily-ch">', dcCard(false) + '<div class="card daily-ch">'); }; }
+  A.dc66 = { team: dcTeam, info: dcInfo, GOAL: DC_GOAL }; A.rogue.over = rgOver;
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   if (localStorage.getItem(UNLOCK_KEY) !== PASS_HASH) gate();
