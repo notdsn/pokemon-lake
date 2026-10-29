@@ -1,0 +1,25 @@
+// v65: Surto de Pokémon do dia
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
+const fs = require('fs'); const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
+const URL = process.argv[2] || 'http://127.0.0.1:18473/'; const LIVE = URL.includes('github.io') ? 'live-' : '';
+let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
+const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-${LIVE}${n}-v65.png`;
+(async () => { const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const ev = (f, a) => p.evaluate(f, a); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
+  await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="4"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
+  await p.waitForTimeout(500); const clr = () => ev(() => document.querySelector('#modal-root').innerHTML = ''); await clr();
+  await ev(() => { PokeApp.debug.S.badges = [0, 1, 2]; PokeApp.debug.save(); PokeApp.debug.go('home'); }); await p.waitForTimeout(400); await clr();
+  const o = await ev(() => { const o = PokeApp.ob65.outbreak(), D = PokeApp.debug; return { o, leg: !!PokeApp.D?.mons?.[o.id]?.L, card: !!document.querySelector('.ob65'), same: JSON.stringify(PokeApp.ob65.outbreak()) === JSON.stringify(o), emo: /\p{Extended_Pictographic}/u.test(document.body.innerText), ovx: document.documentElement.scrollWidth <= innerWidth + 1 }; });
+  ok(o.o && o.o.map && o.o.id, 'surto escolhido: ' + JSON.stringify(o.o)); ok(o.card && o.same, 'cartão do surto no Início'); ok(!o.emo && o.ovx, 'sem emoji, sem overflow');
+  await ev(() => { document.querySelectorAll('.toast').forEach(t => t.remove()); document.querySelector('.ob65').scrollIntoView({ block: 'center' }); }); await p.waitForTimeout(300); await p.screenshot({ path: OUT('surto-inicio') });
+  await p.click('.ob65'); await p.waitForTimeout(400); await clr();
+  ok(await ev(() => !!document.querySelector('.obchip') && document.querySelector('#scene').dataset.mid === PokeApp.ob65.outbreak().map), 'abre o mapa do surto com aviso');
+  const w = await ev(() => { const o = PokeApp.ob65.outbreak(), D = PokeApp.debug; let hit = 0; const N = 400; for (let i = 0; i < N; i++) { /* estatística pela tabela de pesos */ } return o; });
+  const share = await ev(() => { const el = [...document.querySelectorAll('.encm small.mut')].map(x => x.textContent); return el; });
+  ok(share.some(t => /^(6\d|[7-9]\d)%/.test(t)), 'espécie do surto aparece muito mais (' + share.join(',') + ')');
+  const m = await ev(() => { const A = PokeApp.ob65, o = A.outbreak(), mp = { id: o.map }; const r = [A.obMult(mp, o.id)]; for (let i = 0; i < 30; i++) A.obHit(mp, o.id); r.push(A.obMult(mp, o.id)); for (let i = 0; i < 30; i++) A.obHit(mp, o.id); r.push(A.obMult(mp, o.id), A.obMult(mp, -1), A.obMult({ id: 'x' }, o.id)); return r; });
+  ok(m.join() === '1,2,3,1,1', 'chance de shiny 1x → 2x (30) → 3x (60), só no surto: ' + m);
+  ok(await ev(() => JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => /^pkLake\.save\.[^.]+$/.test(k)))).ob.n === 60), 'progresso salvo');
+  await p.waitForTimeout(2600); await ev(() => { PokeApp.debug.render(); document.querySelectorAll('.toast').forEach(t => t.remove()); }); await p.waitForTimeout(200); await p.screenshot({ path: OUT('surto-mapa') });
+  ok(!errs.length, 'sem erros JS ' + errs.slice(0, 2)); await b.close(); console.log(fail ? 'FALHOU' : 'TUDO OK'); process.exit(fail ? 1 : 0); })();

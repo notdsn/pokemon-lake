@@ -406,7 +406,7 @@
     eggSteps(steps); setTimeout(checkEggs, 2500);
     if (!forced && mp.finds && R() < (A.findRate || 0.035)) { const f = pickFind(mp); if (f) { searching = false; $('#searchBtn').disabled = false; S.bag[f] = (S.bag[f] || 0) + 1; save(); SFX.caught();
       modal(`<div class="center badgewin"><div class="bigbadge megab"><img src="img/items/${f}.png" alt=""></div><h2>Você encontrou algo brilhando!</h2><p>Achou <b>${C.ITEM_NAME[f]}</b> escondida em ${mp.name}!</p><p class="mut small">Faça o Pokémon certo segurar para Mega Evoluir.</p><button class="btn primary wide" data-a="close">Uau!</button></div>`); return render(); } }
-    const evs = forced ? null : eventSpawn(mp); const m = PE.makeMon(evs ? evs.id : e[0], lvl, st, { shinyRate: A.shinyRate || (evs ? evs.rate : shinyP()), shiny: !evs && e[4] && e[4].shiny ? true : undefined }); m.caughtAt = mp.name; if (evs) m.evt = 1;
+    const evs = forced ? null : eventSpawn(mp); const m = PE.makeMon(evs ? evs.id : e[0], lvl, st, { shinyRate: A.shinyRate || (evs ? evs.rate : shinyP() * obMult(mp, e[0])), shiny: !evs && e[4] && e[4].shiny ? true : undefined }); m.caughtAt = mp.name; if (evs) m.evt = 1;
     sc.classList.add('alert'); tone(1200, 0.1); await sleep(600); searching = false;
     startBattle({ kind: 'wild', enemy: [m], map: mp, weather: battleWeather(w), legend: !evs && !!e[4]?.legend });
   };
@@ -879,7 +879,7 @@
       return;
     }
     if (s.winner === 0) {
-      await award(); S.stats.wins++; track('win'); if (o.kind === 'trainer') track('trainer'); MUS.victory();
+      await award(); S.stats.wins++; track('win'); if (o.kind === 'wild' && o.enemy && o.enemy[0]) obHit(o.map, o.enemy[0].id); if (o.kind === 'trainer') track('trainer'); MUS.victory();
       if (o.kind === 'trainer') { const f = $('#foe'); if (f) { f.classList.remove('leave'); f.classList.add('back'); } const prize = Math.round((o.prize || 0) * evMoneyMul()); S.money += prize; SFX.win(); log(`🏆 Você venceu ${esc(o.name)}! Ganhou <b>${fmt(prize)}</b>.`); await wait(2000);
         if (o.key) S.trainersBeaten[o.key] = (S.trainersBeaten[o.key] || 0) + 1;
         if (o.badge != null && !S.badges.includes(o.badge)) { S.badges.push(o.badge); S.badges.sort((a, b) => a - b); msg = 'badge:' + o.badge; }
@@ -968,6 +968,7 @@
     if (!S) return; const q = ensureQuests(); let done = 0;
     for (const x of [...q.d, ...q.w]) { if (x.p >= x.n) continue;
       if (x.k === ev && (ev !== 'catchT' || (m && D.mons[m.id].t.includes(x.t)))) { x.p = Math.min(x.n, x.p + n); if (x.p >= x.n) done++; } }
+    if (ev === 'catch' && m && A.obCatch) A.obCatch(m);
     if (ev === 'catch' && m) track('catchT', 1, m);
     if (done) { SFX.coin(); toast(`📜 Missão concluída! Resgate em Mais → Missões.`, 'good'); }
     checkAch();
@@ -2745,6 +2746,27 @@
   A.card53 = { cardPng, newsItems, raidNew };
   A.events = { cdOf, spOf, nextCDs, liveEv, eventSpawn, evolve: (m, to) => evolveAnim(m, to) };
 
+
+  // v65: Surto de Pokémon do dia (Scarlet/Violet). Uma espécie comum aparece em massa num mapa liberado; quanto mais derrota, maior a chance de shiny.
+  const effNow = () => { const n = Date.now(); if (S) S.dayMax = Math.max(S.dayMax || 0, n); return Math.max(n, (S && S.dayMax) || 0); };
+  const effKey = () => { const d = new Date(effNow()); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; };
+  function outbreak() { if (!S || !S.trainer) return null; const key = effKey(); if (A._ob && A._ob.key === key && A._ob.who === S.trainer) return A._ob;
+    let h = 7; for (const c of key + S.trainer) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+    const maps = C.MAPS.filter(mp => unlocked(mp) && mp.enc.some(e => !e[4] && !D.mons[e[0]].L)); if (!maps.length) return null;
+    const mp = maps[h % maps.length], pool = mp.enc.filter(e => !e[4] && !D.mons[e[0]].L); h = (h * 1103515245 + 12345) >>> 0;
+    return (A._ob = { key, who: S.trainer, map: mp.id, id: pool[h % pool.length][0] }); }
+  function obState() { const o = outbreak(); if (!o) return null; if (!S.ob || S.ob.d !== o.key) S.ob = { d: o.key, n: 0 }; return o; }
+  const obLevel = n => n >= 60 ? 3 : n >= 30 ? 2 : 1;
+  function obMult(mp, id) { const o = obState(); return o && mp && mp.id === o.map && id === o.id ? obLevel(S.ob.n) : 1; }
+  function obHit(mp, id) { const o = obState(); if (!o || !mp || mp.id !== o.map || id !== o.id) return; const before = obLevel(S.ob.n); S.ob.n++; if (obLevel(S.ob.n) > before) setTimeout(() => notice(`Surto: chance de shiny de ${D.mons[o.id].n} subiu para ${obLevel(S.ob.n)}x!`, 'good'), 600); save(); }
+  A.obCatch = m => { const o = obState(); if (o && m.id === o.id && S.lastMap === o.map) { S.ob.n++; save(); } };
+  { const _ew = encWeights; encWeights = function (mp, w) { const ws = _ew(mp, w), o = obState(); if (!o || mp.id !== o.map) return ws; const i = mp.enc.findIndex(e => e[0] === o.id); if (i < 0) return ws; const tot = ws.reduce((a, b) => a + b, 0); ws[i] += tot * 1.5; return ws; }; }
+  function obCard(small) { const o = obState(); if (!o) return ''; const mp = C.MAPS.find(m => m.id === o.map), n = S.ob.n, nx = n < 30 ? 30 : n < 60 ? 60 : 0, lo = n < 30 ? 0 : 30;
+    return `<button class="card span2 ob65" data-a="enter" data-id="${mp.id}"><img src="${sprId(o.id)}" alt=""><div class="grow"><small>SURTO DE HOJE</small><h3>${D.mons[o.id].n} em ${mp.name}</h3>
+      <div class="obbar"><i style="width:${nx ? (n - lo) / (nx - lo) * 100 : 100}%"></i></div><small class="mut">${n} derrotados • chance de shiny ${obLevel(n)}x${nx ? ` • ${nx - n} para ${obLevel(nx)}x` : ' (máximo)'}</small></div><span class="arrow">›</span></button>`; }
+  HOME_X.unshift(() => obCard());
+  A.ob65 = { outbreak, obState, obMult, obHit, level: obLevel };
+  { const _ve = vExplore; vExplore = function () { const h = _ve.apply(this, arguments), o = obState(); if (!o || sub !== o.map) return h; return `<div class="obchip"><img src="${sprId(o.id)}" alt="">Surto de ${D.mons[o.id].n} aqui • ${S.ob.n} derrotados • shiny ${obLevel(S.ob.n)}x</div>` + h; }; }
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   if (localStorage.getItem(UNLOCK_KEY) !== PASS_HASH) gate();

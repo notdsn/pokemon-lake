@@ -1220,3 +1220,10 @@ body.in-battle .toast{bottom:auto;top:calc(var(--sat,0px) + 58px)}
 .dxwon{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.4);font-size:.85rem;text-align:center}
 .dxwon h2,.dxwon p{margin:0;font-size:inherit}
 .toast.notice{bottom:auto;top:calc(var(--sat,0px) + 64px);padding:7px 12px;font-size:.8rem;border-radius:11px;max-width:84vw;opacity:.96}
+/* v65: surto do dia */
+.ob65{display:flex;align-items:center;gap:12px;text-align:left;color:inherit;background:linear-gradient(120deg,rgba(168,85,247,.22),rgba(59,130,246,.12));border-color:rgba(168,85,247,.45)}
+.ob65 img{width:64px;height:64px;object-fit:contain;image-rendering:pixelated;flex:0 0 auto}
+.ob65 small:first-child{font-size:.68rem;letter-spacing:.1em;color:#d8b4fe;font-weight:800}.ob65 h3{margin:2px 0 6px;font-size:1rem}
+.obbar{height:6px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden;margin-bottom:4px}.obbar i{display:block;height:100%;background:linear-gradient(90deg,#a855f7,#fde047)}
+.obchip{display:flex;align-items:center;gap:8px;margin:0 0 8px;padding:6px 12px;border-radius:12px;background:rgba(168,85,247,.18);border:1px solid rgba(168,85,247,.4);font-size:.82rem;font-weight:600}
+.obchip img{width:32px;height:32px;image-rendering:pixelated}
