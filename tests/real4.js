@@ -18,7 +18,7 @@ const at = (mo, h) => new Date(2026, mo, 15, Math.floor(h), Math.round((h % 1) *
   const names = {}; for (const [mo, k] of [[3, 'autumn'], [6, 'winter'], [9, 'spring'], [0, 'summer']]) { await p.clock.setFixedTime(at(mo, 12)); names[k] = await ev(() => PokeApp.wx.season()); }
   ok(JSON.stringify(names) === JSON.stringify({ autumn: 'autumn', winter: 'winter', spring: 'spring', summer: 'summer' }), 'estações do hemisfério sul ' + JSON.stringify(names));
   for (const [mo, k] of [[3, 'outono'], [9, 'primavera']]) { await p.clock.setFixedTime(at(mo, 12.2)); await ev(() => { PokeApp.wx.force = 'clear'; PokeApp.debug.go('explore', 'floresta'); }); await p.waitForTimeout(500); await p.screenshot({ path: OUT('floresta-' + k) }); }
-  ok(/Primavera/.test(await p.textContent('.ex-top')), 'chip da estação');
+  ok(await ev(() => [...document.querySelectorAll('.ex-top .chip')].some(c => /Primavera/.test(c.title || c.textContent) && c.querySelector('svg.ic'))), 'chip da estação (ícone + título)');
   await p.clock.setFixedTime(at(9, 12.1)); const i0 = await ev(() => PokeApp.wx.wxIntensity('rain')); await p.clock.setFixedTime(at(9, 13.5)); const i1 = await ev(() => PokeApp.wx.wxIntensity('rain'));
   ok(i0 < i1 && i1 === 1, `chuva começa fraca e engrossa (${i0} → ${i1})`);
   await p.clock.setFixedTime(at(9, 13.5)); await ev(() => { PokeApp.wx.force = 'storm'; PokeApp.debug.go('explore', 'lago' in {} ? 'lago' : PC.MAPS.find(m => m.theme === 'water').id); }); await p.waitForTimeout(5500);

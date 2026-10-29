@@ -26,7 +26,7 @@ const at = h => new Date(2026, 9, 27, Math.floor(h), Math.round((h % 1) * 60));
     await ev(t => PokeApp.debug.go(t), t); await p.waitForTimeout(450); await clr(); await scan('tela ' + t); if (['home', 'more', 'bag', 'shop', 'quests', 'ach'].includes(t)) { await hide(); await p.screenshot({ path: OUT(t) }); } }
   await ev(() => PokeApp.debug.go('explore', 'floresta')); await p.waitForTimeout(900); await clr(); await scan('explorar mapa');
   await ev(() => PokeApp.debug.startBattle({ kind: 'wild', enemy: PokeApp.debug.mkTeam([[16, 12]], 1, 0), map: PokeApp.C.MAPS[1] })); await p.waitForTimeout(3200); await clr(); await scan('batalha'); await hide(); await p.screenshot({ path: OUT('batalha') });
-  await p.click('[data-b="bag"]'); await p.waitForTimeout(300); await scan('batalha: mochila'); await p.screenshot({ path: OUT('batalha-mochila') }); await p.click('[data-b="back"]'); await p.waitForTimeout(200);
+  await p.waitForSelector('[data-b="bag"]', { timeout: 15000 }); await p.click('[data-b="bag"]'); await p.waitForTimeout(300); await scan('batalha: mochila'); await p.screenshot({ path: OUT('batalha-mochila') }); await p.click('[data-b="back"]'); await p.waitForTimeout(200);
   await p.click('[data-b="poke"]'); await p.waitForTimeout(300); await scan('batalha: trocar Pokémon'); await p.screenshot({ path: OUT('batalha-trocar') }); await p.click('[data-b="back"]');
   await p.click('[data-b="fight"]'); await p.waitForTimeout(200); await p.click('.mvb'); await p.waitForTimeout(2500); await scan('batalha: depois do golpe');
   await ev(() => { document.querySelector('#battle')?.remove(); document.body.classList.remove('in-battle'); });

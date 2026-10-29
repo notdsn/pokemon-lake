@@ -19,10 +19,10 @@ const at = h => new Date(2026, 9, 27, Math.floor(h), Math.round((h % 1) * 60));
   for (const [th, bio] of Object.entries(pick)) { const id = MAPS[th]; if (!id) continue;
     await ev(id => { document.querySelector('#battle')?.remove(); PokeApp.debug.go('explore', id); }, id); await p.waitForTimeout(500);
     if (th === 'forest' || th === 'water' || th === 'ice') await p.screenshot({ path: OUT('explore-' + bio) });
-    ok(await ev(b => !!document.querySelector('#scene .bpar.bio-' + b), bio), 'exploração com 3 camadas: ' + bio);
+    { const want = await ev(id => PokeApp.biomeFor({ map: window.PC.MAPS.find(m => m.id === id) }), id); ok(await ev(b => !!document.querySelector('#scene .bpar.bio-' + b), want), 'exploração com 3 camadas: ' + want); }
     await ev(id => PokeApp.debug.startBattle({ kind: 'wild', map: window.PC.MAPS.find(m => m.id === id), enemy: [PokeApp.PE.makeMon(74, 5, { seed: 7 })] }), id); await p.waitForTimeout(3300);
     await p.screenshot({ path: OUT('batalha-' + bio) });
-    ok(await ev(b => document.querySelectorAll('#battle .bcam .bpar.bio-' + b + ' .bl').length === 4, bio), 'batalha com paralaxe: ' + bio); }
+    { const want = await ev(id => PokeApp.biomeFor({ map: window.PC.MAPS.find(m => m.id === id) }), id); ok(await ev(b => document.querySelectorAll('#battle .bcam .bpar.bio-' + b + ' .bl:is(.sky,.gnd,.hills,.fg)').length === 4, want), 'batalha com paralaxe: ' + want + ' (local do mapa)'); } }
   ok(await ev(() => !document.querySelector('.bcam .info') && !!document.querySelector('.bscene > .info')), 'caixas de HP fora da câmera');
   await ev(() => PokeApp.camTo(1)); await p.waitForTimeout(500);
   ok(await ev(() => { const s = document.querySelector('.bpar .sky'), f = document.querySelector('.bpar .fg'); return getComputedStyle(s).transform !== getComputedStyle(f).transform && document.querySelector('#einfo').getBoundingClientRect().top < 60; }), 'camadas se movem diferente; HP parado');

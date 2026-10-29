@@ -1113,3 +1113,20 @@ body.in-battle .toast{bottom:auto;top:calc(var(--sat,0px) + 58px)}
 .ic-egg{color:#fde68a}.ic-moon{color:#c7d2fe}.ic-sun{color:#fcd34d}
 .light .ic,.btn.primary .ic,.bb .ic,.mvb .ic{color:inherit}
 .wheel54 .bb i .ic{width:1em;height:1em}
+/* v58: fundos por local + dia/noite */
+.bio-beach{--gnd:linear-gradient(#f5d38a,#e9c277 60%,#d9ab5c)}.bio-volcano{--gnd:linear-gradient(#44403c,#292524 60%,#1c1917)}
+.bio-ghost{--gnd:linear-gradient(#3b0764,#2e1065 60%,#1e0b3f)}.bio-ruins{--gnd:linear-gradient(#6d28d9,#5b21b6 60%,#3b0764)}
+.bio-swamp{--gnd:linear-gradient(#4b6455,#3d5446 60%,#2d4036)}.bio-meadow{--gnd:linear-gradient(#22c55e,#16a34a 60%,#15803d)}
+.bio-arena{--gnd:linear-gradient(#475569,#3b4656 60%,#2b3442)}
+.bpar:is(.bio-ghost,.bio-volcano,.bio-ruins,.bio-arena,.bio-beach,.bio-swamp,.bio-meadow){filter:none}
+.bpar .starl{top:0;bottom:30%;display:none;background:url(../img/bg/stars.svg) 50% 100%/cover no-repeat}
+.per-night .bpar .starl{display:block}
+.per-night .bpar .sky{filter:brightness(.32) saturate(.55) hue-rotate(15deg)}
+.per-night .bpar :is(.hills,.gnd,.fg){filter:brightness(.55) saturate(.7)}
+.per-dusk .bpar .sky{filter:sepia(.35) saturate(1.5) hue-rotate(-18deg) brightness(.9)}
+.per-dusk .bpar :is(.hills,.gnd,.fg){filter:brightness(.82) sepia(.15)}
+.bpar.bio-arena .sky,.bpar.bio-arena :is(.hills,.gnd,.fg),.bpar.bio-arena .starl{filter:none}.bio-arena .starl{display:none!important}
+.bpar.bio-cave .starl{display:none!important}.per-night .bpar.bio-cave .sky{filter:brightness(.7)}
+.tc2-tr.pose-jump img:first-of-type{animation:pjump 1.2s ease-in-out infinite}.tc2-tr.pose-spin img:first-of-type{animation:pspin 3s linear infinite}
+.tc2-tr.pose-wave img:first-of-type{animation:pwave 1.4s ease-in-out infinite;transform-origin:50% 90%}.tc2-tr.pose-hero img:first-of-type{transform:scale(1.12);filter:drop-shadow(0 0 8px #ffcc33)!important}
+@media (prefers-reduced-motion:reduce){.tc2-tr[class*=pose-] img{animation:none!important}}

@@ -379,7 +379,7 @@
   function vExplore() {
     const mp = C.MAPS.find(m => m.id === sub) || C.MAPS[0], w = weatherOf(mp), ws = encWeights(mp, w), tot = ws.reduce((a, b) => a + b, 0);
     const tr = mp.trainers || [];
-    return `<div class="grid"><div class="card span2 explore theme-${mp.theme} w-${w} per-${period()}" id="scene"><div class="sky"><i class="sun"></i></div><div class="wx"></div><div class="ground"></div>
+    return `<div class="grid"><div class="card span2 explore theme-${mp.theme} w-${w} per-${period()}" id="scene" data-mid="${mp.id}"><div class="sky"><i class="sun"></i></div><div class="wx"></div><div class="ground"></div>
       <div class="grass-row">${'<i></i>'.repeat(12)}</div>${meHtml()}${followerHtml()}<div class="alertmark">!</div>
       <div class="ex-top"><button class="btn small ghost" data-a="tab" data-t="maps">← Mapas</button><span class="chip">${WEATHER[w][1]} ${WEATHER[w][0]}</span><span class="chip">${PERIOD_PT[period()]}</span></div>
       <div class="ex-bot"><h2>${mp.emoji} ${mp.name}</h2><p>${mp.desc}</p><div class="exbtns"><button class="btn primary big" data-a="search" id="searchBtn">🔍 Procurar Pokémon</button>${isWater(mp) ? '<button class="btn big fishbtn" data-a="fish" id="fishBtn0">🎣 Pescar</button>' : ''}${riftBtn(mp)}<button class="btn big phbtn" data-a="photo">📷 Foto</button>${mp.id === 'safari' ? '<button class="btn big sfbtn" data-a="tab" data-t="safari">🦏 Jogo do Safári</button>' : ''}${legendHunts(mp).map(([q, sp]) => `<button class="btn big legbtn" data-a="leghunt" data-q="${q.id}">${sp.btn}</button>`).join('')}</div></div></div>
@@ -648,7 +648,8 @@
     const n = $('.hpn', el); if (n) { const from = parseInt(n.textContent) || 0; const t0 = performance.now(), dur = 600 * spd(); const tick = t => { const k = Math.min(1, (t - t0) / dur); n.textContent = Math.round(from + (hp - from) * k) + '/' + max; if (k < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); } }
   function drawBalls() { if (!B || B.o.kind !== 'trainer') return; $('#ebs').innerHTML = B.s.sides[1].party.map(m => `<i class="${m.hp > 0 ? '' : 'out'}"></i>`).join(''); }
   function log(t) { const l = $('#blog'); if (l) l.innerHTML = `<p>${t}</p>`; }
-  async function runIntro() {
+  async function runIntro() { const ov = $('#battle'); try { await runIntro0(); } catch (e) { if (ov && ov.isConnected) throw e; } }
+  async function runIntro0() {
     const o = B.o, e = B.s.sides[1].b.m, p = B.s.sides[0].b.m; const intro = $('#intro');
     if (o.nat) { natTheme(); await wait(3200); intro.classList.add('out');
       for (const t of ['Então você é quem derrotou o Blue... Eu estava esperando por você.', 'Cada um dos meus parceiros carrega uma história diferente. Juntos, somos imbatíveis.', 'Mostre-me o laço que você tem com seus Pokémon!']) { log(`<b>Nat:</b> “${t}”`); await wait(1700); }
@@ -674,6 +675,7 @@
   function sparkle(side) { const host = bq(side ? '.emon' : '.pmon'); if (!host) return; for (let i = 0; i < 12; i++) { const s = document.createElement('span'); s.className = 'spark'; s.textContent = i % 2 ? '✦' : '✧'; const a = i / 12 * Math.PI * 2;
     s.style.setProperty('--dx', Math.cos(a) * 75 + 'px'); s.style.setProperty('--dy', Math.sin(a) * 75 + 'px'); s.style.animationDelay = (i % 4) * 0.08 + 's'; host.appendChild(s); setTimeout(() => s.remove(), 1500); } }
   function showMain() {
+    if (!B || !$('#bctl')) return; // v58: batalha já fechada (intro assíncrona)
     const m = B.s.sides[0].b.m; log(`O que <b>${esc(pn(m))}</b> vai fazer?`);
     $('#bctl').innerHTML = `<div class="bmain wheel54"><button class="bb fight wh-main" data-b="fight"><i>⚔️</i><b>Lutar</b></button><button class="bb bag wh-s wh1" data-b="bag"><i>🎒</i><b>Mochila</b></button><button class="bb poke wh-s wh2" data-b="poke"><i>🔄</i><b>Pokémon</b></button><button class="bb run wh-s wh3" data-b="run"><i>🏃</i><b>Fugir</b></button></div>`;
     bindCtl();
@@ -2118,11 +2120,21 @@
   // ===== REALISMO 3: fundos em 3 camadas com paralaxe por bioma =====
   const BIOME = { forest: 'forest', grass: 'forest', ghost: 'forest', cave: 'cave', water: 'water', sky: 'mountain', volcano: 'mountain', electric: 'city', psychic: 'city', gym: 'city', ice: 'snow', safari: 'desert' };
   const biomeOf = th => BIOME[th] || 'forest'; A.biomeOf = biomeOf;
-  const parHtml = bio => `<div class="bpar bio-${bio}" aria-hidden="true"><i class="bl sky" style="background-image:url(img/bg/${bio}-sky.svg)"></i><i class="bl gnd"></i><i class="bl hills" style="background-image:url(img/bg/${bio}-hills.svg)"></i><i class="bl fg" style="background-image:url(img/bg/${bio}-fg.svg)"></i></div>`;
-  function addParExplore() { const sc = document.querySelector('#scene.explore'); if (!sc || sc.querySelector('.bpar')) return; const th = (sc.className.match(/theme-(\w+)/) || [])[1]; sc.insertAdjacentHTML('afterbegin', parHtml(biomeOf(th))); }
+  // v58: fundo pelo local exato do mapa (lago, praia, vulcão, pântano, ruínas, arena…)
+  function biomeFor(o) { const m = o && o.map; if (!m) return o && o.tower ? 'ruins' : 'arena'; const n = m.name || '', t = m.theme;
+    if (t === 'ghost') return 'ghost'; if (/Deserto/.test(n)) return 'desert'; if (/P[âa]ntano/.test(n)) return 'swamp';
+    if (t === 'water') return /Lago|F[úu]ria|Redemoinho/.test(n) ? 'water' : 'beach';
+    if (t === 'volcano') return /Prata|Mina/.test(n) ? 'mountain' : 'volcano';
+    if (t === 'psychic') return /Caverna/.test(n) ? 'cave' : /F[áa]brica|Academia/.test(n) ? 'city' : /Floresta/.test(n) ? 'forest' : 'ruins';
+    if (t === 'sky') return /Est[áa]dio|Rose/.test(n) ? 'city' : 'mountain'; if (t === 'electric') return /Caverna/.test(n) ? 'cave' : 'city';
+    if (t === 'grass' || t === 'safari') return /Bosque|Floresta/.test(n) && t === 'grass' ? 'forest' : 'meadow';
+    return BIOME[t] || 'forest'; }
+  A.biomeFor = biomeFor;
+  const parHtml = bio => `<div class="bpar bio-${bio}" aria-hidden="true"><i class="bl sky" style="background-image:url(img/bg/${bio}-sky.svg)"></i><i class="bl starl"></i><i class="bl gnd"></i><i class="bl hills" style="background-image:url(img/bg/${bio}-hills.svg)"></i><i class="bl fg" style="background-image:url(img/bg/${bio}-fg.svg)"></i></div>`;
+  function addParExplore() { const sc = document.querySelector('#scene.explore'); if (!sc || sc.querySelector('.bpar')) return; const th = (sc.className.match(/theme-(\w+)/) || [])[1], mp = C.MAPS.find(x => String(x.id) === sc.dataset.mid) || null; sc.insertAdjacentHTML('afterbegin', parHtml(mp && mp.theme === th ? biomeFor({ map: mp }) : biomeOf(th))); }
   function battleCam(o) { const ov = $('#battle'), sc = ov && $('.bscene', ov); if (!sc || $('.bcam', sc)) return; const cam = document.createElement('div'); cam.className = 'bcam';
     [...sc.children].forEach(ch => { if (!ch.matches('.info,.ebs,.wchip,.intro')) cam.appendChild(ch); }); sc.prepend(cam);
-    const th = o && o.map ? o.map.theme : o && o.tower ? 'psychic' : 'gym'; cam.insertAdjacentHTML('afterbegin', parHtml(biomeOf(th))); }
+    cam.insertAdjacentHTML('afterbegin', parHtml(biomeFor(o))); }
   { const _sb = startBattle; startBattle = function (o) { const r = _sb.apply(this, arguments); try { battleCam(o); } catch (e) {} return r; }; A.debug.startBattle = startBattle; }
   { const _render = render; render = function () { const r = _render.apply(this, arguments); try { addParExplore(); } catch (e) {} return r; }; }
 
@@ -2401,7 +2413,8 @@
       if (a) [head, face, ears].forEach(id => { if (id && id !== 'null' && DRAW[id]) og.drawImage(item(id), 0, 0); });
       MECACHE[key] = out.toDataURL(); delete MEWAIT[key];
       document.querySelectorAll('img[data-me]').forEach(el => { if (el.dataset.me === key) el.src = MECACHE[key]; }); };
-    if (RAW[av]) return go(RAW[av]); const im = new Image(); im.onload = () => { RAW[av] = im; go(im); }; im.src = `img/tr/${av}.png`; }
+    const safe = im => { try { go(im); } catch (e) { MECACHE[key] = `img/tr/${av}.png`; delete MEWAIT[key]; } }; // v58: canvas indisponível (memória do iPhone) → sprite simples
+    if (RAW[av]) return safe(RAW[av]); const im = new Image(); im.onload = () => { RAW[av] = im; safe(im); }; im.src = `img/tr/${av}.png`; }
   function meSrc() { if (!S || !S.avatar) return ''; const k = meKey(); if (MECACHE[k]) return MECACHE[k]; if (!MEWAIT[k]) { MEWAIT[k] = 1; setTimeout(() => compose(k)); } return `img/tr/${S.avatar}.png`; }
   const meTag = (cls = '') => `<img ${cls ? `class="${cls}"` : ''} data-me="${meKey()}" src="${meSrc()}" style="${meFilter2()}" alt="">`;
   const meFilter2 = () => { const c = STYLE.colors.find(x => x[0] === sty().color); return c && c[2] === -1 ? 'filter:drop-shadow(0 0 6px #a855f7)' : ''; };
@@ -2545,7 +2558,7 @@
       const g = [grp('Kanto', C.BADGES.map((_, i) => badgeHtml(i, S.badges.includes(i))).join(''), S.badges.length, C.BADGES.length)];
       if (S.champion && FEAT.johto) g.push(grp('Johto', C.JBADGES.map((_, i) => jbadgeHtml(i, S.jbadges.includes(i))).join(''), S.jbadges.length, C.JBADGES.length));
       REG_ORDER.filter(rOpen).forEach(k => { const r = rS(k); if (r.b.length) g.push(grp(REG[k].n, REG[k].BADGES.map((_, i) => rbadgeHtml(k, i, r.b.includes(i))).join(''), r.b.length, REG[k].BADGES.length)); });
-      return `<div class="tcard2"><div class="tc2-holo"></div><div class="tc2-top"><div class="tc2-tr"><div class="tc2-spot"></div>${trImg()}</div>
+      return `<div class="tcard2"><div class="tc2-holo"></div><div class="tc2-top"><div class="tc2-tr ${auraOf() ? 'au-' + auraOf() : ''} ${poseCls()}"><div class="tc2-spot"></div>${trImg()}</div>
         <div class="tc2-id"><small class="tc2-k">CARTÃO DE TREINADOR</small><h2>${esc(S.trainer)}${S.champion ? ' <span class="tc2-crown">👑</span>' : ''}</h2>${t ? `<span class="tc2-title">🏆 ${t}</span>` : ''}
         <div class="tc2-stats"><span><b>${ca}</b> capturados</span><span><b>${se}</b> vistos</span><span><b>${sh}</b> ✨</span></div></div></div>
         <div class="tc2-badges">${g.join('')}</div></div>`; } catch (e) { return _tc.apply(this, arguments); } }; }

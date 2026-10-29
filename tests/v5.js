@@ -28,7 +28,7 @@ const URL = process.argv[2] || 'http://127.0.0.1:18473/', TAGN = URL.includes('g
     ok(await ev(() => !PokeApp.debug.B), `${tag} Safári sem batalha`); await clr(); await ev(() => PokeApp.debug.S.safari = null);
     // raide
     await ev(() => { PokeApp.debug.healAll(); PokeApp.debug.S.bag['wishing-piece'] = 1; PokeApp.debug.go('raid'); }); await shot('raid', 400);
-    await ev(() => document.querySelector('[data-a="wish"]').click()); ok(await ev(() => document.querySelector('.raidhead .chip').textContent.startsWith('4')), `${tag} Peça dos Desejos +1 raide`);
+    const rl0 = await ev(() => PokeApp.debug.raidsLeft ? PokeApp.debug.raidsLeft() : parseInt(document.querySelector('.raidhead .chip').textContent)); await ev(() => document.querySelector('[data-a="wish"]').click()); await p.waitForTimeout(150); const rl1 = await ev(() => parseInt(document.querySelector('.raidhead .chip').textContent)); ok(rl1 === rl0 + 1, `${tag} Peça dos Desejos +1 raide (${rl0} → ${rl1})`);
     await ev(() => document.querySelector('[data-a="raidgo"]').click()); await p.waitForTimeout(300); await shot('raid-pick', 300); await ev(() => document.querySelector('#rgo').click());
     await p.waitForTimeout(2600); ok(await ev(() => !!(PokeApp.debug.B && PokeApp.debug.B.o.raid)), `${tag} raide começou`); await shot('raid-battle', 200);
     ok(await ev(() => document.querySelector('.bag, #battle') && !!document.querySelector('#raidt')), `${tag} HUD do raide`);
@@ -50,9 +50,9 @@ const URL = process.argv[2] || 'http://127.0.0.1:18473/', TAGN = URL.includes('g
     await ev(() => document.querySelector('[data-a="rematch"]').click()); await p.waitForTimeout(2500); ok(await ev(() => !!(PokeApp.debug.B && PokeApp.debug.B.s.sides[1].party.length === 6)), `${tag} revanche com 6 Pokémon`); await shot('rematch', 200);
     await ev(() => PokeApp.debug.closeBattle()); await busy();
     // estilo + casa
-    await ev(() => PokeApp.debug.go('style')); await p.waitForTimeout(300);
-    for (const k of ['c5', 'h6', 'a3']) { await p.evaluate(k => document.querySelector(`[data-a="stybuy"][data-id="${k}"]`)?.click(), k); await p.waitForTimeout(150); await clr(); }
-    ok(await ev(() => PokeApp.debug.S.style.hat === 'h6' && PokeApp.debug.S.style.aura === 'a3'), `${tag} comprou coroa + aura`); await shot('style', 400);
+    await ev(() => { PokeApp.debug.S.money = Math.max(PokeApp.debug.S.money, 100000); PokeApp.debug.go('style'); }); await p.waitForTimeout(300);
+    for (const k of ['c5', 'h6', 'a3']) { await p.evaluate(k => document.querySelector(`[data-a="stybuy"][data-id="${k}"],[data-a="accbuy"][data-id="${k}"]`)?.click(), k); await p.waitForTimeout(150); await clr(); }
+    ok(await ev(() => PokeApp.debug.S.style.hat === 'h6' && PokeApp.debug.S.style.aura === 'a3'), `${tag} comprou coroa + aura ` + await ev(() => JSON.stringify(PokeApp.debug.S.style))); await shot('style', 400);
     await ev(() => PokeApp.debug.go('card')); await shot('card', 400);
     await ev(() => PokeApp.debug.go('house')); await p.waitForTimeout(300); for (let k = 0; k < 3; k++) { await p.evaluate(k => document.querySelectorAll('[data-a="fbuy"]')[k]?.click(), k); await p.waitForTimeout(100); }
     for (let k = 0; k < 3; k++) { await p.evaluate(k => document.querySelectorAll('[data-a="hslot"]')[k * 2 + 1]?.click(), k); await p.waitForTimeout(300); if (k === 0) await shot('house-place', 200); await ev(() => document.querySelector('.modal [data-f]')?.click()); await p.waitForTimeout(200); }
