@@ -1174,3 +1174,22 @@ body.in-battle .toast{bottom:auto;top:calc(var(--sat,0px) + 58px)}
 .medal .ae{font-size:24px}.medal .ae svg{width:26px;height:26px}.medal:not(.got) b{opacity:.75}
 .mprog{display:block;width:100%;height:6px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:4px}.mprog i{display:block;height:100%;background:linear-gradient(90deg,#f59e0b,#fde047);border-radius:4px}
 @media (prefers-reduced-motion:reduce){.medal.got .md::after{animation:none;display:none}}
+/* v61: Pokédex em grade + carrossel de iniciais */
+.dex61{grid-template-columns:repeat(4,1fr);gap:6px}
+@media(min-width:600px){.dex61{grid-template-columns:repeat(auto-fill,minmax(92px,1fr))}}
+.dex61 .dx{min-height:96px;padding:4px 2px}.dex61 .dx img{width:52px;height:52px}.dex61 .dx b{font-size:.68rem;line-height:1.1;word-break:break-word}
+.dex61 .dx:not(.c){background:rgba(255,255,255,.025)}
+.dexrwbtn{margin-top:10px;position:relative}.dexrwbtn .rdot{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:10px;background:#ef4444;color:#fff;font-size:.72rem;font-weight:800;margin-left:8px;padding:0 5px}
+.dexrwm .dexrw{margin:0 0 10px}
+.sc61{display:flex;flex-direction:column;min-height:calc(100dvh - 40px);padding-top:8px}
+.sc61 .sch{text-align:center;margin:6px 0 10px;font-size:1.25rem}
+.scar{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;flex:1;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.scar::-webkit-scrollbar{display:none}
+.sslide.starter{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always;min-height:440px;border-radius:24px;justify-content:center;gap:10px;padding:20px 16px;background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--tc) 45%,transparent),transparent 65%),var(--bg2);cursor:pointer;transform:none}
+.sslide.starter:hover{transform:none}
+.sslide .srg{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.sslide img{width:200px;height:200px;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))}
+.sslide b{font-size:1.6rem}.sslide .schoose{margin-top:14px;width:100%;max-width:300px;min-height:56px;font-size:1.1rem;display:flex;align-items:center;justify-content:center}
+.snav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 4px}
+.sarr{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:inherit;display:grid;place-items:center;flex:0 0 auto}
+.sdots{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;max-width:230px}.sdots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25)}.sdots i.on{background:#fde047;transform:scale(1.4)}
