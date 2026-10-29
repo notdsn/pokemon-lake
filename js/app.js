@@ -556,6 +556,7 @@
     try { S = PS.importSave(txt, user); toast('Save importado!', 'good'); go('home'); } catch (e) { toast('Código inválido: ' + esc(e.message), 'bad'); } }
   ACT.imp = () => doImport($('#imp').value);
   document.addEventListener('change', e => { if (e.target.id === 'impf' && e.target.files[0]) e.target.files[0].text().then(doImport); });
+  AS0 = AS0 || audioSettings;
   // v62: configurações com chaves deslizantes e sliders, em seções simples
   const SPEEDS = [[1.4, 'Lenta'], [1, 'Normal'], [0.6, 'Rápida'], [0.3, 'Turbo']];
   const tog = (act, on, k) => `<button class="tgl ${on ? 'on' : ''}" role="switch" aria-checked="${on}" data-a="${act}" ${k ? `data-k="${k}"` : ''} data-v="${!on}"><i></i></button>`;
@@ -563,11 +564,12 @@
   const srow = (ic, t, ctl, sub) => `<div class="srow"><span class="sic">${ic}</span><div class="grow"><b>${t}</b>${sub ? `<small class="mut">${sub}</small>` : ''}</div>${ctl}</div>`;
   function vSettings() {
     const st0 = S.settings, mus = st0.music !== false, si = Math.max(0, SPEEDS.findIndex(x => x[0] === (st0.speed || 1)));
+    const ex = audioSettings().slice(AS0().length), cut = ex.indexOf('<div class="setrow"><span>🧊'), exA = cut < 0 ? ex : ex.slice(0, cut), exB = cut < 0 ? '' : ex.slice(cut);
     return `<div class="card set62"><h3>⚙️ Configurações</h3>
       <h4 class="sgh">Som</h4>${srow('🔊', 'Efeitos sonoros', tog('set', st0.sound !== false, 'sound'))}${srow('🎵', 'Música', tog('setmus', mus))}
-      ${srow('', 'Volume da música', sld('mvol', 0, 0.6, 0.05, st0.mvol ?? 0.35, 'Volume da música'))}${srow('', 'Volume dos efeitos', sld('svol', 0, 1.2, 0.1, st0.svol ?? 0.8, 'Volume dos efeitos'))}
+      ${srow('', 'Volume da música', sld('mvol', 0, 0.6, 0.05, st0.mvol ?? 0.35, 'Volume da música'))}${srow('', 'Volume dos efeitos', sld('svol', 0, 1.2, 0.1, st0.svol ?? 0.8, 'Volume dos efeitos'))}${exA}
       <h4 class="sgh">Jogo</h4>${srow('🐾', 'Pokémon seguindo no mapa', tog('setfollow', st0.follow !== false))}${srow('📳', 'Vibração', tog('set', st0.vibe !== false, 'vibe'), 'Críticos, capturas e shinies (o iPhone não permite)')}
-      <div class="srow col"><div class="row between"><b>Velocidade da batalha</b><span class="chip" id="spdl">${SPEEDS[si][1]}</span></div>${sld('speed', 0, 3, 1, si, 'Velocidade da batalha')}<div class="sticks">${SPEEDS.map(x => `<small>${x[1]}</small>`).join('')}</div></div>
+      <div class="srow col"><div class="row between"><b>Velocidade da batalha</b><span class="chip" id="spdl">${SPEEDS[si][1]}</span></div>${sld('speed', 0, 3, 1, si, 'Velocidade da batalha')}<div class="sticks">${SPEEDS.map(x => `<small>${x[1]}</small>`).join('')}</div></div>${exB}
       <h4 class="sgh">Conta</h4><button class="btn wide ghost" data-a="lock">🔒 Bloquear site neste aparelho</button></div>
       <div class="card"><h3>🎁 Código de presente</h3><p class="mut small">Tem um código? Digite aqui para receber o presente (cada código vale uma vez por conta).</p>
       <form id="giftForm" class="row gift"><input id="giftCode" autocapitalize="characters" autocomplete="off" placeholder="XXXX-XXXX" aria-label="Código de presente"><button class="btn primary">Resgatar</button></form><p id="giftErr" class="err"></p></div>
@@ -1182,6 +1184,7 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden) MUS.stop(); });
   ACT.setvol = d => { S.settings[d.k] = +d.v; save(); MUS.refresh(); render(); };
   ACT.setmus = d => { S.settings.music = d.v === 'true'; save(); MUS.refresh(); if (S.settings.music) MUS.want(mapTheme()); render(); };
+  var AS0;
   function audioSettings() {
     const vs = [[0, '0'], [0.15, 'Baixo'], [0.35, 'Médio'], [0.6, 'Alto']];
     return `<div class="setrow"><span>🎵 Música</span><div class="seg">${[[true, 'Ligada'], [false, 'Desligada']].map(([v, l]) => `<button class="${(S.settings.music !== false) === v ? 'on' : ''}" data-a="setmus" data-v="${v}">${l}</button>`).join('')}</div></div>
