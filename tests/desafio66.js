@@ -10,10 +10,10 @@ const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-${LIVE}${n}-v66.png`
   await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="4"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
   await p.waitForTimeout(500); const clr = () => ev(() => document.querySelector('#modal-root').innerHTML = ''); await clr();
   await ev(() => PokeApp.debug.go('home')); await p.waitForTimeout(300); await clr();
-  const h = await ev(() => ({ card: !!document.querySelector('.dc66'), imgs: document.querySelectorAll('.dc66 .dcteam img').length, team: PokeApp.dc66.team(PokeApp.dc66.info().dk), emo: /\p{Extended_Pictographic}/u.test(document.body.innerText), ovx: document.documentElement.scrollWidth <= innerWidth + 1 }));
+  const h = await ev(() => ({ card: !!document.querySelector('.hoje67 .hrow[data-t="rogue"]'), imgs: document.querySelectorAll('.hoje67 .hrow[data-t="rogue"] .hteam img').length, team: PokeApp.dc66.team(PokeApp.dc66.info().dk), emo: /\p{Extended_Pictographic}/u.test(document.body.innerText), ovx: document.documentElement.scrollWidth <= innerWidth + 1 }));
   ok(h.card && h.imgs === 3, 'cartão do desafio no Início com o time do dia'); ok(!h.emo && h.ovx, 'sem emoji, sem overflow');
-  await ev(() => { document.querySelectorAll('.toast').forEach(t => t.remove()); document.querySelector('.dc66').scrollIntoView({ block: 'center' }); }); await p.waitForTimeout(300); await p.screenshot({ path: OUT('desafio-inicio') });
-  await p.click('.dc66'); await p.waitForTimeout(400); await clr(); ok(await ev(() => !!document.querySelector('.dc66') && !!document.querySelector('[data-a="rgdaily"]')), 'abre o desafio com prévia do time');
+  await ev(() => { document.querySelectorAll('.toast').forEach(t => t.remove()); document.querySelector('.hoje67 .hrow[data-t="rogue"]').scrollIntoView({ block: 'center' }); }); await p.waitForTimeout(300); await p.screenshot({ path: OUT('desafio-inicio') });
+  await p.click('.hoje67 .hrow[data-t="rogue"]'); await p.waitForTimeout(400); await clr(); ok(await ev(() => !!document.querySelector('.dc66') && !!document.querySelector('[data-a="rgdaily"]')), 'abre o desafio com prévia do time');
   await p.click('[data-a="rgdaily"]'); await p.waitForTimeout(300);
   const t = await ev(() => JSON.stringify(PokeApp.debug.S.rogue.run.party.map(m => m.id)) === JSON.stringify(PokeApp.dc66.team(PokeApp.dc66.info().dk)));
   ok(t, 'time da corrida = time mostrado (igual para todos no dia)');

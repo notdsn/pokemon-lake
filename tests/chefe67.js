@@ -1,0 +1,36 @@
+// v67: Hoje + Chefe enfurecido
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
+const fs = require('fs'); const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
+const URL = process.argv[2] || 'http://127.0.0.1:18473/'; const LIVE = URL.includes('github.io') ? 'live-' : '';
+let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
+const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-${LIVE}${n}-v67.png`;
+(async () => { const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const ev = (f, a) => p.evaluate(f, a); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
+  await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="4"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
+  await p.waitForTimeout(500); const clr = () => ev(() => document.querySelector('#modal-root').innerHTML = ''); await clr();
+  await ev(() => PokeApp.debug.go('home')); await p.waitForTimeout(400); await clr();
+  const h = await ev(() => ({ n: document.querySelectorAll('.hoje67 .hrow').length, cards: document.querySelectorAll('.ob65,.home .dc66').length, boss: PokeApp.boss67.today(), emo: /\p{Extended_Pictographic}/u.test(document.body.innerText), ovx: document.documentElement.scrollWidth <= innerWidth + 1 }));
+  ok(h.n === 3 && h.cards === 0, 'um único cartão Hoje com 3 linhas (' + h.n + ')'); ok(!h.emo && h.ovx, 'sem emoji, sem overflow');
+  ok(h.boss && !(await ev(id => PDATA.mons[id].L, h.boss.id)), 'chefe é Pokémon comum: ' + (h.boss && h.boss.id));
+  await ev(() => { document.querySelectorAll('.toast').forEach(t => t.remove()); document.querySelector('.hoje67').scrollIntoView({ block: 'center' }); }); await p.waitForTimeout(300); await p.screenshot({ path: OUT('hoje-inicio') });
+  // luta 1: deixa a vida em 50% e foge
+  await p.click('.hrow[data-a="boss67"]'); await p.waitForTimeout(2500);
+  const b1 = await ev(() => { const B = PokeApp.debug.B; const e = B.s.sides[1].party[0]; return { boss: !!B.o.boss67, ratio: e.hp / PokeApp.boss67.maxhp(e) }; }).catch(e => ({ err: e.message }));
+  ok(b1.boss && b1.ratio > 0.99, 'batalha do chefe com vida cheia ' + JSON.stringify(b1));
+  await p.screenshot({ path: OUT('chefe-batalha') });
+  await ev(() => { const B = PokeApp.debug.B, e = B.s.sides[1].party[0]; e.hp = Math.round(PokeApp.boss67.maxhp(e) * 0.5); PokeApp.boss67.close(); }); await p.waitForTimeout(1200);
+  const s1 = await ev(() => { const b = PokeApp.boss67.today(); return { ...b, pp: PokeApp.boss67.pips(b) }; }); ok(Math.abs(s1.hp - 0.5) < 0.02 && !s1.done && s1.pp === 2, 'vida salva entre lutas, fúria 2/3');
+  await clr(); await ev(() => PokeApp.debug.go('home')); await p.waitForTimeout(300);
+  await p.click('.hrow[data-a="boss67"]'); await p.waitForTimeout(2500);
+  const r2 = await ev(() => { const B = PokeApp.debug.B, e = B.s.sides[1].party[0]; return e.hp / PokeApp.boss67.maxhp(e); }); ok(Math.abs(r2 - 0.5) < 0.02, 'segunda luta começa com 50%');
+  const before = await ev(() => ({ n: PokeApp.debug.S.party.length + PokeApp.debug.S.box.length, m: PokeApp.debug.S.money }));
+  await ev(() => { const B = PokeApp.debug.B, e = B.s.sides[1].party[0]; e.hp = 0; PokeApp.boss67.close(); }); await p.waitForTimeout(1500);
+  const a = await ev(() => ({ b: PokeApp.boss67.today(), n: PokeApp.debug.S.party.length + PokeApp.debug.S.box.length, m: PokeApp.debug.S.money, msg: document.querySelector('#modal-root').innerText }));
+  ok(a.b.done && a.n === before.n + 1 && a.m === before.m + 8000 && /acalmou/.test(a.msg), 'chefe acalma, entra no time e dá prêmio');
+  await p.screenshot({ path: OUT('chefe-calmo') }); await clr();
+  await ev(() => PokeApp.debug.go('home')); await p.waitForTimeout(300);
+  ok(await ev(() => document.querySelector('.hrow[data-a="boss67"]').classList.contains('done')), 'linha do chefe marcada como feita');
+  ok(!errs.length, 'sem erros: ' + errs.join(' | '));
+  console.log(fail ? 'FALHOU ' + fail : 'TUDO OK'); await b.close(); process.exit(fail ? 1 : 0);
+})();

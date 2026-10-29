@@ -2753,7 +2753,7 @@
   function outbreak() { if (!S || !S.trainer) return null; const key = effKey(); if (A._ob && A._ob.key === key && A._ob.who === S.trainer) return A._ob;
     let h = 7; for (const c of key + S.trainer) h = (h * 31 + c.charCodeAt(0)) >>> 0;
     const maps = C.MAPS.filter(mp => unlocked(mp) && mp.enc.some(e => !e[4] && !D.mons[e[0]].L)); if (!maps.length) return null;
-    const mp = maps[h % maps.length], pool = mp.enc.filter(e => !e[4] && !D.mons[e[0]].L); h = (h * 1103515245 + 12345) >>> 0;
+    const mp = maps[h % maps.length], pool = (mp.enc || []).filter(e => D.mons[e[0]] && !D.mons[e[0]].L); h = (h * 1103515245 + 12345) >>> 0;
     return (A._ob = { key, who: S.trainer, map: mp.id, id: pool[h % pool.length][0] }); }
   function obState() { const o = outbreak(); if (!o) return null; if (!S.ob || S.ob.d !== o.key) S.ob = { d: o.key, n: 0 }; return o; }
   const obLevel = n => n >= 60 ? 3 : n >= 30 ? 2 : 1;
@@ -2764,7 +2764,6 @@
   function obCard(small) { const o = obState(); if (!o) return ''; const mp = C.MAPS.find(m => m.id === o.map), n = S.ob.n, nx = n < 30 ? 30 : n < 60 ? 60 : 0, lo = n < 30 ? 0 : 30;
     return `<button class="card span2 ob65" data-a="enter" data-id="${mp.id}"><img src="${sprId(o.id)}" alt=""><div class="grow"><small>SURTO DE HOJE</small><h3>${D.mons[o.id].n} em ${mp.name}</h3>
       <div class="obbar"><i style="width:${nx ? (n - lo) / (nx - lo) * 100 : 100}%"></i></div><small class="mut">${n} derrotados • chance de shiny ${obLevel(n)}x${nx ? ` • ${nx - n} para ${obLevel(nx)}x` : ' (máximo)'}</small></div><span class="arrow">›</span></button>`; }
-  HOME_X.unshift(() => obCard());
   A.ob65 = { outbreak, obState, obMult, obHit, level: obLevel };
   { const _ve = vExplore; vExplore = function () { const h = _ve.apply(this, arguments), o = obState(); if (!o || sub !== o.map) return h; return `<div class="obchip"><img src="${sprId(o.id)}" alt="">Surto de ${D.mons[o.id].n} aqui • ${S.ob.n} derrotados • shiny ${obLevel(S.ob.n)}x</div>` + h; }; }
 
@@ -2778,13 +2777,43 @@
     return `<${home ? 'button data-a="tab" data-t="rogue"' : 'div'} class="card span2 dc66 ${c.clear ? 'clear' : ''}"><div class="dchead"><div><small>DESAFIO DE HOJE</small><h3>Time fixo do dia</h3></div>${home ? '<span class="arrow">›</span>' : ''}</div>
       <div class="dcteam">${c.team.map(id => `<div><img src="${sprId(id)}" alt=""><small>${D.mons[id].n}</small></div>`).join('')}</div>
       <div class="dcbar"><i style="width:${pc}%"></i><span class="mk" style="left:50%"></span></div><div class="row between small"><span>${st}</span><span class="mut">Onda 10: 3 Fichas de Ovo • Onda ${DC_GOAL}: Ovo Raro</span></div></${home ? 'button' : 'div'}>`; }
-  HOME_X.push(() => { try { const c = dcInfo(); return c.clear ? '' : dcCard(true); } catch (e) { return ''; } });
   { const _f = ACT.rgfight; ACT.rgfight = d => { const run = rogue().run; if (run && run.daily && run.wave > DC_GOAL) { run.cleared = 1; return rgOver(); } return _f(d); }; }
   { const _o = rgOver; rgOver = function () { const run = rogue().run; const r = _o.apply(this, arguments); if (!run || !run.daily) return r; const w = run.wave - 1, dk = run.seed.slice(6), dd = rogue().daily[dk] || {};
       const bonus = []; if (w >= 10) { S.bag['egg-token'] = (S.bag['egg-token'] || 0) + 3; bonus.push('3 Fichas de Ovo'); } if (w >= DC_GOAL) { giveEgg('rare', 'Desafio Diário'); dd.clear = 1; S.stats.dcClears = (S.stats.dcClears || 0) + 1; bonus.push('1 Ovo Raro'); }
       rogue().daily[dk] = dd; save(); const m = document.querySelector('#modal-root .rgover'); if (m && bonus.length) m.querySelector('h2').insertAdjacentHTML('afterend', `<p class="dcwin">${w >= DC_GOAL ? 'Desafio do dia concluído!' : 'Prêmio do desafio'}: <b>${bonus.join(' + ')}</b></p>`); return r; }; }
   { const _v = XV.rogue; XV.rogue = function () { const h = _v.apply(this, arguments); return rogue().run && !rogue().run.daily ? h : h.replace('<div class="card daily-ch">', dcCard(false) + '<div class="card daily-ch">'); }; }
   A.dc66 = { team: dcTeam, info: dcInfo, GOAL: DC_GOAL }; A.rogue.over = rgOver;
+
+  // v67: cartão único "Hoje" no Início (surto, desafio, chefe e próximos itens diários)
+  const HOJE = [];
+  const hrow = (act, img, t, sub, extra = '', done = false) => `<button class="hrow ${done ? 'done' : ''}" ${act}><img src="${img}" alt="" loading="lazy"><div class="grow"><b>${t}</b><small class="mut">${sub}</small>${extra}</div><span class="arrow">›</span></button>`;
+  HOJE.push(() => { const o = obState(); if (!o) return ''; const mp = C.MAPS.find(m => m.id === o.map), n = S.ob.n; return hrow(`data-a="enter" data-id="${mp.id}"`, sprId(o.id), `Surto: ${D.mons[o.id].n}`, `${mp.name} • ${n} derrotados • shiny ${obLevel(n)}x`); });
+  HOJE.push(() => { const c = dcInfo(); return hrow('data-a="tab" data-t="rogue"', sprId(c.team[0]), 'Desafio do dia', c.clear ? `Concluído • onda ${c.wave}` : c.done ? `Onda ${c.wave} de ${DC_GOAL}` : c.run ? `Em andamento • onda ${c.run.wave}` : `Time fixo • chegue à onda ${DC_GOAL}`, `<span class="hteam">${c.team.map(id => `<img src="${sprId(id)}" alt="">`).join('')}</span>`, c.clear); });
+  function hojeCard() { const rows = HOJE.map(f => { try { return f(); } catch (e) { return ''; } }).filter(Boolean); if (!rows.length) return '';
+    return `<div class="card span2 hoje67"><div class="row between"><h3>📅 Hoje</h3><small class="mut">${rows.length} atividades</small></div><div class="hrows">${rows.join('')}</div></div>`; }
+  HOME_X.unshift(hojeCard); A.hoje = { rows: HOJE, card: hojeCard };
+
+  // v67: Chefe selvagem enfurecido (Legends Arceus / Z-A). Pokémon comum gigante e furioso; a vida dele fica salva entre batalhas (várias etapas).
+  function bossToday() { if (!S || !S.trainer) return null; const key = effKey(); if (S.boss67 && S.boss67.d === key) return S.boss67;
+    let h = 99; for (const c of key + S.trainer + 'boss') h = (h * 31 + c.charCodeAt(0)) >>> 0;
+    const maps = C.MAPS.filter(mp => unlocked(mp) && mp.lv); if (!maps.length) return null; const mp = maps[h % maps.length];
+    const pool = [...new Set((mp.enc || []).filter(e => D.mons[e[0]] && !D.mons[e[0]].L).map(e => e[0]))].map(id => { let x = id; for (let i = 0; i < 3; i++) { const ev = (D.mons[x].e || [])[0]; if (!ev || !D.mons[ev.to] || D.mons[ev.to].L) break; x = +ev.to; } return x; }).filter(id => D.mons[id] && !D.mons[id].L);
+    if (!pool.length) return null; h = (h * 1103515245 + 12345) >>> 0;
+    S.boss67 = { d: key, map: mp.id, id: pool[h % pool.length], hp: 1, done: 0, tries: 0 }; save(); return S.boss67; }
+  const furyPips = b => b.done ? 0 : Math.max(1, Math.ceil(b.hp * 3));
+  ACT.boss67 = async () => { const b = bossToday(); if (!b) return; if (b.done) return toast('O chefe de hoje já está calmo. Volte amanhã!');
+    if (!S.party.some(m => m.hp > 0)) return toast('Seus Pokémon estão sem energia! Vá ao Centro Pokémon.', 'bad');
+    const mp = C.MAPS.find(m => m.id === b.map), lv = Math.min(100, (mp.lv ? mp.lv[1] : 30) + 8);
+    const m = PE.makeMon(b.id, lv, st, { shinyRate: shinyP(), iv: Array(6).fill(31) }); m.raidHp = 3; m.hp = Math.max(1, Math.round(PE.maxhp(m) * b.hp)); m.caughtAt = mp.name + ' (chefe enfurecido)'; m.boss67 = 1;
+    b.tries++; save(); startBattle({ kind: 'wild', enemy: [m], map: mp, boss67: 1, weather: battleWeather(weatherOf(mp)), intro: `${D.mons[b.id].n} enfurecido apareceu! Fúria ${furyPips(b)}/3` }); };
+  { const _cb = closeBattle; closeBattle = function () { try { if (B && B.o && B.o.boss67) { const b = bossToday(), e = B.s.sides[1].party[0], mine = [...S.party, ...S.box].some(x => x === e || (x.uid && e.uid && x.uid === e.uid));
+        if (b && !b.done) { if (mine || e.hp <= 0) { b.done = 1; b.hp = 0; S.stats.bosses = (S.stats.bosses || 0) + 1; S.money += 8000; S.bag['rare-candy'] = (S.bag['rare-candy'] || 0) + 2;
+            if (!mine) { const g = PE.makeMon(b.id, e.lvl, st, { ot: S.trainer, caughtAt: e.caughtAt }); delete g.raidHp; addCaught(g); if (S.party.length < 6) S.party.push(g); else S.box.push(g); }
+            setTimeout(() => modal(`<div class="center badgewin"><img class="bigspr" src="${sprId(b.id)}" alt=""><h2>${D.mons[b.id].n} se acalmou!</h2><p>Ele decidiu seguir você. Prêmio: <b>${fmt(8000)}</b> e <b>2 Balas Raras</b>.</p><button class="btn primary wide" data-a="close">Ótimo!</button></div>`), 500); }
+          else { b.hp = Math.max(0.01, e.hp / PE.maxhp(e)); setTimeout(() => notice(`O chefe ainda está com fúria ${furyPips(b)}/3. Cure seu time e volte!`), 400); } save(); } } } catch (er) {} return _cb.apply(this, arguments); }; }
+  HOJE.push(() => { const b = bossToday(); if (!b) return ''; const mp = C.MAPS.find(m => m.id === b.map);
+    return hrow('data-a="boss67"', sprId(b.id), `Chefe enfurecido: ${D.mons[b.id].n}`, b.done ? 'Acalmado hoje' : `${mp.name} • a vida fica salva entre lutas`, b.done ? '' : `<span class="fury">${[0, 1, 2].map(i => `<i class="${i < furyPips(b) ? 'on' : ''}"></i>`).join('')}</span>`, !!b.done); });
+  A.boss67 = { today: bossToday, pips: furyPips, close: () => closeBattle(), maxhp: m => PE.maxhp(m) };
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   if (localStorage.getItem(UNLOCK_KEY) !== PASS_HASH) gate();
