@@ -28,7 +28,7 @@ const at = h => new Date(2026, 9, 27, Math.floor(h), Math.round((h % 1) * 60));
     // swipe missões
     const sl = await ev(async () => { const t = document.querySelector('.qc-track'); t.scrollTo({ left: 400 }); await new Promise(r => setTimeout(r, 400)); return t.scrollLeft; }); ok(sl > 100, `${W}: missões rolam para o lado`);
   }
-  await p.waitForTimeout(800); ok(toasts.some(t => /Raide nova disponível/.test(t)), 'toast "Raide nova disponível"');
+  for (let w = 0; w < 20 && !toasts.some(t => /Raide nova disponível/.test(t)); w++) await p.waitForTimeout(300); ok(toasts.some(t => /Raide nova disponível/.test(t)), 'toast "Raide nova disponível"');
   await ev(() => PokeApp.debug.go('raid')); await p.waitForTimeout(600); await clr(); await ev(() => PokeApp.debug.go('home')); await p.waitForTimeout(600);
   ok(await ev(() => !document.querySelector('.nav [data-t="more"]').classList.contains('ndot53') && PokeApp.debug.S.seen53 && !!PokeApp.debug.S.seen53.raid), 'aviso some após ver as raides (salvo)');
   // cartão PNG

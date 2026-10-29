@@ -147,8 +147,8 @@
   // ---------- navegação ----------
   const MORE_TABS = ['shop', 'center', 'bag', 'dex', 'card', 'saves', 'settings', 'daycare', 'quests', 'games', 'ach', 'safari', 'raid', 'legends', 'arena', 'house', 'style'];
   const moreOk = k => k !== 'daycare' || FEAT.daycare;
-  let navAt = 0;
-  function go(t, s) { navAt = Date.now(); tab = t; sub = s || null; render(); window.scrollTo(0, 0); }
+  let navAt = 0, navSeq = 0;
+  function go(t, s) { navAt = Date.now(); navSeq++; tab = t; sub = s || null; render(); window.scrollTo(0, 0); }
   function render() {
     if (!S) return;
     const nav = [['home', '🏠', 'Início'], ['team', '🎒', 'Time'], ['maps', '🗺️', 'Mapas'], ['battle', '⚔️', 'Batalha'], ['more', '☰', 'Mais']];
@@ -166,7 +166,7 @@
     const fn = ACT[a]; if (fn) { e.preventDefault(); fn(b.dataset, b); }
   });
   ACT.tab = d => go(d.t);
-  function notice(msg, kind = '') { const wait = Math.max(0, navAt + 2200 - Date.now()); setTimeout(() => { if (Date.now() < navAt + 2200) return notice(msg, kind); toast(msg, (kind + ' notice').trim()); }, wait); }
+  function notice(msg, kind = '', n = 0) { const q = navSeq; setTimeout(() => { if (navSeq !== q && n < 3) return notice(msg, kind, n + 1); toast(msg, (kind + ' notice').trim()); }, 2200); }
   function toast(msg, kind = '') { const t = document.createElement('div'); t.className = 'toast ' + kind; t.innerHTML = msg; $('#toast-root').appendChild(t); setTimeout(() => t.classList.add('out'), 2600); setTimeout(() => t.remove(), 3100); }
   function modal(html, cls = '') { closeModal(); const m = document.createElement('div'); m.className = 'modal-bg'; m.innerHTML = `<div class="modal ${cls}">${html}</div>`;
     m.addEventListener('click', e => { if (e.target === m && !m.dataset.lock) closeModal(); }); $('#modal-root').appendChild(m); return m; }
