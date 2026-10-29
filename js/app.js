@@ -2868,6 +2868,20 @@
   ACT.trev = d => { const m = trMon(), i = +d.i; m.ev = m.ev || [0, 0, 0, 0, 0, 0]; const tot = m.ev.reduce((a, b) => a + b, 0), add = Math.min(TR_EVSTEP, 252 - m.ev[i], 510 - tot); if (add <= 0 || !pay(TR_EV)) return; const h0 = PE.calcStats(m)[0]; m.ev[i] += add; if (i === 0) m.hp += PE.calcStats(m)[0] - h0; save(); render(); };
   ACT.trreset = () => { const m = trMon(); if (!pay(TR_RESET)) return; m.ev = [0, 0, 0, 0, 0, 0]; m.hp = Math.min(m.hp, PE.calcStats(m)[0]); save(); render(); toast('Pontos de status zerados.'); };
   A.tr69 = { learn: trLearn };
+
+  // v70: Caminho de troféus (Clash/Brawl Stars): troféus vêm de tudo que você já fez; cada marco libera um prêmio.
+  const TROAD = [[10, { 'poke-ball': 10 }], [25, { money: 3000 }], [50, { 'great-ball': 10 }], [80, { 'rare-candy': 2 }], [120, { money: 8000 }], [170, { 'ultra-ball': 10 }], [230, { 'egg-token': 3 }], [300, { 'rare-candy': 5 }], [400, { money: 20000 }], [520, { 'ultra-ball': 20 }], [660, { 'rare-candy': 10 }], [820, { money: 50000 }], [1000, { 'master-ball': 1 }]];
+  function trophies() { const c = Object.keys(S.dex.caught || {}).length, sh = Object.keys(S.dex.shiny || {}).length, a = Object.keys(S.ach || {}).length; return { c, sh, a, b: S.badges.length, t: c * 2 + sh * 5 + a * 10 + S.badges.length * 15 }; }
+  const trClaimed = () => S.troad | 0;
+  const trReady = () => { const t = trophies().t; let n = 0; for (let i = trClaimed(); i < TROAD.length && TROAD[i][0] <= t; i++) n++; return n; };
+  MORE_X.push(() => ['troad', '🏆', 'Caminho de Troféus', `${trophies().t} troféus${trReady() ? ` • ${trReady()} prêmio(s)` : ''}`]);
+  XV.troad = () => { const T = trophies(), cl = trClaimed(), nx = TROAD.find(x => x[0] > T.t);
+    return `<div class="card troad70"><h3>🏆 Caminho de Troféus</h3><div class="trsum"><b>${T.t}</b><small class="mut">troféus${nx ? ` • próximo marco em ${nx[0]}` : ' • caminho completo'}</small></div>
+      <small class="mut">Espécies capturadas ×2 (${T.c}) • shiny ×5 (${T.sh}) • conquistas ×10 (${T.a}) • insígnias ×15 (${T.b})</small>
+      <div class="trpath">${TROAD.map(([need, r], i) => { const st = i < cl ? 'done' : need <= T.t ? 'ready' : 'lock';
+        return `<div class="trnode ${st}"><span class="trdot">${st === 'done' ? '✅' : st === 'ready' ? '🎁' : '🔒'}</span><div class="grow"><b>${need} troféus</b><small class="mut">${rewardText(r)}</small></div>${st === 'ready' && i === cl ? '<button class="btn small primary" data-a="trclaim">Pegar</button>' : ''}</div>`; }).join('')}</div></div>`; };
+  ACT.trclaim = () => { const i = trClaimed(); if (i >= TROAD.length || TROAD[i][0] > trophies().t) return; giveReward(TROAD[i][1]); S.troad = i + 1; save(); SFX.evo && SFX.evo(); render(); toast(`Prêmio do caminho: ${rewardText(TROAD[i][1])}!`, 'good'); };
+  A.tr70 = { trophies, ready: trReady, road: TROAD };
   // ---------- boot ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   if (localStorage.getItem(UNLOCK_KEY) !== PASS_HASH) gate();

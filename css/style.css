@@ -1259,3 +1259,15 @@ body.in-battle .toast{bottom:auto;top:calc(var(--sat,0px) + 58px)}
 .trmv:has(input:checked){background:rgba(251,191,36,.18);outline:1px solid #fbbf24}.trmv input{accent-color:#fbbf24;margin:0}
 .trevs{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}.trev{display:grid;grid-template-columns:62px 1fr 34px 36px;gap:8px;align-items:center;font-size:13px}
 .trev i{height:8px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}.trev i b{display:block;height:100%;background:#4ade80}.trev small{text-align:right}.trev .btn{padding:4px 0}
+/* v70 fixes */
+.seg2 button.on .ic{color:inherit}.seg2 button.on .ic-star{fill:currentColor}
+.trevs{gap:2px}.trev{grid-template-columns:62px 1fr 30px 32px}.trev .btn{min-height:0;height:26px;padding:0;line-height:1;font-size:15px}
+/* v70 Caminho de troféus */
+.troad70 .trsum{display:flex;align-items:baseline;gap:8px;margin:4px 0}.troad70 .trsum b{font-size:30px;color:#fbbf24}
+.trpath{position:relative;display:flex;flex-direction:column;gap:6px;margin-top:12px;padding-left:4px}
+.trpath:before{content:"";position:absolute;left:19px;top:10px;bottom:10px;width:3px;background:rgba(255,255,255,.12);border-radius:2px}
+.trnode{position:relative;display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:12px}
+.trnode .grow{flex:1;display:flex;flex-direction:column}.trnode small{font-size:12px}
+.trdot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#1e293b;border:2px solid rgba(255,255,255,.15);z-index:1;flex:none}
+.trnode.done{opacity:.55}.trnode.done .trdot{border-color:#4ade80}.trnode.ready{background:rgba(251,191,36,.12)}.trnode.ready .trdot{border-color:#fbbf24;box-shadow:0 0 8px #fbbf24}.trnode.lock{opacity:.7}
+.trmv input{width:16px;height:16px;min-height:0;flex:none;padding:0;-webkit-appearance:auto;appearance:auto}
