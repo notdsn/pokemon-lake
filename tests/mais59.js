@@ -1,0 +1,36 @@
+// v59: Mais em grade (Jogar/Coleção/Loja) + mochila com abas
+const { chromium } = require('/workspace/pk-pw/node_modules/playwright-core');
+const fs = require('fs'); const HASH = fs.readFileSync('/workspace/pokemon-lake/js/app.js', 'utf8').match(/PASS_HASH = '([0-9a-f]+)'/)[1];
+const URL = process.argv[2] || 'http://127.0.0.1:18473/'; const LIVE = URL.includes('github.io') ? 'live-' : '';
+let fail = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'FAIL') + ' ' + m); if (!c) fail++; };
+const OUT = n => `/workspace/pokemon-lake/prints/v2/375x667-${LIVE}${n}-v59.png`;
+(async () => { const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+  const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, deviceScaleFactor: 2 }); await ctx.addInitScript(h => localStorage.setItem('pkLake.unlock', h), HASH); const p = await ctx.newPage(); const ev = (f, a) => p.evaluate(f, a); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  await p.clock.setFixedTime(new Date(2026, 9, 27, 12, 10));
+  await p.goto(URL); await p.fill('#au', 'Edson'); await p.fill('#ap', 'teste123'); await p.click('#accForm button.primary');
+  await p.fill('#tn', 'Edson'); await p.click('#next'); await p.click('.starter[data-id="4"]'); await p.click('.mbtns .btn.primary'); await p.click('.mbtns .btn.primary');
+  await p.waitForTimeout(500); const clr = () => ev(() => document.querySelector('#modal-root').innerHTML = ''); await clr();
+  await ev(() => { const S = PokeApp.debug.S; Object.assign(S.bag, { 'great-ball': 3, 'super-potion': 2, revive: 1, 'fire-stone': 1, 'oran-berry': 4, 'old-rod': 1, 'tera-orb': 1, 'charizardite-x': 1 }); S.money = 50000; PokeApp.debug.save(); });
+  const hide = () => ev(() => document.querySelectorAll('.toast').forEach(t => t.style.visibility = 'hidden'));
+  await ev(() => PokeApp.debug.go('more')); await p.waitForTimeout(500); await clr();
+  const r = await ev(() => { const g = [...document.querySelectorAll('.mgrp h4')].map(h => h.textContent), t = [...document.querySelectorAll('.mtile')];
+    return { g, n: t.length, keys: t.map(x => x.dataset.t), big: t.filter(x => !(x.getBoundingClientRect().height >= 88 && x.querySelector('svg.ic'))).map(x => x.dataset.t), cols: getComputedStyle(document.querySelector('.mtiles')).gridTemplateColumns.split(' ').length, ovx: document.documentElement.scrollWidth <= innerWidth + 1, emo: /\p{Extended_Pictographic}/u.test(document.body.innerText), old: !!document.querySelector('.morec') }; });
+  ok(r.g.join() === 'Jogar,Coleção,Loja,Conta', 'grupos: ' + r.g.join(' / '));
+  ok(r.n >= 24 && !r.big.length && r.cols === 3 && !r.old, `${r.n} blocos grandes com ícone desenhado, 3 por linha ${r.big}`);
+  ok(['quests', 'games', 'dex', 'ach', 'shop', 'bag', 'center', 'fusion', 'pass', 'raid'].every(k => r.keys.includes(k)), 'nenhuma tela sumiu do Mais');
+  ok(r.ovx && !r.emo, 'sem overflow, sem emoji');
+  await hide(); await p.screenshot({ path: OUT('mais-grade') });
+  ok(await ev(() => !document.querySelector('.mtile[data-t="quests"] .mdot')), 'sem pontinho quando não há nada a resgatar');
+  const qd = await ev(() => { const h = PokeApp.moreGrid([['quests', 'x', 'Missões', ''], ['exped', 'x', 'Expedições', '2 equipe(s) voltaram!'], ['shop', 'x', 'Loja Pokémon', '']], 1, 0); return [/mt-quests[^"]*dot/.test(h), /mt-exped[^"]*dot/.test(h), /mt-shop[^"]*dot/.test(h)]; });
+  ok(qd.join() === 'true,true,false', 'pontinho vermelho só onde há novidade (' + qd + ')');
+  await p.click('.mtile[data-t="bag"]'); await p.waitForTimeout(400); await clr();
+  const bg = await ev(() => ({ tabs: [...document.querySelectorAll('.btab')].map(x => x.textContent.replace(/\d+/g, '').trim()), imgs: [...document.querySelectorAll('.bcell img.itemimg')].every(i => i.complete && i.naturalWidth > 0), cells: document.querySelectorAll('.bcell').length }));
+  ok(bg.tabs.join() === 'Bolas,Remédios,Batalha,Chaves', 'abas: ' + bg.tabs.join(' / '));
+  ok(bg.cells === 2 && bg.imgs, 'Bolas: 2 itens com imagem');
+  await hide(); await p.screenshot({ path: OUT('mochila-bolas') });
+  const cat = await ev(() => Object.fromEntries(['poke-ball', 'safari-ball', 'super-potion', 'revive', 'oran-berry', 'rare-candy', 'fire-stone', 'charizardite-x', 'tera-shard', 'old-rod', 'tera-orb', 'mega-bracelet', 'capsule-token'].map(k => [k, PokeApp.bagCat(k)])));
+  ok(JSON.stringify(cat) === JSON.stringify({ 'poke-ball': 'balls', 'safari-ball': 'balls', 'super-potion': 'meds', revive: 'meds', 'oran-berry': 'meds', 'rare-candy': 'meds', 'fire-stone': 'battle', 'charizardite-x': 'battle', 'tera-shard': 'battle', 'old-rod': 'keys', 'tera-orb': 'keys', 'mega-bracelet': 'keys', 'capsule-token': 'keys' }), 'categorias certas');
+  for (const [t, n] of [['meds', 4], ['battle', 2], ['keys', 2]]) { await p.click(`.btab[data-t="${t}"]`); await p.waitForTimeout(200); const c = await ev(() => document.querySelectorAll('.bcell').length); ok(c === n, `aba ${t}: ${c} itens`); if (t === 'meds') { await hide(); await p.screenshot({ path: OUT('mochila-remedios') }); } }
+  await p.click('.btab[data-t="meds"]'); await p.click('.bcell[data-id="super-potion"]'); await p.waitForTimeout(300); ok(await ev(() => !!document.querySelector('#modal-root .mcard')), 'usar Super Poção abre escolha do Pokémon');
+  ok(await ev(() => !/\p{Extended_Pictographic}/u.test(document.body.innerText)), 'sem emoji na mochila');
+  ok(!errs.length, 'sem erros JS ' + errs.slice(0, 2)); await b.close(); console.log(fail ? 'FALHOU' : 'TUDO OK'); process.exit(fail ? 1 : 0); })();
