@@ -147,7 +147,8 @@
   // ---------- navegação ----------
   const MORE_TABS = ['shop', 'center', 'bag', 'dex', 'card', 'saves', 'settings', 'daycare', 'quests', 'games', 'ach', 'safari', 'raid', 'legends', 'arena', 'house', 'style'];
   const moreOk = k => k !== 'daycare' || FEAT.daycare;
-  function go(t, s) { tab = t; sub = s || null; render(); window.scrollTo(0, 0); }
+  let navAt = 0;
+  function go(t, s) { navAt = Date.now(); tab = t; sub = s || null; render(); window.scrollTo(0, 0); }
   function render() {
     if (!S) return;
     const nav = [['home', '🏠', 'Início'], ['team', '🎒', 'Time'], ['maps', '🗺️', 'Mapas'], ['battle', '⚔️', 'Batalha'], ['more', '☰', 'Mais']];
@@ -165,6 +166,7 @@
     const fn = ACT[a]; if (fn) { e.preventDefault(); fn(b.dataset, b); }
   });
   ACT.tab = d => go(d.t);
+  function notice(msg, kind = '') { const wait = Math.max(0, navAt + 2200 - Date.now()); setTimeout(() => { if (Date.now() < navAt + 2200) return notice(msg, kind); toast(msg, (kind + ' notice').trim()); }, wait); }
   function toast(msg, kind = '') { const t = document.createElement('div'); t.className = 'toast ' + kind; t.innerHTML = msg; $('#toast-root').appendChild(t); setTimeout(() => t.classList.add('out'), 2600); setTimeout(() => t.remove(), 3100); }
   function modal(html, cls = '') { closeModal(); const m = document.createElement('div'); m.className = 'modal-bg'; m.innerHTML = `<div class="modal ${cls}">${html}</div>`;
     m.addEventListener('click', e => { if (e.target === m && !m.dataset.lock) closeModal(); }); $('#modal-root').appendChild(m); return m; }
@@ -491,7 +493,7 @@
     SFX.coin(); toast(`Comprou ${n}x ${x.name}!`, 'good'); save(); render(); };
   // v60: Ofertas do dia (só dinheiro do jogo) + pacotes
   const BUNDLES = [['b-ini', 'Kit Iniciante', [['poke-ball', 10], ['potion', 5]], 0.75, 0], ['b-cap', 'Kit Captura', [['great-ball', 10], ['ultra-ball', 3]], 0.8, 2], ['b-cura', 'Kit Cura', [['super-potion', 5], ['revive', 2]], 0.8, 3]];
-  function dayOffers() { const d = new Date(), key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; let h = 0; for (const c of key + (S.trainer || '')) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  function dayOffers() { const now = Date.now(); S.dayMax = Math.max(S.dayMax || 0, now); const d = new Date(Math.max(now, S.dayMax)), key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; let h = 0; for (const c of key + (S.trainer || '')) h = (h * 31 + c.charCodeAt(0)) >>> 0;
     const pool = C.SHOP.filter(x => S.badges.length >= x.req), out = [], used = new Set(); for (let i = 0; i < 3 && used.size < pool.length; i++) { h = (h * 1103515245 + 12345) >>> 0; let j = h % pool.length; while (used.has(j)) j = (j + 1) % pool.length; used.add(j); const off = [20, 25, 30][(h >>> 8) % 3]; out.push({ x: pool[j], off, pr: Math.max(1, Math.round(pool[j].price * (100 - off) / 100)) }); }
     const bundles = BUNDLES.filter(b => S.badges.length >= b[4] && b[2].every(([k]) => C.ITEM_NAME[k])).map(([id, n, items, f]) => { const full = items.reduce((a, [k, q]) => a + q * ((C.SHOP.find(x => x.id === k) || {}).price || 200), 0); return { id, n, items, full, pr: Math.round(full * f / 10) * 10 }; });
     return { key, items: out, bundles }; }
@@ -512,7 +514,7 @@
   const BAG_TABS = [['balls', 'Bolas', 'img/items/poke-ball.png'], ['meds', 'Remédios', 'img/items/potion.png'], ['battle', 'Batalha', 'img/items/fire-stone.png'], ['keys', 'Chaves', 'img/items/old-rod.png']];
   function bagCat(k) { if (PE.BALLS[k] || /-ball$/.test(k)) return 'balls'; if (/potion|restore|revive|heal|antidote|candy|-berry$|ether|elixir/.test(k)) return 'meds';
     if (/-stone$|ite(-[xy])?$|tera-shard|kings-rock|metal-coat|dragon-scale|up-grade/.test(k) && k !== 'tera-orb') return 'battle'; return 'keys'; }
-  let bagTab = null; A.bagCat = bagCat;
+  let bagTab = null; A.bagCat = bagCat; A.notice = (m, k) => notice(m, k);
   function vBag() {
     const it = Object.entries(S.bag).filter(([k, v]) => v > 0 && C.ITEM_NAME[k]), by = {}; BAG_TABS.forEach(([t]) => by[t] = []); it.forEach(x => by[bagCat(x[0])].push(x));
     if (!bagTab || !by[bagTab]) bagTab = (BAG_TABS.find(([t]) => by[t].length) || BAG_TABS[0])[0];
@@ -567,16 +569,17 @@
     const ex = audioSettings().slice(AS0().length), cut = ex.indexOf('<div class="setrow"><span>🧊'), exA = cut < 0 ? ex : ex.slice(0, cut), exB = cut < 0 ? '' : ex.slice(cut);
     return `<div class="card set62"><h3>⚙️ Configurações</h3>
       <h4 class="sgh">Som</h4>${srow('🔊', 'Efeitos sonoros', tog('set', st0.sound !== false, 'sound'))}${srow('🎵', 'Música', tog('setmus', mus))}
-      ${srow('', 'Volume da música', sld('mvol', 0, 0.6, 0.05, st0.mvol ?? 0.35, 'Volume da música'))}${srow('', 'Volume dos efeitos', sld('svol', 0, 1.2, 0.1, st0.svol ?? 0.8, 'Volume dos efeitos'))}${exA}
+      ${srow('🌿', 'Som ambiente', tog('ambmute', !st0.amute))}${srow('', 'Volume do ambiente', `<input type="range" id="ambvol" class="sld" min="0" max="100" step="5" value="${Math.round((st0.avol ?? 0.5) * 100)}" aria-label="Volume do som ambiente"${st0.amute ? ' disabled' : ''} style="--p:${Math.round((st0.avol ?? 0.5) * 100)}%">`)}
+      ${srow('', 'Volume da música', sld('mvol', 0, 0.6, 0.05, st0.mvol ?? 0.35, 'Volume da música'))}${srow('', 'Volume dos efeitos', sld('svol', 0, 1.2, 0.1, st0.svol ?? 0.8, 'Volume dos efeitos'))}
       <h4 class="sgh">Jogo</h4>${srow('🐾', 'Pokémon seguindo no mapa', tog('setfollow', st0.follow !== false))}${srow('📳', 'Vibração', tog('set', st0.vibe !== false, 'vibe'), 'Críticos, capturas e shinies (o iPhone não permite)')}
-      <div class="srow col"><div class="row between"><b>Velocidade da batalha</b><span class="chip" id="spdl">${SPEEDS[si][1]}</span></div>${sld('speed', 0, 3, 1, si, 'Velocidade da batalha')}<div class="sticks">${SPEEDS.map(x => `<small>${x[1]}</small>`).join('')}</div></div>${exB}
+      <div class="srow col"><div class="row between"><b>Velocidade da batalha</b><span class="chip" id="spdl">${SPEEDS[si][1]}</span></div>${sld('speed', 0, 3, 1, si, 'Velocidade da batalha')}<div class="sticks">${SPEEDS.map(x => `<small>${x[1]}</small>`).join('')}</div></div>${exB ? (() => { const g = st0.g3d === undefined ? 'auto' : String(st0.g3d); return `<div class="srow col"><b>Gráficos 3D</b><div class="seg2" role="radiogroup">${[['auto', 'Auto'], ['true', 'Ligado'], ['false', 'Desligado']].map(([v, l]) => `<button role="radio" aria-checked="${g === v}" class="${g === v ? 'on' : ''}" data-a="setg3d" data-v="${v}">${l}</button>`).join('')}</div><small class="mut">Auto liga o 3D só em aparelhos que aguentam.</small></div>`; })() : ''}
       <h4 class="sgh">Conta</h4><button class="btn wide ghost" data-a="lock">🔒 Bloquear site neste aparelho</button></div>
       <div class="card"><h3>🎁 Código de presente</h3><p class="mut small">Tem um código? Digite aqui para receber o presente (cada código vale uma vez por conta).</p>
       <form id="giftForm" class="row gift"><input id="giftCode" autocapitalize="characters" autocomplete="off" placeholder="XXXX-XXXX" aria-label="Código de presente"><button class="btn primary">Resgatar</button></form><p id="giftErr" class="err"></p></div>
       <div class="card"><h3>🛟 Recuperar Pokémon</h3><p class="mut small">Sumiu algum Pokémon? Procura nas cópias de segurança deste aparelho e devolve para o PC. Não apaga nada.</p><button class="btn wide" data-a="recover">🔎 Procurar Pokémon perdidos</button></div>`;
   }
   document.addEventListener('input', e => { const t = e.target; if (!t.classList || !t.classList.contains('sld') || !S) return; const k = t.dataset.k, v = +t.value;
-    t.style.setProperty('--p', (v - +t.min) / (+t.max - +t.min) * 100 + '%');
+    t.style.setProperty('--p', (v - +t.min) / (+t.max - +t.min) * 100 + '%'); if (!k) return;
     if (k === 'speed') { S.settings.speed = SPEEDS[v][0]; const l = document.getElementById('spdl'); if (l) l.textContent = SPEEDS[v][1]; } else { S.settings[k] = v; if (k === 'mvol') MUS.refresh(); } });
   document.addEventListener('change', e => { const t = e.target; if (t.classList && t.classList.contains('sld') && S) { save(); if (t.dataset.k === 'svol' && SFX.coin) SFX.coin(); } });
   // ---------- recuperação de Pokémon (lê backups; só ADICIONA ao PC) ----------
@@ -1005,6 +1008,9 @@
     addItems(r); save(); SFX.caught();
     modal(`<div class="center badgewin"><div class="bigbadge megab">${r['shiny-charm'] ? itemImg('shiny-charm') : '🏅'}</div><h2>Marco de ${dmN(k)} capturados!</h2><p>${rewardText(r)}</p>${r['shiny-charm'] ? '<p class="mut small">O Amuleto Brilhante triplica a chance de shiny!</p>' : ''}${r['super-rod'] ? '<p class="mut small">Agora você pode pescar os Pokémon mais raros!</p>' : ''}<button class="btn primary wide" data-a="close">Oba!</button></div>`); render(); };
 
+  { const _dc = ACT.dexclaim; ACT.dexclaim = d => { const open = !!document.querySelector('#modal-root .dexrwm'); _dc(d); if (!open || +d.k === 1025 || d.k === 'all') return;
+    const m = document.querySelector('#modal-root .modal'), won = m ? (m.querySelector('h2') || {}).innerHTML + ' ' + ((m.querySelector('p') || {}).innerHTML || '') : '';
+    ACT.dexrw(); const mm = document.querySelector('#modal-root .dexrwm'); if (mm && won) mm.insertAdjacentHTML('afterbegin', `<div class="dxwon">${won}</div>`); render(); }; }
   // ---------- shiny: efeito de encontro ----------
   SFX.shiny = () => { [1319, 1568, 1976, 2637, 3136].forEach((f, i) => tone(f, 0.18, 'sine', 0.06, i * 0.08)); [659, 988].forEach((f, i) => tone(f, 0.5, 'triangle', 0.05, 0.4 + i * 0.12)); };
   function shinyBurst() { const ov = document.createElement('div'); ov.className = 'shinyburst'; ov.innerHTML = '<b>✨ SHINY! ✨</b>' + '<i></i>'.repeat(14); ($('#battle') || document.body).appendChild(ov); setTimeout(() => ov.remove(), 2200); }
@@ -2571,7 +2577,7 @@
   function raidRestore() { try { if (!S || !S.trainer) return 0; S.fixes = S.fixes || {}; if (S.fixes.raid44) return 0;
     const r = raidState(), had = { used: r.used || 0, done: Object.keys(r.done || {}).length };
     r.used = 0; r.done = {}; r.extra = (r.extra || 0) + RAID_PER_DAY; S.fixes.raid44 = Date.now(); save();
-    setTimeout(() => { try { toast('⬣ Evento Dinamax restaurado! +' + RAID_PER_DAY + ' raides extras hoje 🎁'); } catch (e) {} }, 1200); return had; } catch (e) { return 0; } }
+    setTimeout(() => { try { notice('⬣ Evento Dinamax restaurado! +' + RAID_PER_DAY + ' raides extras hoje 🎁'); } catch (e) {} }, 1200); return had; } catch (e) { return 0; } }
   A.raidRestore = raidRestore;
   { const _render = render; render = function () { const r = _render.apply(this, arguments); try { raidRestore(); } catch (e) {} return r; }; }
   // ===== Lendas de Paldea =====
@@ -2707,7 +2713,7 @@
     if (tr) { tr.addEventListener('scroll', () => { const i = Math.round(tr.scrollLeft / Math.max(1, tr.clientWidth)); dots.forEach((d, k) => d.classList.toggle('on', k === i)); }, { passive: true });
       clearInterval(A._nw); if (!RMOT()) A._nw = setInterval(() => { if (!document.body.contains(tr)) return clearInterval(A._nw); if (tr.matches(':hover') || tr._touch) return; const n = tr.children.length, i = (Math.round(tr.scrollLeft / tr.clientWidth) + 1) % n; tr.scrollTo({ left: i * tr.clientWidth, behavior: 'smooth' }); }, 5000);
       tr.addEventListener('touchstart', () => { tr._touch = 1; }, { passive: true }); }
-    if (raidNew() && A._raidT !== dayKey()) { A._raidT = dayKey(); setTimeout(() => { try { toast('⬣ Raide nova disponível! Veja em Mais → Raides.', 'good'); } catch (e) {} }, 900); } }
+    if (raidNew() && A._raidT !== dayKey()) { A._raidT = dayKey(); setTimeout(() => { try { notice('⬣ Raide nova disponível! Veja em Mais → Raides.', 'good'); } catch (e) {} }, 900); } }
   { const _render = render; render = function () { const r = _render.apply(this, arguments); try { homeApp(); } catch (e) {} return r; }; }
   // cartão compartilhável (canvas PNG)
   const ldImg = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; });

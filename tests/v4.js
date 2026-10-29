@@ -39,10 +39,10 @@ const URL = process.argv[2] || 'http://127.0.0.1:18473/', OUT = '/workspace/poke
     await p.click('[data-a="fish"]'); await p.waitForTimeout(300); ok(await ev(() => PokeApp.debug.S.bag['old-rod'] === 1), `${tag} ganhou Vara Velha`);
     await p.click('.modal [data-a="fish"]'); await p.waitForTimeout(500); await shot('fish-wait');
     await p.waitForSelector('#bite:not(.hidden)', { timeout: 9000 }); await p.waitForTimeout(150); await p.screenshot({ path: `${OUT}${tag}-v4-fish-bite.png` }); await p.click('#fishBtn');
-    await p.waitForTimeout(3500); ok(await ev(() => !!PokeApp.debug.B && PokeApp.debug.S.stats.fished === 1), `${tag} fisgou e iniciou batalha`); await shot('fish-battle');
+    await p.waitForFunction(() => !!PokeApp.debug.B && PokeApp.debug.S.stats.fished === 1, null, { timeout: 12000 }).catch(() => {}); ok(await ev(() => !!PokeApp.debug.B && PokeApp.debug.S.stats.fished === 1), `${tag} fisgou e iniciou batalha`); await shot('fish-battle');
     await busy(); await ev(() => { PokeApp.debug.closeBattle(); }); await p.waitForTimeout(500);
     // cedo demais
-    await ev(() => PokeApp.debug.go('explore', 'cerulean')); await p.click('[data-a="fish"]'); await p.waitForTimeout(200); await p.click('#fishBtn'); ok((await p.textContent('#fishT')).includes('Cedo'), `${tag} puxar cedo falha`); await clr();
+    await ev(() => { document.querySelector('#modal-root').innerHTML = ''; PokeApp.debug.go('explore', 'cerulean'); }); await p.waitForTimeout(300); await ev(() => document.querySelector('#modal-root').innerHTML = ''); await p.click('[data-a="fish"]'); await p.waitForSelector('#fishBtn'); await p.waitForTimeout(200); await p.click('#fishBtn'); ok((await p.textContent('#fishT')).includes('Cedo'), `${tag} puxar cedo falha`); await clr();
     // loja de varas
     await ev(() => { PokeApp.debug.S.money = 50000; PokeApp.debug.go('shop'); }); await p.click('[data-a="buyrod"][data-id="good-rod"]'); ok(await ev(() => PokeApp.debug.S.bag['good-rod'] === 1), `${tag} comprou Vara Boa`);
     // 4b. Quiz
